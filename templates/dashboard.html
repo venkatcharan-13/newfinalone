@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="../static/dashboard.css">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+	<!-- JavaScript Bundle with Popper -->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" 
+	integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" 
+	crossorigin="anonymous"></script>
+	<title>Dashboard</title>
+</head>
+
+<body>
+	<h1>JordenSky</h1>
+	<div class="sidenav">
+		<a href="/" class="current">Home</a>
+		<a href="/accounts">Accounts</a>
+		<a href="/analytics">Analytics</a>
+		<a href="/taxes">Taxes</a>
+		<a href="/help">Help</a>
+		<a href="/profile">Profile</a>
+	</div>
+	<div class="main">
+		<h2>JordenSky</h2>
+		<div class="month-dropdown">
+			<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+				Select Month
+			</button>
+			<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+				<li><a class="dropdown-item" href="#">January</a></li>
+				<li><a class="dropdown-item" href="#">February</a></li>
+				<li><a class="dropdown-item" href="#">March</a></li>
+				<li><a class="dropdown-item" href="#">April</a></li>
+			</ul>
+		</div>
+		<div class="accordion" id="accordionExample">
+			<div class="accordion-item">
+				<h2 class="accordion-header" id="headingOne">
+					<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+						Your books for the month of July is cooked and ready to be served.
+					</button>
+				</h2>
+				<div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+					<div class="accordion-body">
+						<ul class="list-group">
+							<li class="list-group-item active">Level 1 - Month yet to be completed</li>
+							<li class="list-group-item active">Level 2 - Document Submitted</li>
+							<li class="list-group-item">Level 3 - Accounting Completed, Pending review</li>
+							<li class="list-group-item">Level 4 - Review done, pending Actionables</li>
+							<li class="list-group-item">Level 5 - Actionables closed, Accounts ready to be dispatched</li>
+							<li class="list-group-item">Level 6 - Accounts dispatched</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="accordion-item">
+				<h2 class="accordion-header" id="headingTwo">
+					<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+						Pending Actionables from your end for this month
+					</button>
+				</h2>
+				<div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+					<div class="accordion-body">
+						<table class="table">
+							<thead>
+								<tr>
+									<th scope="col">#</th>
+									<th scope="col">Pending Points</th>
+									<th scope="col">Client Remarks</th>
+									<th scope="col">Status</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for point in pending_points %}
+								<tr>
+									<th scope="row">{{ forloop.counter }}</th>
+									<td>{{point.point}}</td>
+									<td>
+										<div class="input-group">
+											<input type="text" class="form-control" aria-label="Remark"></input>
+										</div>
+									</td>
+									<td>
+										<div class="form-check">
+											<input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+										</div>
+									</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="accordion-item">
+				<h2 class="accordion-header" id="headingThree">
+					<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+						Things to watch out this month
+					</button>
+				</h2>
+				<div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+					<div class="accordion-body">
+						<table class="table">
+							<thead>
+								<tr>
+									<th scope="col">#</th>
+									<th scope="col">Points</th>
+									<th scope="col">Remarks</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for point in watch_out_points %}
+								<tr>
+									<th scope="row">{{ forloop.counter }}</th>
+									<td>{{point.point}}</td>
+									<td>
+										<div class="input-group">
+											<input type="text" class="form-control" aria-label="Remark"></input>
+										</div>
+									</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="accordion-item">
+				<h2 class="accordion-header" id="headingFour">
+					<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+						Statutory Compliances Due Dates for this Month
+					</button>
+				</h2>
+				<div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
+					<div class="accordion-body">
+						<strong>This is the fourth item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>
