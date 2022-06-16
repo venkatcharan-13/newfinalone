@@ -1,6 +1,6 @@
 from django.contrib import admin
-from home.models import PendingActionables, WatchOut
+from home.models import PendingActionable, WatchOutPoint
 
 # Register your models here.
-admin.site.register(PendingActionables)
-admin.site.register(WatchOut)
+admin.site.register(PendingActionable)
+admin.site.register(WatchOutPoint)
