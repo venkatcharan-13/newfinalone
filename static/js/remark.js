@@ -6,11 +6,12 @@ function add_actionable_remark(pk) {
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify({actionRemark: remark_val}),
         dataType: 'json',
+    }).done(function (data) {
+        console.log("Success");
+        document.location.reload();
+    }).fail(function (error) {
+        console.log("error");
     });
-    // $.post("add_remark/" + pk + "/", {
-    //     rkey: String(remark_val)
-    // },"json");
-    document.location.reload();
 }
 
 function add_watchout_remark(pk) {
@@ -21,6 +22,12 @@ function add_watchout_remark(pk) {
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify({watchoutRemark: remark_val}),
         dataType: 'json',
+        success: function(data) {
+            console.log("Remark added");
+            document.location.reload();
+        },
+        error: function (error) {
+            console.log(error);
+        }
     });
-    document.location.reload();
 }

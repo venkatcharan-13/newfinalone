@@ -23,5 +23,6 @@ admin.site.index_title = "Welcome to JordenSky Admin Portal"
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('home.urls')),
-    path('analytics/', include('analytics.urls'))
+    path('analytics/', include('analytics.urls')),
+    path('accounts/', include('accounts.urls'))
 ]

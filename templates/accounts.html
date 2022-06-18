@@ -1,0 +1,315 @@
+{% extends 'accounts_base.html' %}
+{% block title %}Profit and Loss{% endblock title %}
+{% block body %}
+<div class="box" style="margin-top: 20px;">
+  <table class="table" style="border-style: dotted;">
+    <p>Profit & Loss Statement {{ data.chartLabel }} will help you understand the current book financial position of the company for the
+      period selected. (we can change)
+    </p>
+  </table>
+</div>
+
+<table class="table " style="width:100%;margin-top:20px;">
+  <thead>
+    <tr>
+      <th scope=" col ">Sales </th>
+      <th scope="col "> COGS </th>
+      <th scope="col "> Gross Profit </th>
+      <th scope="col "> Expenses</th>
+      <th scope="col "> Profit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <td>INR 6.2 Lacs</td>
+    <td>INR 3.1 Lacs</td>
+    <td>INR 3.1 Lacs</td>
+    <td>INR 2.1 Lacs</td>
+    <td>INR 1.0 Lacs</td>
+  </tbody>
+</table>
+
+<button class="btn" id="print" style="margin-top: 0px;"><i class="fa fa-print"></i> </button>
+<button class="btn"><i class="fa fa-share-alt"></i> </button>
+<button class="btn" id="download" onclick="download()"><i class="fa fa-cloud-download"></i> </button>
+
+<button class="btn btn-success btn-lg float-right" id="button" type="submit" style="margin-top:40px; display:block">
+  Add Note
+</button>
+
+<div class="btn-group" role="group" aria-label="Basic example" style="margin-top:20px;">
+  <button type="button" type="button" id="expbtn" aria-expanded="false"
+    onclick="expan(this.id,'#i1,#i2,#e1,#e3,#e3,#e4,#e5,#e6,#eb1,#et1,#subrow1,#subrow2,#subcgs1,#subcgs2,#subcgs3,#subcgs4,#subue1,#subue2,#subue3,#subrr1,#subrr2,#subrr3,#subgac1,#subgac2,#subgac3,#subgac4,#subgac5,#subgac6,#subgac7,#subgac8');"
+    Style=" width:70px; background-color:  blue;color:white;border-radius: 10px;text-align: center;margin: 5px;">Expand</button>
+  <button type="button" type="button" id="colbtn" aria-expanded="false"
+    onclick="collap(this.id,'#i1,#i2,#e1,#e3,#e3,#e4,#e5,#e6,#eb1,#et1,#subrow1,#subrow2,#subcgs1,#subcgs2,#subcgs3,#subcgs4,#subue1,#subue2,#subue3,#subrr1,#subrr2,#subrr3,#subgac1,#subgac2,#subgac3,#subgac4,#subgac5,#subgac6,#subgac7,#subgac8');"
+    style=" width:70px; background-color:  blue;color:white;border-radius: 10px;text-align: center;margin: 5px;">Collapse</button>
+</div>
+
+<table class="table table-hover table-borderless "
+  style="width:100%; margin-top:5px;border:none; border-collapse: collapse; ">
+  <thead>
+    <tr>
+      <th style="width: 280px;"></th>
+      <th>current Period</th>
+      <th>% </th>
+      <th>Previous Period </th>
+      <th>%</th>
+      <th>%change</th>
+      <th>Avg Last 3 Months</th>
+
+    </tr>
+
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <a style="color:blue;" type="button" id="row1" aria-expanded="false"
+          onclick="toggle(this.id,'#subrow1,#subrow2');" aria-controls="subrow1 subrow2" aria-label="2 more from">
+          <ion-icon name="add-circle"></ion-icon>
+        </a>
+        <a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Income </a>
+
+      </td>
+    </tr>
+    <tr id="subrow1" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Direct Income</a></td>
+    </tr>
+    <tr class="hidden" id="subrow2">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Indirect Income</td>
+    </tr>
+
+    <tr>
+      <td id="i2" class="hidden">
+        <a style="color:blue;" type="button" id="row1" aria-expanded="false"
+          onclick="toggle(this.id,'#subcgs1,#subcgs2,#subcgs3,#subcgs4');" aria-controls="subrow1 subrow2"
+          aria-label="2 more from">
+          <ion-icon name="add-circle"></ion-icon>
+        </a>
+        <a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Costs of Goods Sold </a>
+
+      </td>
+    </tr>
+    <tr id="subcgs1" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Labour</a></td>
+    </tr>
+    <tr class="hidden" id="subcgs2">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Material </td>
+    </tr>
+    <tr id="subcgs3" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Discounts</a></td>
+    </tr>
+    <tr class="hidden" id="subcgs4">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Transportation Cost </td>
+    </tr>
+
+
+    <tr>
+      <th colspan="3 ">Gross Profit <ion-icon name="information-circle-outline" style="position: center;"></ion-icon>
+      </th>
+    </tr>
+
+    <tr>
+      <th>
+        <a style="color:blue;" type="button" id="ue1" aria-expanded="false"
+          onclick="toggle(this.id,'#e1,#e2,#e3,#e4,#e5,#e6');"
+          aria-controls="EDENS01b EDENS02b EDENS03b EDENS04b EDENS05b" aria-label="5 more from"
+          aria-labelledby="btnEDENSb lblEDENSb">
+          <ion-icon name="add-circle"></ion-icon>
+        </a>
+        <a type="button">Expenses </a>
+      </th>
+    </tr>
+    <tr id="e1" class="hidden">
+      <td>
+        <a style="color:blue;" type="button" id="ue1" aria-expanded="false"
+          onclick="toggle(this.id,'#subue1,#subue2,#subue3');"
+          aria-controls="EDENS01b EDENS02b EDENS03b EDENS04b EDENS05b" aria-label="5 more from"
+          aria-labelledby="btnEDENSb lblEDENSb">
+          <ion-icon name="add-circle"></ion-icon>
+        </a>
+        <a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Employment Expenses</a>
+      </td>
+    </tr>
+    <tr id="subue1" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Salary & Wages</a></td>
+    </tr>
+    <tr id="subue2" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Director Remuneration </a></td>
+    </tr>
+    <tr id="subue3" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Other Employee related expenses</a></td>
+    </tr>
+    <tr id="e2" class="hidden">
+      <td>
+        <a style="color:blue;" type="button" id="rr1" aria-expanded="false"
+          onclick="toggle(this.id,'#subrr1,#subrr2,#subrr3'); nonscroll()"
+          aria-controls="EDENS01b EDENS02b EDENS03b EDENS04b EDENS05b" aria-label="5 more from"
+          aria-labelledby="btnEDENSb lblEDENSb">
+          <ion-icon name="add-circle"></ion-icon>
+        </a>
+        <a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Rent , Rates & Repair Expenses</a>
+      </td>
+    </tr>
+    <tr id="subrr1" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()"> Rent Expenses</td></a>
+    </tr>
+    <tr id="subrr2" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Utilities Expenses</a></th>
+    </tr>
+    <tr id="subrr3" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup() ">Repairs & Maintenance Expenses</a></td>
+    </tr>
+
+
+    <tr id="e3" class="hidden">
+      <td>
+        <a style="color:blue;" type="button" id="oe1" aria-expanded="false"
+          onclick="toggle(this.id,'#subgac1,#subgac2,#subgac3,#subgac4,#subgac5,#subgac6,#subgac7,#subgac8');"
+          aria-controls="EDENS01b EDENS02b EDENS03b EDENS04b EDENS05b" aria-label="5 more from"
+          aria-labelledby="btnEDENSb lblEDENSb">
+          <ion-icon name="add-circle"></ion-icon>
+        </a>
+        <a style="color:blue;" type="button" id="btn1" onclick="openPopup()">General & Admin Chargess</a>
+      </td>
+    </tr>
+    <tr id="subgac1" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Bank fees & charges</a></td>
+    </tr>
+    <tr id="subgac2" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Insurance Expenses</a></td>
+    </tr>
+    <tr id="subgac3" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">IT and Internet Expenses</a></td>
+    </tr>
+    <tr id="subgac4" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Office Expensess</a></td>
+    </tr>
+    <tr id="subgac5" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Legal & Professional fees</a></td>
+    </tr>
+    <tr id="subgac6" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Training Expenses</a></td>
+    </tr>
+    <tr id="subgac7" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Other Expenses</a></td>
+    </tr>
+    <tr id="subgac8" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Travel & Hotel Stay Expenses</a></td>
+    </tr>
+    <tr id="e4" class="hidden">
+      <td>
+        <a href="#" style="color:blue;" type="button" id="btn1" onclick="openPopup()"> Tax Expenses</a>
+      </td>
+    </tr>
+    <tr id="e5" class="hidden">
+      <td>
+        <a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Advertising And Marketing</a>
+      </td>
+    </tr>
+    <tr id="e6" class="hidden">
+      <td>
+        <a style="color:blue;" type="button" id="btn1" onclick="openPopup()"> Brokerage & Commission Charges</a>
+      </td>
+    </tr>
+
+    <tr>
+      <th>
+        <a style="color:blue;" type="button" id="oe1" aria-expanded="false" onclick="toggle(this.id,'#eb1');"
+          aria-controls="EDENS01b EDENS02b EDENS03b EDENS04b EDENS05b" aria-label="5 more from"
+          aria-labelledby="btnEDENSb lblEDENSb">
+          <ion-icon name="add-circle"></ion-icon>
+        </a>
+        <a type="button">EBITDA</a>
+      </th>
+    </tr>
+    <tr id="eb1" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Interest Expenses</a></td>
+    </tr>
+
+    <tr>
+      <th>
+        <a style="color:blue;" type="button" id="oe1" aria-expanded="false" onclick="toggle(this.id,'#et1');"
+          aria-controls="EDENS01b EDENS02b EDENS03b EDENS04b EDENS05b" aria-label="5 more from"
+          aria-labelledby="btnEDENSb lblEDENSb">
+          <ion-icon name="add-circle"></ion-icon>
+        </a>
+        <a type="button">EBTD</a>
+      </th>
+    </tr>
+    <tr id="et1" class="hidden">
+      <td><a style="color:blue;" type="button" id="btn1" onclick="openPopup()">Depreciation expenses </a></td>
+    </tr>
+
+    <tr>
+      <th>EBT
+        <ion-icon name="information-circle-outline" style="position: center;"></ion-icon>
+      </th>
+    </tr>
+
+  </tbody>
+  <tfoot>
+    <tr>
+      <th colspan="2 ">Net Profit/Loss
+        <ion-icon name="information-circle-outline" style="position: center;"></ion-icon>
+      </th>
+    </tr>
+  </tfoot>
+</table>
+
+
+<div class="bg-model ">
+  <div class="model-content ">
+    <h3>Notes</h3>
+    <form action=" ">
+      <textarea required row="100 " placeholder="Write here..... " class="texting"></textarea>
+      <button class="btn btn-success btn-lg float-left" type="submit" style="margin-right: 20px;">
+        Submit
+      </button>
+    </form>
+
+    <button class="btn btn-success btn-lg float-right" id="close" type="submit" style="margin-left: 20px;">
+      Close
+    </button>
+  </div>
+</div>
+<div class="vl "></div>
+
+<div class="bg-model1">
+  <div class="model-content1">
+    <button class="btn btn-success btn-lg float-right" id="notesbutton" type="submit"
+      style="margin-left: 400px;margin-top: 30px;margin-right: 10px; padding-bottom: 10px;">
+      Add Note
+    </button>
+
+    <div>
+      <table class="table table-hover table-borderless " style="size:relative;margin-left:5px;">
+        <thead>
+          <tr>
+            <th> Status Missing</th>
+            <th> Name of Vendor </th>
+            <th>current Period</th>
+            <th>Previous Period </th>
+            <th>%change</th>
+            <th>Avg 3 Months</th>
+          </tr>
+
+        </thead>
+        <tbody>
+          <tr>
+            <td>New</td>
+          </tr>
+          <tr>
+            <td>Regular</td>
+          </tr>
+          <tr>
+            <td>Irregular</td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn btn-success btn-lg float-right" id="closebutton" type="submit" style="padding-right: 30px;">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock body %}

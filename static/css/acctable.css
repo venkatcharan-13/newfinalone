@@ -1,0 +1,297 @@
+body {
+    margin: 0;
+    background-color: lightsteelblue;
+    font-family: "Work Sans";
+    overflow: scroll;
+}
+
+
+/* pop for info*/
+
+.infor .tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.infor .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.infor .tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.infor .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+/* for side navigation bar  dashboard.html*/
+
+.container {
+    width: 80%;
+    margin: 0 atuo;
+}
+
+nav {
+    float: right;
+}
+
+.sidenav {
+    height: 100%;
+    width: 200px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    padding-top: 40px;
+}
+
+.sidenav a {
+    padding: 20px 6px 6px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+}
+
+.sidenav a:hover {
+    color: #f6f6f6;
+}
+
+.sidenav .current {
+    color: #f6f6f6;
+}
+
+.main {
+    margin-left: 250px;
+    margin-right: 50px;
+    width: 60%;
+}
+
+.month-dropdown {
+    margin: 15px 0px 15px 0px;
+}
+
+.main .accordion .accordion-item {
+    margin-bottom: 40px;
+    border: 1px solid rgb(0, 0, 0);
+}
+
+li.list-group-item {
+    margin-bottom: 15px;
+    border: 1px black solid !important;
+}
+
+.collapsible {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+}
+
+.content {
+    padding: 0 18px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+    background-color: #f1f1f1;
+}
+
+.vl {
+    border-left: 6px solid lightgreen;
+    height: 1900px;
+    position: absolute;
+    left: 14%;
+    margin-left: -3px;
+    top: 5px;
+}
+
+
+/* now for adding notes*/
+
+.bg-model {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    position: absolute;
+    top: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.model-content {
+    width: 500px;
+    height: 270px;
+    background-color: white;
+    border: 5px solid black;
+    align-items: center;
+    position: absolute;
+}
+
+h3 {
+    width: 30%;
+    color: whitesmoke;
+    margin-top: 25px auto;
+    margin-left: 10px;
+    text-align: center;
+}
+
+.texting {
+    width: 90%;
+    margin: 10px;
+    border: 3px solid black;
+    outline: #222;
+    background-color: lightgrey;
+    padding: 45px;
+    margin-bottom: 0px;
+    margin-left: 5%;
+}
+
+.texting:focus {
+    background-color: lightskyblue;
+}
+
+input {
+    background-color: white;
+    color: black;
+    width: 20%;
+    position: right;
+    margin-left: 20px;
+    cursor: pointer;
+}
+
+input:focus {
+    background-color: black;
+    color: white;
+}
+
+.close {
+    position: absolute;
+    top: 0;
+    right: 14px;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+    text-align: center
+}
+
+
+/* completed notes part*/
+
+
+/* notes display here*/
+
+.noteshere {
+    width: 75%;
+    height: auto;
+    margin-left: 250px;
+    border: #2cc16a;
+    border-style: dashed;
+}
+
+
+/*for popup winows*/
+
+.bg-model1 {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    position: absolute;
+    top: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    -ms-scroll-chaining: chained;
+}
+
+.model-content1 {
+    width: 1100px;
+    height: 350px;
+    margin-left: 25px;
+    margin-right: 5px;
+    background-color: white;
+    border: 5px solid black;
+    align-items: center;
+    position: absolute;
+}
+
+
+/* endoing of popups*/
+
+.labels tr td {
+    background-color: #2cc16a;
+    font-weight: bold;
+    color: #fff;
+}
+
+.label tr td label {
+    display: block;
+}
+
+[data-toggle="toggle"] {
+    display: none;
+}
+
+tr.hidden {
+    display: none;
+}
+
+
+/* details transactions*/
+
+.topsec {
+    text-align: center;
+    font-family: joan;
+    text-size-adjust: 500px;
+    display: block;
+    font-size: 5px;
+    margin-top: 10%;
+}
+
+.heading {
+    text-align: center;
+    font-family: joan;
+    text-size-adjust: 500px;
+    display: block;
+    font-size: 20px;
+    padding-bottom: -10px;
+}
+
+.heading2 {
+    font-weight: 800;
+}
+
+li {
+    font-size: 20px;
+}

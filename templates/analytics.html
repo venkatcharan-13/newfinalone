@@ -1,13 +1,41 @@
 {% extends 'analytics_base.html' %}
 {% block title %}MIS Report{% endblock title %}
 {% block body %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"></script>
+  <script src="../static/js/report.js"></script>
   <h1>Graphs</h1>
   <div class="container">
-    <div class="row row-cols-2">
-      <div class="col">Column</div>
-      <div class="col">Column</div>
-      <div class="col">Column</div>
-      <div class="col">Column</div>
+    <div class="row mb-5">
+      <div class="col-6">
+        <canvas id="graph1"></canvas>
+      </div>
+      <div class="col-6">
+        <canvas id="graph2"></canvas>
+      </div>
+    </div>
+    <div class="row mb-5">
+      <div class="col-6">
+        <canvas id="graph3"></canvas>
+      </div>
+      <div class="col-6">
+        <canvas id="graph4"></canvas>
+      </div>
+    </div>
+    <div class="row mb-5">
+      <div class="col-6">
+        <canvas id="graph5"></canvas>
+      </div>
+      <div class="col-6">
+        <canvas id="graph6"></canvas>
+      </div>
+    </div>
+    <div class="row mb-5">
+      <div class="col-6">
+        <canvas id="graph7"></canvas>
+      </div>
+      <div class="col-6">
+        <canvas id="graph8"></canvas>
+      </div>
     </div>
   </div>
 {% endblock body %}
