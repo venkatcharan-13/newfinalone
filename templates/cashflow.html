@@ -1,0 +1,101 @@
+{% extends 'accounts_base.html' %}
+{% block title %}Cashflow{% endblock title %}
+{% block active3 %}active{% endblock active3 %}
+{% block body %}
+<div class="box" style="margin-top: 20px;">
+  <table class="table" style="border-style: dotted;">
+    <h2>Cashflow</h2>
+  </table>
+</div>
+
+<!-- <table class="table " style="width:100%;margin-top:20px;">
+  <thead>
+    <tr>
+      <th scope="col"> CFO </th>
+      <th scope="col"> CFI </th>
+      <th scope="col"> CFF </th>
+      <th scope="col"> Cash & Bank </th>
+    </tr>
+  </thead>
+  <tbody>
+    <td>INR 6.2 Lacs</td>
+    <td>INR 3.1 Lacs</td>
+    <td>INR 3.1 Lacs</td>
+    <td>INR 2.1 Lacs</td>
+  </tbody>
+</table> -->
+
+<table class="table table-striped table-bordered" id="cashflow">
+  <thead>
+    <tr>
+      <th scope="col" style="width: 40%;">ACCOUNT</th>
+      <th scope="col" style="width: 20%; text-align: right;">Current</th>
+      <th scope="col" style="width: 20%; text-align: right;">Previous</th>
+      <th scope="col" style="width: 20%; text-align: center;">% Change</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr id="beg_cash_bal">
+    </tr>
+    <tr>
+      <td colspan="5"></td>
+    </tr>
+    <tr>
+      <th scope="row" colspan="5">A. Cash Flow from Operating Activities</th>
+    </tr>
+    <tr>
+      <td colspan="5">
+        <table class="table mb-0" id="cashflowA">
+          <tbody>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+    <tr id="netA">
+    </tr>
+    <tr>
+      <td colspan="5"></td>
+    </tr>
+    <tr>
+      <th scope="row" colspan="5">B. Cash Flow from Investing Activities</th>
+    </tr>
+    <tr>
+      <td colspan="5">
+        <table class="table mb-0" id="cashflowB">
+          <tbody>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+    <tr id="netB">
+    </tr>
+    <tr>
+      <td colspan="5"></td>
+    </tr>
+    <tr>
+      <th scope="row" colspan="5">C. Cash Flow from Financing Activities</th>
+    </tr>
+    <tr>
+      <td colspan="5">
+        <table class="table mb-0" id="cashflowC">
+          <tbody>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+    <tr id="netC">
+    </tr>
+    <tr>
+      <td colspan="5"></td>
+    </tr>
+    <tr id="netABC">
+    </tr>
+    <tr>
+      <td colspan="5"></td>
+    </tr>
+    <tr id="endbal">
+    </tr>
+  </tbody>
+</table>
+
+{% endblock body %}
