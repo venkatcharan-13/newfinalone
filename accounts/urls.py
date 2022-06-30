@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path('', views.accounts, name='accounts'),
+    path('pnl/<str:account>/', views.pnl_transaction, name='transactions'),
     path('api/pnlData/', views.PnlData.as_view()),
     path('balance_sheet/', views.balsheet, name='balsheet'),
     path('balance_sheet/api/balsheetData/', views.BalanceSheetData.as_view()),

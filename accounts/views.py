@@ -3,17 +3,42 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 import locale
 from django.shortcuts import render
-from accounts.models import ZohoAccount, ZohoTransaction
+from utility import acc_util, jsonobj
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from accounts.models import ZohoAccount, ZohoTransaction
+from django.db.models import Sum, Count
+from django.db.models.functions import Round
 
 locale.setlocale(locale.LC_ALL, 'en_IN.utf8')
-SELECTED_DATE = date(2022, 5, 31)
+SELECTED_DATE = date(2022, 6, 30)
 pnl_pbt = {
     'current': 0,
     'previous': 0,
     'per_change': 0
 }
+pnl_dep_exp = {
+    'current': 0,
+    'previous': 0,
+    'per_change': 0
+}
+cashflow_accounts = (
+    'Bank Balance',
+    'Cash Balance',
+    'Accounts Receivable',
+    'Other Current Assets',
+    'Other Non Current Assets',
+    'Trade Payables',
+    'Other long term Liabilities & Provisions',
+    'Other Liabilities',
+    'Other Current Liabilities & Provisions',
+    'Tangible Assets',
+    'Short Term Loans & Advances',
+    'Long Term Loans & Advances',
+    'Short-term borrowings',
+    'Long Term Borrowing',
+    'Share Capital'
+)
 
 # Create your views here.
 
@@ -30,16 +55,29 @@ def cashflow(request):
     return render(request, 'cashflow.html')
 
 
+def pnl_transaction(request, account):
+
+    # Fetching PNL transactions for each payee related to an account
+    response_data, totals = acc_util.fetch_pnl_transactions(SELECTED_DATE, account)
+
+    context = {
+        'account': account,
+        'response_data': response_data,
+        'totals': totals
+    }
+    return render(request, 'pnl_trans.html', context)
+
+
 class PnlData(APIView):
     authentication_classes = []
     permission_classes = []
 
     # Fetching accounts and transactions from database
-    pnl_accounts_data = ZohoAccount.objects.filter(
-        account_type__in=['income', 'expense', 'other_expense', 'cost_of_goods_sold'])
-    transactions_data = ZohoTransaction.objects.filter(
-        transaction_date__gte=SELECTED_DATE + relativedelta(months=-3), transaction_date__lte=SELECTED_DATE
-    ).all()
+    pnl_accounts_data, transactions_data = acc_util.fetch_data_from_db(
+        'pnl',
+        SELECTED_DATE,
+        ['income', 'expense', 'other_expense', 'cost_of_goods_sold']
+    )
 
     def get(self, request, format=None):
         accounts_map, transactions_map = {}, {}
@@ -72,18 +110,7 @@ class PnlData(APIView):
                 transactions_map[account_header].append(transaction)
 
         # Defining structure for API response
-        pnl_data = {
-            'income': [],
-            'expense': {},
-            'cost_of_goods_sold': [],
-            'gross_profit': {},
-            'ebitda': {},
-            'depreciation_expenses': [],
-            'pbit': {},
-            'interest_expenses': [],
-            'pbt': {},
-            'total_income': {}
-        }
+        pnl_data = copy.deepcopy(jsonobj.json_structure['pnl_data'])
 
         # Filling up API response with relevant data
         for account_header in transactions_map:
@@ -147,7 +174,6 @@ class PnlData(APIView):
 
         for k in ('current', 'previous', 'per_change', 'three_month_avg'):
             pnl_data['total_income'][k] = income_total[k]
-            
 
         for acc in pnl_data['cost_of_goods_sold']:
             cogs_total['current'] += acc['current']
@@ -184,25 +210,12 @@ class PnlData(APIView):
             pnl_data['gross_profit'][k] = income_total[k] - cogs_total[k]
             pnl_data['ebitda'][k] = pnl_data['gross_profit'][k] - \
                 expense_total[k]
-        
+
         # Calculating PBIT
-        if pnl_data['interest_expenses']:
-            pnl_data['interest_expenses'] = pnl_data['interest_expenses'][0]
-            for k in income_total:
-                pnl_data['pbit'][k] = pnl_data['ebitda'][k] - \
-                    pnl_data['interest_expenses'][k]
-        else:
-            pnl_data['interest_expenses'] = {
-                'current': 0,
-                'previous': 0,
-                'per_change': 0,
-                'three_month_avg': 0
-            }
-        # Calculating PBT
         if pnl_data['depreciation_expenses']:
             pnl_data['depreciation_expenses'] = pnl_data['depreciation_expenses'][0]
             for k in income_total:
-                pnl_data['pbt'][k] = pnl_data['pbit'][k] - \
+                pnl_data['pbit'][k] = pnl_data['ebitda'][k] - \
                     pnl_data['depreciation_expenses'][k]
         else:
             pnl_data['depreciation_expenses'] = {
@@ -211,46 +224,45 @@ class PnlData(APIView):
                 'per_change': 0,
                 'three_month_avg': 0
             }
-            pnl_data['pbt'] = copy.deepcopy(pnl_data['pbit'])
+            pnl_data['pbit'] = {
+                'current': pnl_data['ebitda']['current'],
+                'previous': pnl_data['ebitda']['previous'],
+                'per_change': pnl_data['ebitda']['per_change'],
+                'three_month_avg': pnl_data['ebitda']['three_month_avg']
+            }
+        # Calculating PBT
+        if pnl_data['interest_expenses']:
+            pnl_data['interest_expenses'] = pnl_data['interest_expenses'][0]
+            for k in income_total:
+                pnl_data['pbt'][k] = pnl_data['pbit'][k] - \
+                    pnl_data['interest_expenses'][k]
+        else:
+            pnl_data['interest_expenses'] = {
+                'current': 0,
+                'previous': 0,
+                'per_change': 0,
+                'three_month_avg': 0
+            }
+            pnl_data['pbt'] = {
+                'current': pnl_data['pbit']['current'],
+                'previous': pnl_data['pbit']['previous'],
+                'per_change': pnl_data['pbit']['per_change'],
+                'three_month_avg': pnl_data['pbit']['three_month_avg']
+            }
+        pnl_data['pbt'] = copy.deepcopy(pnl_data['pbit'])
 
         for k in ('gross_profit', 'ebitda', 'depreciation_expenses', 'pbit', 'interest_expenses', 'pbt'):
-            pnl_data[k]['curr_per'] = round(pnl_data[k]['current']/income_total['current'] * 100)
-            pnl_data[k]['prev_per'] = round(pnl_data[k]['previous']/income_total['previous'] * 100)
+            pnl_data[k]['curr_per'] = round(
+                pnl_data[k]['current']/income_total['current'] * 100)
+            pnl_data[k]['prev_per'] = round(
+                pnl_data[k]['previous']/income_total['previous'] * 100)
 
-        global pnl_pbt
+        global pnl_pbt, pnl_dep_exp
         pnl_pbt = copy.deepcopy(pnl_data['pbt'])
+        pnl_dep_exp = copy.deepcopy(pnl_data['depreciation_expenses'])
 
-        # Changing value to Indian comma notation
-        for k in pnl_data:
-            if k in ('income', 'cost_of_goods_sold'):
-                for acc in pnl_data[k]:
-                    acc['current'] = locale.format(
-                        "%d", acc['current'], grouping=True)
-                    acc['previous'] = locale.format(
-                        "%d", acc['previous'], grouping=True)
-                    acc['three_month_avg'] = locale.format(
-                        "%d", acc['three_month_avg'], grouping=True)
-                    acc['per_change'] = round(acc['per_change'])
-            elif k == 'expense':
-                for cat in pnl_data[k]:
-                    for acc in pnl_data[k][cat]:
-                        acc['current'] = locale.format(
-                            "%d", acc['current'], grouping=True)
-                        acc['previous'] = locale.format(
-                            "%d", acc['previous'], grouping=True)
-                        acc['three_month_avg'] = locale.format(
-                            "%d", acc['three_month_avg'], grouping=True)
-                        acc['per_change'] = round(acc['per_change'])
-            else:
-                pnl_data[k]['current'] = locale.format(
-                    "%d", pnl_data[k]['current'], grouping=True)
-                pnl_data[k]['previous'] = locale.format(
-                    "%d", pnl_data[k]['previous'], grouping=True)
-                pnl_data[k]['three_month_avg'] = locale.format(
-                    "%d", pnl_data[k]['three_month_avg'], grouping=True)
-                pnl_data[k]['per_change'] = round(pnl_data[k]['per_change'])
-
-        return Response(pnl_data)
+        pnl_data_response = acc_util.convert_to_indian_comma_notation(pnl_data)
+        return Response(pnl_data_response)
 
 
 class BalanceSheetData(APIView):
@@ -258,8 +270,10 @@ class BalanceSheetData(APIView):
     permission_classes = []
 
     # Fetching accounts and transactions from database
-    accounts_data = ZohoAccount.objects.filter(
-        account_type__in=(
+    bal_accounts_data, transactions_data = acc_util.fetch_data_from_db(
+        'balsheet',
+        SELECTED_DATE,
+        (
             'accounts_payable',
             'accounts_receivable',
             'bank',
@@ -274,18 +288,15 @@ class BalanceSheetData(APIView):
             'stock'
         )
     )
-    transactions_data = ZohoTransaction.objects.filter(
-        transaction_date__lte='2022-06-23'
-    ).all()
 
     def get(self, request, format=None):
         accounts_map, transactions_map = {}, {}
 
-        for account in self.accounts_data:
+        for account in self.bal_accounts_data:
             accounts_map[account.account_id] = (
                 account.account_type, account.account_for_coding
             )
-
+        # Finding transactions related to each account header
         for transaction in self.transactions_data:
             if transaction.account_id in accounts_map:
                 account_header = accounts_map[transaction.account_id]
@@ -293,41 +304,25 @@ class BalanceSheetData(APIView):
                     transactions_map[account_header] = []
                 transactions_map[account_header].append(transaction)
 
-        bal_sheet_data = {
-            'accounts_payable': [],
-            'accounts_receivable': [],
-            'cash': [],
-            'bank': [],
-            'equity': [],
-            'fixed_asset': [],
-            'long_term_liability': [],
-            'other_asset': [],
-            'other_current_asset': [],
-            'other_current_liability': [],
-            'other_liability': [],
-            'stock': [],
-            'total_assets': 0,
-            'total_liabilities': 0,
-            'total_equity': 0
-        }
+        # Defining structure of API response for balance sheet data
+        bal_sheet_data = copy.deepcopy(
+            jsonobj.json_structure['bal_sheet_data'])
 
+        # Filling up response with appropriate values
         for account_header in transactions_map:
             temp = {
                 "account_header": account_header[1],
                 "current": 0,
                 "previous": 0,
-                "per_change": 0,
-                "three_month_avg": 0
+                "per_change": 0
             }
 
             for transaction in transactions_map[account_header]:
                 temp["current"] += transaction.credit_amount - \
                     transaction.debit_amount
-                if transaction.transaction_date <= SELECTED_DATE:
+                if transaction.transaction_date <= SELECTED_DATE + relativedelta(months=-1):
                     temp['previous'] += transaction.credit_amount - \
                         transaction.debit_amount
-                temp["three_month_avg"] += (
-                    transaction.credit_amount - transaction.debit_amount)/3
 
             if temp['previous'] == 0:
                 temp['per_change'] = 0
@@ -340,110 +335,37 @@ class BalanceSheetData(APIView):
         for k in ('accounts_receivable', 'fixed_asset', 'other_asset', 'other_current_asset', 'stock', 'cash', 'bank'):
             for acc in bal_sheet_data[k]:
                 bal_sheet_data['total_assets'] += acc['current']
-        bal_sheet_data['total_assets'] = locale.format(
-            "%d", abs(bal_sheet_data['total_assets']), grouping=True)
 
         for k in ('accounts_payable', 'long_term_liability', 'other_current_liability', 'other_liability'):
             for acc in bal_sheet_data[k]:
                 bal_sheet_data['total_liabilities'] += acc['current']
-        bal_sheet_data['total_liabilities'] = locale.format(
-            "%d", abs(bal_sheet_data['total_liabilities']), grouping=True)
 
         for acc in bal_sheet_data['equity']:
             bal_sheet_data['total_equity'] = acc['current']
-        bal_sheet_data['total_equity'] = locale.format(
-            "%d", abs(bal_sheet_data['total_equity']), grouping=True)
 
-        for k in bal_sheet_data:
-            if k in ('total_assets', 'total_liabilities', 'total_equity'):
-                break
-            for acc in bal_sheet_data[k]:
-                acc['current'] = locale.format(
-                    "%d", abs(acc['current']), grouping=True)
-                acc['previous'] = locale.format(
-                    "%d", abs(acc['previous']), grouping=True)
-                acc['three_month_avg'] = locale.format(
-                    "%d", abs(acc['three_month_avg']), grouping=True)
-                acc['per_change'] = round(acc['per_change'])
-
-        return Response(bal_sheet_data)
+        bal_sheet_data_response = acc_util.convert_to_indian_comma_notation(
+            bal_sheet_data)
+        return Response(bal_sheet_data_response)
 
 
 class CashFlowData(APIView):
     authentication_classes = []
     permission_classes = []
 
-    accounts_data = ZohoAccount.objects.filter(
-        account_for_coding__in = (
-            'Bank Balance',
-            'Interest Expenses',
-            'Accounts Receivable',
-            'Other Current Assets',
-            'Other Non Current Assets',
-            'Trade Payables',
-            'Other long term Liabilities & Provisions',
-            'Other Liabilities',
-            'Other Current Liabilities & Provisions',
-            'Tangible Assets',
-            'Short Term Loans & Advances',
-            'Long Term Loans & Advances',
-            'Short-term borrowings',
-            'Long Term Borrowing',
-            'Share Capital'
-        )
+    # Fetching data related to cashflow accounts
+    cashflow_accounts_data, transactions_data = acc_util.fetch_data_from_db(
+        'cashflow',
+        SELECTED_DATE,
+        cashflow_accounts
     )
-    transactions_data = ZohoTransaction.objects.filter(
-        transaction_date__lte='2022-06-23'
-    ).all()
 
     def get(self, request, format=None):
-        cashflow_accounts = (
-            'Bank Balance',
-            'Interest Expenses',
-            'Accounts Receivable',
-            'Other Current Assets',
-            'Other Non Current Assets',
-            'Trade Payables',
-            'Other long term Liabilities & Provisions',
-            'Other Liabilities',
-            'Other Current Liabilities & Provisions',
-            'Tangible Assets',
-            'Short Term Loans & Advances',
-            'Long Term Loans & Advances',
-            'Short-term borrowings',
-            'Long Term Borrowing',
-            'Share Capital'
-        )
-        cashflow_data = {
-            'beginning_cash_balance': {},
-            'cashflow_from_operating_activities': [],
-            'net_cash_a': {
-                'current': 0,
-                'previous': 0,
-                'per_change': 0
-            },
-            'cashflow_from_investing_activities': [],
-            'net_cash_b': {
-                'current': 0,
-                'previous': 0,
-                'per_change': 0
-            },
-            'cashflow_from_financing_activities': [],
-            'net_cash_c': {
-                'current': 0,
-                'previous': 0,
-                'per_change': 0
-            },
-            'net_change_abc': {
-                'current': 0,
-                'previous': 0,
-                'per_change': 0
-            },
-            'ending_cash_balance': {}
-        }
+
+        # Defining structure for API response
+        cashflow_data = copy.deepcopy(jsonobj.json_structure['cashflow_data'])
 
         accounts_map, transactions_map = {}, {}
-        cashflow_data_uncategorized = {}
+        cashflow_data_uncategorized = {} # To store data related to all cashflow accounts
 
         for account in cashflow_accounts:
             cashflow_data_uncategorized[account] = {
@@ -452,7 +374,7 @@ class CashFlowData(APIView):
                 'pre_prev': 0
             }
 
-        for account in self.accounts_data:
+        for account in self.cashflow_accounts_data:
             accounts_map[account.account_id] = account.account_for_coding
 
         for transaction in self.transactions_data:
@@ -472,10 +394,10 @@ class CashFlowData(APIView):
             for transaction in transactions_map[account_head]:
                 temp["current"] += transaction.credit_amount - \
                     transaction.debit_amount
-                if transaction.transaction_date <= SELECTED_DATE:
+                if transaction.transaction_date <= SELECTED_DATE + relativedelta(months=-1):
                     temp['previous'] += transaction.credit_amount - \
                         transaction.debit_amount
-                if transaction.transaction_date <= SELECTED_DATE - relativedelta(months=-1):
+                if transaction.transaction_date <= SELECTED_DATE + relativedelta(months=-2):
                     temp['pre_prev'] += transaction.credit_amount - \
                         transaction.debit_amount
 
@@ -485,27 +407,22 @@ class CashFlowData(APIView):
 
             cashflow_data_uncategorized[account_head] = temp
 
+        # Filling up response data with uncategorized and combined data
         temp = cashflow_data_uncategorized['Bank Balance']
+        temp2 = cashflow_data_uncategorized['Cash Balance']
         cashflow_data['beginning_cash_balance'] = {
-            'current': temp['previous'],
-            'previous': temp['pre_prev'],
-            'per_change': 0 if temp['pre_prev'] == 0 else round((temp['previous'] / temp['pre_prev']-1) * 100)
+            'current': temp['previous'] + temp2['previous'],
+            'previous': temp['pre_prev'] + temp2['pre_prev'],
+            'per_change': 0 if temp['pre_prev'] == 0 else round(((temp['previous'] + temp2['previous']) / (temp['pre_prev'] + temp2['pre_prev'])-1) * 100)
         }
 
-        cashflow_data['cashflow_from_operating_activities'].append({
-            'activity': 'Net Income',
-            'current': round(pnl_pbt['current']),
-            'previous': round(pnl_pbt['previous']),
-            'per_change': round(pnl_pbt['per_change'])
-        })
-
-        temp = cashflow_data_uncategorized['Interest Expenses']
-        cashflow_data['cashflow_from_operating_activities'].append({
-            'activity': 'Plus: Depreciation & Amortization',
-            'current': temp['current'],
-            'previous': temp['previous'],
-            'per_change': 0 if temp['previous'] == 0 else round((temp['current'] /temp['previous']-1) * 100)
-        })
+        for act, val in {'Net Income': pnl_pbt, 'Plus: Depreciation & Amortization': pnl_dep_exp}.items():
+            cashflow_data['cashflow_from_operating_activities'].append({
+                'activity': act,
+                'current': round(val['current']),
+                'previous': round(val['previous']),
+                'per_change': round(val['per_change'])
+            })
 
         temp = cashflow_data_uncategorized['Accounts Receivable']
         cashflow_data['cashflow_from_operating_activities'].append({
@@ -514,7 +431,6 @@ class CashFlowData(APIView):
             'previous': temp['pre_prev'] - temp['previous'],
             'per_change': 0 if (temp['pre_prev'] - temp['previous']) == 0 else round(((temp['previous'] - temp['current'])/(temp['pre_prev'] - temp['previous'])-1) * 100)
         })
-
 
         temp = cashflow_data_uncategorized['Other Current Assets']
         temp2 = cashflow_data_uncategorized['Other Non Current Assets']
@@ -525,7 +441,6 @@ class CashFlowData(APIView):
             'per_change': 0 if temp['pre_prev'] + temp2['pre_prev'] - (temp['previous'] + temp2['previous']) == 0 else round(((temp['previous'] + temp2['previous'] - (temp['current'] + temp2['current']))/(temp['pre_prev'] + temp2['pre_prev'] - (temp['previous'] + temp2['previous']))-1)*100)
         })
 
-
         temp = cashflow_data_uncategorized['Trade Payables']
         cashflow_data['cashflow_from_operating_activities'].append({
             'activity': 'Increase / Decrease in sundry creditors',
@@ -534,12 +449,13 @@ class CashFlowData(APIView):
             'per_change': 0 if temp['previous'] - temp['pre_prev'] == 0 else round(((temp['current'] - temp['previous'])/(temp['previous'] - temp['pre_prev']) - 1) * 100)
         })
 
-
         temp = cashflow_data_uncategorized['Other long term Liabilities & Provisions']
         temp2 = cashflow_data_uncategorized['Other Liabilities']
         temp3 = cashflow_data_uncategorized['Other Current Liabilities & Provisions']
-        a = temp['current'] + temp2['current'] + temp3['current'] - (temp['previous'] + temp2['previous'] + temp3['previous'])
-        b = temp['previous'] + temp2['previous'] + temp3['previous'] - (temp['pre_prev'] + temp2['pre_prev'] + temp3['pre_prev'])
+        a = temp['current'] + temp2['current'] + temp3['current'] - \
+            (temp['previous'] + temp2['previous'] + temp3['previous'])
+        b = temp['previous'] + temp2['previous'] + temp3['previous'] - \
+            (temp['pre_prev'] + temp2['pre_prev'] + temp3['pre_prev'])
         cashflow_data['cashflow_from_operating_activities'].append({
             'activity': 'Increase / Decrease in Other Liability',
             'current': temp['current'] + temp2['current'] + temp3['current'] - (temp['previous'] + temp2['previous'] + temp3['previous']),
@@ -550,8 +466,8 @@ class CashFlowData(APIView):
         for key in cashflow_data['cashflow_from_operating_activities']:
             cashflow_data['net_cash_a']['current'] += key['current']
             cashflow_data['net_cash_a']['previous'] += key['previous']
-        cashflow_data['net_cash_a']['per_change'] = 0 if cashflow_data['net_cash_a']['previous'] == 0 else round(cashflow_data['net_cash_a']['current']/cashflow_data['net_cash_a']['previous']-1) * 100
-
+        cashflow_data['net_cash_a']['per_change'] = 0 if cashflow_data['net_cash_a']['previous'] == 0 else round(
+            cashflow_data['net_cash_a']['current']/cashflow_data['net_cash_a']['previous']-1) * 100
 
         temp = cashflow_data_uncategorized['Tangible Assets']
         cashflow_data['cashflow_from_investing_activities'].append({
@@ -571,15 +487,19 @@ class CashFlowData(APIView):
         for key in cashflow_data['cashflow_from_investing_activities']:
             cashflow_data['net_cash_b']['current'] += key['current']
             cashflow_data['net_cash_b']['previous'] += key['previous']
-        cashflow_data['net_cash_b']['per_change'] = 0 if cashflow_data['net_cash_b']['previous'] == 0 else round(cashflow_data['net_cash_b']['current']/cashflow_data['net_cash_b']['previous']-1) * 100
-
+        cashflow_data['net_cash_b']['per_change'] = 0 if cashflow_data['net_cash_b']['previous'] == 0 else round(
+            cashflow_data['net_cash_b']['current']/cashflow_data['net_cash_b']['previous']-1) * 100
 
         temp = cashflow_data_uncategorized['Short-term borrowings']
         temp2 = cashflow_data_uncategorized['Long Term Borrowing']
         temp3 = cashflow_data_uncategorized['Short Term Loans & Advances']
         temp4 = cashflow_data_uncategorized['Long Term Loans & Advances']
-        a = temp['current'] + temp2['current'] - temp['previous'] - temp2['previous'] + temp3['previous'] + temp4['previous'] - temp3['current'] - temp4['current']
-        b = temp['previous'] + temp2['previous'] - temp['pre_prev'] - temp2['pre_prev'] + temp3['pre_prev'] + temp4['pre_prev'] - temp3['previous'] - temp4['previous']
+        a = temp['current'] + temp2['current'] - temp['previous'] - temp2['previous'] + \
+            temp3['previous'] + temp4['previous'] - \
+            temp3['current'] - temp4['current']
+        b = temp['previous'] + temp2['previous'] - temp['pre_prev'] - temp2['pre_prev'] + \
+            temp3['pre_prev'] + temp4['pre_prev'] - \
+            temp3['previous'] - temp4['previous']
         cashflow_data['cashflow_from_financing_activities'].append({
             'activity': 'Issuance (repayment) of debt',
             'current': a,
@@ -598,16 +518,22 @@ class CashFlowData(APIView):
         for key in cashflow_data['cashflow_from_financing_activities']:
             cashflow_data['net_cash_c']['current'] += key['current']
             cashflow_data['net_cash_c']['previous'] += key['previous']
-        cashflow_data['net_cash_c']['per_change'] = 0 if cashflow_data['net_cash_c']['previous'] == 0 else round(cashflow_data['net_cash_c']['current']/cashflow_data['net_cash_c']['previous']-1) * 100
+        cashflow_data['net_cash_c']['per_change'] = 0 if cashflow_data['net_cash_c']['previous'] == 0 else round(
+            cashflow_data['net_cash_c']['current']/cashflow_data['net_cash_c']['previous']-1) * 100
 
         for k in ('current', 'previous'):
-            cashflow_data['net_change_abc'][k] = (cashflow_data['net_cash_a'][k] + cashflow_data['net_cash_b'][k] + cashflow_data['net_cash_c'][k])
-        cashflow_data['net_change_abc']['per_change'] = 0 if cashflow_data['net_change_abc']['previous'] == 0 else round(cashflow_data['net_change_abc']['current']/cashflow_data['net_change_abc']['previous']-1)*100
-        
+            cashflow_data['net_change_abc'][k] = (
+                cashflow_data['net_cash_a'][k] + cashflow_data['net_cash_b'][k] + cashflow_data['net_cash_c'][k])
+        cashflow_data['net_change_abc']['per_change'] = 0 if cashflow_data['net_change_abc']['previous'] == 0 else round(
+            cashflow_data['net_change_abc']['current']/cashflow_data['net_change_abc']['previous']-1)*100
+
         cashflow_data['ending_cash_balance'] = {
             'current': cashflow_data['beginning_cash_balance']['current'] + cashflow_data['net_change_abc']['current'],
             'previous': cashflow_data['beginning_cash_balance']['previous'] + cashflow_data['net_change_abc']['previous']
         }
-        cashflow_data['ending_cash_balance']['per_change'] = 0 if cashflow_data['ending_cash_balance']['previous'] == 0 else round((cashflow_data['ending_cash_balance']['current'])/(cashflow_data['ending_cash_balance']['previous'])-1)*100
+        cashflow_data['ending_cash_balance']['per_change'] = 0 if cashflow_data['ending_cash_balance']['previous'] == 0 else round(
+            (cashflow_data['ending_cash_balance']['current'])/(cashflow_data['ending_cash_balance']['previous'])-1)*100
 
-        return Response(cashflow_data)
+        cashflow_data_response = acc_util.convert_to_indian_comma_notation(
+            cashflow_data)
+        return Response(cashflow_data_response)

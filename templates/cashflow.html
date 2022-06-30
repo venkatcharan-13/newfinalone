@@ -1,4 +1,5 @@
 {% extends 'accounts_base.html' %}
+{% load static %}
 {% block title %}Cashflow{% endblock title %}
 {% block active3 %}active{% endblock active3 %}
 {% block body %}
@@ -99,3 +100,7 @@
 </table>
 
 {% endblock body %}
+
+{% block script %}
+  <script src="{% static 'js/cashflow.js' %}"></script>
+{% endblock script %}

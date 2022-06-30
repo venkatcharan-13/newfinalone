@@ -1,4 +1,5 @@
 {% extends 'accounts_base.html' %}
+{% load static %}
 {% block title %}Balance Sheet{% endblock title %}
 {% block active2 %}active{% endblock active2 %}
 {% block body %}
@@ -27,18 +28,17 @@
   <thead>
     <tr>
       <th scope="col" style="width: 40%;">ASSETS</th>
-      <th scope="col" style="width: 13%; text-align: right;">Current</th>
-      <th scope="col" style="width: 13%; text-align: right;">Previous</th>
-      <th scope="col" style="width: 13%; text-align: center;">% Change</th>
-      <th scope="col" style="width: 21%; text-align: right;">Avg(last 3 months)</th>
+      <th scope="col" style="width: 20%; text-align: right;">Current</th>
+      <th scope="col" style="width: 20%; text-align: right;">Previous</th>
+      <th scope="col" style="width: 20%; text-align: center;">% Change</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th scope="row" colspan="5">Fixed Assets</th>
+      <th scope="row" colspan="4">Fixed Assets</th>
     </tr>
     <tr>
-      <td colspan="5">
+      <td colspan="4">
         <table class="table mb-0" id="fixasset">
           <tbody>
           </tbody>
@@ -46,10 +46,10 @@
       </td>
     </tr>
     <tr>
-      <th scope="row" colspan="5">Other Assets</th>
+      <th scope="row" colspan="4">Other Assets</th>
     </tr>
     <tr>
-      <td colspan="5">
+      <td colspan="4">
         <table class="table mb-0" id="othasset">
           <tbody>
           </tbody>
@@ -57,10 +57,10 @@
       </td>
     </tr>
     <tr>
-      <th scope="row" colspan="5">Accounts Receivable</th>
+      <th scope="row" colspan="4">Accounts Receivable</th>
     </tr>
     <tr>
-      <td colspan="5">
+      <td colspan="4">
         <table class="table mb-0" id="acc_rec">
           <tbody>
           </tbody>
@@ -68,10 +68,10 @@
       </td>
     </tr>
     <tr>
-      <th scope="row" colspan="5">Bank</th>
+      <th scope="row" colspan="4">Bank</th>
     </tr>
     <tr>
-      <td colspan="5">
+      <td colspan="4">
         <table class="table mb-0" id="bank">
           <tbody>
           </tbody>
@@ -79,10 +79,10 @@
       </td>
     </tr>
     <tr>
-      <th scope="row" colspan="5">Cash</th>
+      <th scope="row" colspan="4">Cash</th>
     </tr>
     <tr>
-      <td colspan="5">
+      <td colspan="4">
         <table class="table mb-0" id="cash">
           <tbody>
           </tbody>
@@ -90,10 +90,10 @@
       </td>
     </tr>
     <tr>
-      <th scope="row" colspan="5">Other Current Asset</th>
+      <th scope="row" colspan="4">Other Current Asset</th>
     </tr>
     <tr>
-      <td colspan="5">
+      <td colspan="4">
         <table class="table mb-0" id="ocasset">
           <tbody>
           </tbody>
@@ -101,10 +101,10 @@
       </td>
     </tr>
     <tr>
-      <th scope="row" colspan="5">Stock</th>
+      <th scope="row" colspan="4">Stock</th>
     </tr>
     <tr>
-      <td colspan="5">
+      <td colspan="4">
         <table class="table mb-0" id="stock">
           <tbody>
           </tbody>
@@ -118,18 +118,17 @@
   <thead>
     <tr>
       <th scope="col" style="width: 40%;">LIABILITIES</th>
-      <th scope="col" style="width: 13%; text-align: right;">Current</th>
-      <th scope="col" style="width: 13%; text-align: right;">Previous</th>
-      <th scope="col" style="width: 13%; text-align: center;">% Change</th>
-      <th scope="col" style="width: 21%; text-align: right;">Avg(last 3 months)</th>
+      <th scope="col" style="width: 20%; text-align: right;">Current</th>
+      <th scope="col" style="width: 20%; text-align: right;">Previous</th>
+      <th scope="col" style="width: 20%; text-align: center;">% Change</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th scope="row" colspan="5">Long Term Liability</th>
+      <th scope="row" colspan="4">Long Term Liability</th>
     </tr>
     <tr>
-      <td colspan="5">
+      <td colspan="4">
         <table class="table mb-0" id="ltliab">
           <tbody>
           </tbody>
@@ -137,10 +136,10 @@
       </td>
     </tr>
     <tr>
-      <th scope="row" colspan="5">Other Liability</th>
+      <th scope="row" colspan="4">Other Liability</th>
     </tr>
     <tr>
-      <td colspan="5">
+      <td colspan="4">
         <table class="table mb-0" id="othliab">
           <tbody>
           </tbody>
@@ -148,10 +147,10 @@
       </td>
     </tr>
     <tr>
-      <th scope="row" colspan="5">Accounts Payable</th>
+      <th scope="row" colspan="4">Accounts Payable</th>
     </tr>
     <tr>
-      <td colspan="5">
+      <td colspan="4">
         <table class="table mb-0" id="acc_pay">
           <tbody>
           </tbody>
@@ -159,10 +158,10 @@
       </td>
     </tr>
     <tr>
-      <th scope="row" colspan="5">Other Current Liability</th>
+      <th scope="row" colspan="4">Other Current Liability</th>
     </tr>
     <tr>
-      <td colspan="5">
+      <td colspan="4">
         <table class="table mb-0" id="ocliab">
           <tbody>
           </tbody>
@@ -176,18 +175,17 @@
   <thead>
     <tr>
       <th scope="col" style="width: 40%;">EQUITIES</th>
-      <th scope="col" style="width: 13%; text-align: right;">Current</th>
-      <th scope="col" style="width: 13%; text-align: right;">Previous</th>
-      <th scope="col" style="width: 13%; text-align: center;">% Change</th>
-      <th scope="col" style="width: 21%; text-align: right;">Avg(last 3 months)</th>
+      <th scope="col" style="width: 20%; text-align: right;">Current</th>
+      <th scope="col" style="width: 20%; text-align: right;">Previous</th>
+      <th scope="col" style="width: 20%; text-align: center;">% Change</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th scope="row" colspan="5">Equity</th>
+      <th scope="row" colspan="4">Equity</th>
     </tr>
     <tr>
-      <td colspan="5">
+      <td colspan="4">
         <table class="table mb-0" id="equity">
           <tbody>
           </tbody>
@@ -198,3 +196,7 @@
 </table>
 
 {% endblock body %}
+
+{% block script %}
+  <script src="{% static 'js/balsheet.js' %}"></script>
+{% endblock script %}
