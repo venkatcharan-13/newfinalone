@@ -1,41 +1,71 @@
 {% extends 'analytics_base.html' %}
 {% block title %}MIS Report{% endblock title %}
+{% block active %}active{% endblock active %}
 {% block body %}
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"></script>
-  <script src="../static/js/report.js"></script>
-  <h1>Graphs</h1>
+  <script src="../static/js/report.js"></script><br>
+  <h1>Graphs</h1><br>
   <div class="container">
+    <h3 style="text-align: center;">Sales Performance</h3>
     <div class="row mb-5">
-      <div class="col-6">
-        <canvas id="graph1"></canvas>
-      </div>
-      <div class="col-6">
-        <canvas id="graph2"></canvas>
+      <div class="col-12">
+        <canvas id="sales_performance1"></canvas>
       </div>
     </div>
     <div class="row mb-5">
       <div class="col-6">
-        <canvas id="graph3"></canvas>
+        <canvas id="sales_performance2"></canvas>
       </div>
       <div class="col-6">
-        <canvas id="graph4"></canvas>
-      </div>
-    </div>
-    <div class="row mb-5">
-      <div class="col-6">
-        <canvas id="graph5"></canvas>
-      </div>
-      <div class="col-6">
-        <canvas id="graph6"></canvas>
+        <canvas id="sales_performance3"></canvas>
       </div>
     </div>
     <div class="row mb-5">
       <div class="col-6">
-        <canvas id="graph7"></canvas>
+        <canvas id="income_vs_expenses"></canvas>
       </div>
       <div class="col-6">
-        <canvas id="graph8"></canvas>
+        <canvas id="inflow_vs_outflow"></canvas>
+      </div>
+    </div>
+    <div class="row mb-5">
+      <div class="col-6">
+        <canvas id="closing_bank_balance"></canvas>
+      </div>
+      <div class="col-6">
+        <canvas id="gross_and_net_profit"></canvas>
+      </div>
+    </div>
+    <div class="row mb-5">
+      <div class="col-6">
+        <canvas id="monthly_runaway"></canvas>
+      </div>
+      <div class="col-6">
+        <canvas id="gp_expenses_ebitda"></canvas>
+      </div>
+    </div>
+    <div class="row mb-5">
+      <div class="col-6">
+        <canvas id="monthly_cashflow"></canvas>
       </div>
     </div>
   </div>
+  <h1>Tabular Summaries</h1><br>
+  <h2>P&L Summary</h2>
+  <table class="table table-bordered">
+    <thead class="table-dark" id="pnl_head">
+    </thead>
+    <tbody id="pnl_summary">
+      
+    </tbody>
+  </table>
+  <br><h2>Balance Sheet Summary</h2>
+  <table class="table table-bordered">
+    <thead class="table-dark" id="bal_sheet_head">
+    </thead>
+    <tbody id="bal_sheet_summary">
+      
+    </tbody>
+  </table>
+
 {% endblock body %}

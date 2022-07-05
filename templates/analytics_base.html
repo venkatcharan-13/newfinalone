@@ -29,13 +29,13 @@
   <div class="main">
     <ul class="nav nav-tabs">
       <li class="nav-item">
-        <a class="nav-link active" aria-current="page" href="/analytics">MIS Report</a>
+        <a class="nav-link {%block active%}{%endblock active%}" aria-current="page" href="/analytics">MIS Report</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/analytics/insights">Insights</a>
+        <a class="nav-link {%block active2%}{%endblock active2%}" href="/analytics/insights">Insights</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/analytics/deep_insights/">Deep Insights</a>
+        <a class="nav-link {%block active3%}{%endblock active3%}" href="/analytics/deep_insights/">Deep Insights</a>
       </li>
     </ul>
     {% block body %}{% endblock body %}
