@@ -38,6 +38,7 @@ class ReportData(APIView):
         monthly_cashflow_statements = analytics_util.get_monthly_cashflow_statement(CURRENT_DATE)
         pnl_summary = analytics_util.get_pnl_summary(CURRENT_DATE)
         balance_sheet_summary = analytics_util.get_balance_sheet_summary(CURRENT_DATE)
+        cashflow_statement_summary = analytics_util.get_cashflow_summary(CURRENT_DATE)
         
         data = {
             "monthly_sales_performance": {
@@ -144,7 +145,8 @@ class ReportData(APIView):
                 ]
             },
             "pnl_summary": pnl_summary,
-            "bal_sheet_summary": balance_sheet_summary
+            "bal_sheet_summary": balance_sheet_summary,
+            "cashflow_summary": cashflow_statement_summary
         }
         
         return Response(data)

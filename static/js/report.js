@@ -14,8 +14,9 @@ $.ajax({
     grossAndNetProfitGraph(graphData.gross_and_net_profit, "gross_and_net_profit");
     runwayGraph(graphData.runaway, "monthly_runaway");
     gpExpensesEbitdaGraph(graphData.gp_vs_expenses_vs_ebitda, "gp_expenses_ebitda");
-    showPnlSummary(graphData.pnl_summary, "pnl_head", "pnl_summary");
-    showPnlSummary(graphData.bal_sheet_summary, "bal_sheet_head", "bal_sheet_summary");
+    showSixMonthSummary(graphData.pnl_summary, "pnl_head", "pnl_summary");
+    showSixMonthSummary(graphData.bal_sheet_summary, "bal_sheet_head", "bal_sheet_summary");
+    showSixMonthSummary(graphData.cashflow_summary, "cashflow_head", "cashflow_summary");
     montlhyCashFlowGraph(graphData.monthly_cashflow, "monthly_cashflow");
   },
   error: function (error_data) {
@@ -261,23 +262,26 @@ function montlhyCashFlowGraph(data, id) {
       datasets: [{
         label: dataset[0].label,
         backgroundColor: "#3e95cd",
+        borderColor:  "#3e95cd",
         data: dataset[0].cashflowOperations
       },
       {
         label: dataset[1].label,
         backgroundColor: "#8e5ea2",
+        borderColor: "#8e5ea2",
         data: dataset[1].cashflowInvesting
       },
       {
         label: dataset[2].label,
         backgroundColor: "#00a300",
+        borderColor:  "#00a300",
         data: dataset[2].cashflowFinancing
       }],
     }
   })
 }
 
-function showPnlSummary(data, id, tid) {
+function showSixMonthSummary(data, id, tid) {
   document.getElementById(id).innerHTML = '<thead><th style="width:40%;"> Month </th>' +
     '<th style="width: 10%; text-align:right;">' + data.months[0] + '</th>' +
     '<th style="width: 10%; text-align:right;">' + data.months[1] + '</th>' +

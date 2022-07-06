@@ -390,6 +390,41 @@ def get_monthly_cashflow_statement(current_date):
         account_id__in = (tup[0] for tup in cashflow_accounts_data)
     )
 
+    accounts_related_to_pbt = ZohoAccount.objects.filter(
+        account_type__in = ('income', 'expense', 'other_expense', 'cost_of_goods_sold')
+    ).values_list('account_id', 'account_type')
+    
+    transactions_related_to_pbt = ZohoTransaction.objects.filter(
+        account_id__in = (tup[0] for tup in accounts_related_to_pbt)
+    )
+
+    accounts_map = {}
+    for account in accounts_related_to_pbt:
+        accounts_map[account[0]] = account[1]
+    
+    prev_six_months = []
+    temp_date = current_date
+    for i in range(6):
+        last_date_of_previous_month = temp_date.replace(
+            day=1) + relativedelta(days=-1)
+        prev_six_months.append(last_date_of_previous_month.date())
+        temp_date = last_date_of_previous_month
+
+    pbt_lst = []
+    for i in range(5, -1, -1):
+        month = prev_six_months[i].month
+        year = prev_six_months[i].year
+        income, cogs, expenses = 0, 0, 0,
+        for transaction in transactions_related_to_pbt:
+            if transaction.transaction_date.month == month and transaction.transaction_date.year == year:
+                if accounts_map[transaction.account_id] == 'income':
+                    income += (transaction.credit_amount - transaction.debit_amount)
+                if accounts_map[transaction.account_id] == 'cost_of_goods_sold':
+                    cogs += (transaction.debit_amount - transaction.credit_amount)
+                if accounts_map[transaction.account_id] in ('expense', 'other_expense'):
+                    expenses += (transaction.debit_amount - transaction.credit_amount)
+        pbt_lst.append(round(income-cogs-expenses))
+ 
     # Defining structure for API response
     cashflow_data = {
         'cashflow_from_operating_activities': [],
@@ -439,6 +474,7 @@ def get_monthly_cashflow_statement(current_date):
         cashflow_data_uncategorized[account_head[0]] = temp
 
 
+    cashflow_data['cashflow_from_operating_activities'].append(pbt_lst)
     temp = cashflow_data_uncategorized['Accounts Receivable']
     lst = [0]*6
     for i in range(5, -1, -1):
@@ -589,11 +625,11 @@ def get_balance_sheet_summary(current_date):
             'stock'
         )
     ).values_list('account_id', 'account_type')
-    
+
     transactions_related_to_balancesheet = ZohoTransaction.objects.filter(
         account_id__in = (tup[0] for tup in accounts_related_to_balancesheet)
     )
-
+    
     accounts_map = {}
     for account in accounts_related_to_balancesheet:
         accounts_map[account[0]] = account[1]
@@ -631,3 +667,31 @@ def get_balance_sheet_summary(current_date):
         balance_sheet_summary['Equity'][i] = locale.format("%d", equity, grouping=True)
     
     return balance_sheet_summary
+
+def get_cashflow_summary(current_date):
+    monthly_cashflow_data = get_monthly_cashflow_statement(current_date)
+    prev_six_months = []
+    for i in range(6):
+        last_date_of_previous_month = current_date.replace(
+            day=1) + relativedelta(days=-1)
+        prev_six_months.append(last_date_of_previous_month.date())
+        current_date = last_date_of_previous_month
+    prev_six_months.reverse()
+
+    cashflow_summary = {
+        'months': [0]*6,
+        'Cashflow from Operations': [],
+        'Cashflow from Investing': [],
+        'Cashflow from Financing': []
+    }
+    for i in range(5, -1, -1):
+        month = prev_six_months[i].month
+        year = prev_six_months[i].year
+        cashflow_summary['months'][i] = calendar.month_name[month][:3] + '-' + str(year % 100)
+
+    for key in monthly_cashflow_data:
+        cashflow_summary['Cashflow from Operations'].append(locale.format("%d", monthly_cashflow_data[key]['cf_from_operations'], grouping=True))
+        cashflow_summary['Cashflow from Investing'].append(locale.format("%d", monthly_cashflow_data[key]['cf_from_investing'], grouping=True))
+        cashflow_summary['Cashflow from Financing'].append(locale.format("%d", monthly_cashflow_data[key]['cf_from_financing'], grouping=True))
+
+    return cashflow_summary
