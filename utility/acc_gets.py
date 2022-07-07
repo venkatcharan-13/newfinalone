@@ -37,7 +37,7 @@ cashflow_accounts = (
 )
 
 
-def pnl_get(period):
+def get_pnl(period):
 
     # Fetching accounts and transactions from database
     pnl_accounts_data, transactions_data = accounts_util.fetch_data_from_db(
@@ -81,7 +81,7 @@ def pnl_get(period):
     # Filling up API response with relevant data
     for account_header in transactions_map:
 
-        temp = {
+        temporary_storage = {
             "account_header": account_header[1],
             "current": 0,
             "previous": 0,
@@ -91,32 +91,31 @@ def pnl_get(period):
 
         # Calculating total amount for current, previous period and average of last 3 months for each account header
         for transaction in transactions_map[account_header]:
+            credit_minus_debit = transaction.credit_amount - transaction.debit_amount
             if transaction.transaction_date.month == period.month:
-                temp["current"] += transaction.credit_amount - \
-                    transaction.debit_amount
+                temporary_storage["current"] += credit_minus_debit
             elif transaction.transaction_date.month == period.month-1:
-                temp["previous"] += transaction.credit_amount - \
-                    transaction.debit_amount
-            temp["three_month_avg"] += transaction.credit_amount - \
-                transaction.debit_amount
+                temporary_storage["previous"] += credit_minus_debit
+            temporary_storage["three_month_avg"] += credit_minus_debit
 
-        temp['three_month_avg'] /= 3
+        temporary_storage['three_month_avg'] /= 3
 
         # Calculating percentage change
-        if temp['previous'] == 0:
-            temp['per_change'] = 0
+        if temporary_storage['previous'] == 0:
+            temporary_storage['per_change'] = 0
         else:
-            temp['per_change'] = (
-                temp['current']/temp['previous'] - 1) * 100
+            temporary_storage['per_change'] = (
+                temporary_storage['current']/temporary_storage['previous'] - 1) * 100
 
         # Finally updating the data in response
         if len(account_header) == 2:
-            pnl_data[account_header[0]].append(temp)
+            pnl_data[account_header[0]].append(temporary_storage)
 
         else:
             if account_header[2] not in pnl_data[account_header[0]]:
                 pnl_data[account_header[0]][account_header[2]] = []
-            pnl_data[account_header[0]][account_header[2]].append(temp)
+            pnl_data[account_header[0]][account_header[2]].append(
+                temporary_storage)
 
     # Calculating total income and costs of goods sold
     income_total, cogs_total = {
@@ -231,7 +230,7 @@ def pnl_get(period):
     return pnl_data
 
 
-def balsheet_get(period):
+def get_balsheet(period):
     # Fetching accounts and transactions from database
     bal_accounts_data, transactions_data = accounts_util.fetch_data_from_db(
         'balsheet',
@@ -272,7 +271,7 @@ def balsheet_get(period):
 
     # Filling up response with appropriate values
     for account_header in transactions_map:
-        temp = {
+        temporary_storage = {
             "account_header": account_header[1],
             "current": 0,
             "previous": 0,
@@ -282,24 +281,23 @@ def balsheet_get(period):
         }
 
         for transaction in transactions_map[account_header]:
-            temp["current"] += transaction.credit_amount - \
-                transaction.debit_amount
+            credit_minus_debit = transaction.credit_amount - transaction.debit_amount
+            temporary_storage["current"] += credit_minus_debit
             if transaction.transaction_date <= (period.replace(day=1)) + relativedelta(days=-1):
-                temp['previous'] += transaction.credit_amount - \
-                    transaction.debit_amount
+                temporary_storage['previous'] += credit_minus_debit
             if transaction.transaction_date <= (period + relativedelta(months=-2)):
-                temp['pre_prev'] += transaction.credit_amount - \
-                    transaction.debit_amount
-        
-        temp["three_month_avg"] += (temp['current'] + temp['previous'] + temp['pre_prev'])/3
+                temporary_storage['pre_prev'] += credit_minus_debit
 
-        if temp['previous'] == 0:
-            temp['per_change'] = 0
+        temporary_storage["three_month_avg"] += (
+            temporary_storage['current'] + temporary_storage['previous'] + temporary_storage['pre_prev'])/3
+
+        if temporary_storage['previous'] == 0:
+            temporary_storage['per_change'] = 0
         else:
-            temp['per_change'] = (
-                temp['current']/temp['previous'] - 1) * 100
+            temporary_storage['per_change'] = (
+                temporary_storage['current']/temporary_storage['previous'] - 1) * 100
 
-        bal_sheet_data[account_header[0]].append(temp)
+        bal_sheet_data[account_header[0]].append(temporary_storage)
 
     for k in ('accounts_receivable', 'fixed_asset', 'other_asset', 'other_current_asset', 'stock', 'cash', 'bank'):
         for acc in bal_sheet_data[k]:
@@ -316,12 +314,11 @@ def balsheet_get(period):
 
     for acc in bal_sheet_data['equity']:
         bal_sheet_data['total_equity'] = acc['current']
-        
 
     return bal_sheet_data
 
 
-def cashflow_get(period):
+def get_cashflow(period):
     # Fetching data related to cashflow accounts
     cashflow_accounts_data, transactions_data = accounts_util.fetch_data_from_db(
         'cashflow',
@@ -334,7 +331,8 @@ def cashflow_get(period):
 
     accounts_map, transactions_map = {}, {}
     cashflow_data_uncategorized = {}  # To store data related to all cashflow accounts
-    assets_related_types = ('fixed_asset', 'accounts_receivable', 'other_asset', 'bank', 'cash', 'other_current_asset', 'stock')
+    assets_related_types = ('fixed_asset', 'accounts_receivable',
+                            'other_asset', 'bank', 'cash', 'other_current_asset', 'stock')
 
     for account in cashflow_accounts:
         cashflow_data_uncategorized[account] = {
@@ -344,7 +342,8 @@ def cashflow_get(period):
         }
 
     for account in cashflow_accounts_data:
-        accounts_map[account.account_id] = (account.account_for_coding, account.account_type)
+        accounts_map[account.account_id] = (
+            account.account_for_coding, account.account_type)
 
     for transaction in transactions_data:
         if transaction.account_id in accounts_map:
@@ -354,142 +353,152 @@ def cashflow_get(period):
             transactions_map[acccount_header].append(transaction)
 
     for account_head in transactions_map:
-        temp = {
+        temporary_storage = {
             'current': 0,
             'previous': 0,
             'pre_prev': 0,
         }
 
         for transaction in transactions_map[account_head]:
-            temp["current"] += transaction.credit_amount - \
-                transaction.debit_amount
+            credit_minus_debit = transaction.credit_amount - transaction.debit_amount
+            temporary_storage["current"] += credit_minus_debit
             if transaction.transaction_date <= (period.replace(day=1)) + relativedelta(days=-1):
-                temp['previous'] += transaction.credit_amount - \
-                    transaction.debit_amount
+                temporary_storage['previous'] += credit_minus_debit
             if transaction.transaction_date <= period + relativedelta(months=-2):
-                temp['pre_prev'] += transaction.credit_amount - \
-                    transaction.debit_amount
+                temporary_storage['pre_prev'] += credit_minus_debit
 
         if account_head[1] in assets_related_types:
-            temp['current'] = -round(float(temp['current']))
-            temp['previous'] = -round(float(temp['previous']))
-            temp['pre_prev'] = -round(float(temp['pre_prev']))
+            temporary_storage['current'] = - \
+                round(float(temporary_storage['current']))
+            temporary_storage['previous'] = - \
+                round(float(temporary_storage['previous']))
+            temporary_storage['pre_prev'] = - \
+                round(float(temporary_storage['pre_prev']))
         else:
-            temp['current'] = round(float(temp['current']))
-            temp['previous'] = round(float(temp['previous']))
-            temp['pre_prev'] = round(float(temp['pre_prev']))
+            temporary_storage['current'] = round(
+                float(temporary_storage['current']))
+            temporary_storage['previous'] = round(
+                float(temporary_storage['previous']))
+            temporary_storage['pre_prev'] = round(
+                float(temporary_storage['pre_prev']))
 
-        cashflow_data_uncategorized[account_head[0]] = temp
+        cashflow_data_uncategorized[account_head[0]] = temporary_storage
 
+    cashflow_from_operating_activities = 'cashflow_from_operating_activities'
+    cashflow_from_investing_activities = 'cashflow_from_investing_activities'
+    cashflow_from_financing_activities = 'cashflow_from_financing_activities'
+    
     # Filling up response data with uncategorized and combined data
-    temp = cashflow_data_uncategorized['Bank Balance']
-    temp2 = cashflow_data_uncategorized['Cash Balance']
+    temporary_storage = cashflow_data_uncategorized['Bank Balance']
+    temporary_storage2 = cashflow_data_uncategorized['Cash Balance']
     cashflow_data['beginning_cash_balance'] = {
-        'current': temp['previous'] + temp2['previous'],
-        'previous': temp['pre_prev'] + temp2['pre_prev'],
-        'per_change': 0 if (temp['pre_prev'] + temp2['pre_prev']) == 0 else round(((temp['previous'] + temp2['previous']) / (temp['pre_prev'] + temp2['pre_prev'])-1) * 100)
+        'current': temporary_storage['previous'] + temporary_storage2['previous'],
+        'previous': temporary_storage['pre_prev'] + temporary_storage2['pre_prev'],
+        'per_change': 0 if (temporary_storage['pre_prev'] + temporary_storage2['pre_prev']) == 0 else round(((temporary_storage['previous'] + temporary_storage2['previous']) / (temporary_storage['pre_prev'] + temporary_storage2['pre_prev'])-1) * 100)
     }
 
     for act, val in {'Net Income': pnl_pbt, 'Plus: Depreciation & Amortization': pnl_dep_exp}.items():
-        cashflow_data['cashflow_from_operating_activities'].append({
+        cashflow_data[cashflow_from_operating_activities].append({
             'activity': act,
             'current': round(val['current']),
             'previous': round(val['previous']),
             'per_change': round(val['per_change'])
         })
 
-    temp = cashflow_data_uncategorized['Accounts Receivable']
-    cashflow_data['cashflow_from_operating_activities'].append({
+    temporary_storage = cashflow_data_uncategorized['Accounts Receivable']
+    cashflow_data[cashflow_from_operating_activities].append({
         'activity': 'Increase / decrease in sundry debtors',
-        'current': temp['previous'] - temp['current'],
-        'previous': temp['pre_prev'] - temp['previous'],
-        'per_change': 0 if (temp['pre_prev'] - temp['previous']) == 0 else round(((temp['previous'] - temp['current'])/(temp['pre_prev'] - temp['previous'])-1) * 100)
+        'current': temporary_storage['previous'] - temporary_storage['current'],
+        'previous': temporary_storage['pre_prev'] - temporary_storage['previous'],
+        'per_change': 0 if (temporary_storage['pre_prev'] - temporary_storage['previous']) == 0 else round(((temporary_storage['previous'] - temporary_storage['current'])/(temporary_storage['pre_prev'] - temporary_storage['previous'])-1) * 100)
     })
 
-    temp = cashflow_data_uncategorized['Other Current Assets']
-    temp2 = cashflow_data_uncategorized['Other Non Current Assets']
-    cashflow_data['cashflow_from_operating_activities'].append({
+    temporary_storage = cashflow_data_uncategorized['Other Current Assets']
+    temporary_storage2 = cashflow_data_uncategorized['Other Non Current Assets']
+    cashflow_data[cashflow_from_operating_activities].append({
         'activity': 'Increase / Decrease in Other Assets',
-        'current': temp['previous'] + temp2['previous'] - (temp['current'] + temp2['current']),
-        'previous': temp['pre_prev'] + temp2['pre_prev'] - (temp['previous'] + temp2['previous']),
-        'per_change': 0 if temp['pre_prev'] + temp2['pre_prev'] - (temp['previous'] + temp2['previous']) == 0 else round(((temp['previous'] + temp2['previous'] - (temp['current'] + temp2['current']))/(temp['pre_prev'] + temp2['pre_prev'] - (temp['previous'] + temp2['previous']))-1)*100)
+        'current': temporary_storage['previous'] + temporary_storage2['previous'] - (temporary_storage['current'] + temporary_storage2['current']),
+        'previous': temporary_storage['pre_prev'] + temporary_storage2['pre_prev'] - (temporary_storage['previous'] + temporary_storage2['previous']),
+        'per_change': 0 if temporary_storage['pre_prev'] + temporary_storage2['pre_prev'] - (temporary_storage['previous'] + temporary_storage2['previous']) == 0 else round(((temporary_storage['previous'] + temporary_storage2['previous'] - (temporary_storage['current'] + temporary_storage2['current']))/(temporary_storage['pre_prev'] + temporary_storage2['pre_prev'] - (temporary_storage['previous'] + temporary_storage2['previous']))-1)*100)
     })
 
-    temp = cashflow_data_uncategorized['Trade Payables']
-    cashflow_data['cashflow_from_operating_activities'].append({
+    temporary_storage = cashflow_data_uncategorized['Trade Payables']
+    cashflow_data[cashflow_from_operating_activities].append({
         'activity': 'Increase / Decrease in sundry creditors',
-        'current': temp['current'] - temp['previous'],
-        'previous': temp['previous'] - temp['pre_prev'],
-        'per_change': 0 if temp['previous'] - temp['pre_prev'] == 0 else round(((temp['current'] - temp['previous'])/(temp['previous'] - temp['pre_prev']) - 1) * 100)
+        'current': temporary_storage['current'] - temporary_storage['previous'],
+        'previous': temporary_storage['previous'] - temporary_storage['pre_prev'],
+        'per_change': 0 if temporary_storage['previous'] - temporary_storage['pre_prev'] == 0 else round(((temporary_storage['current'] - temporary_storage['previous'])/(temporary_storage['previous'] - temporary_storage['pre_prev']) - 1) * 100)
     })
 
-    temp = cashflow_data_uncategorized['Other long term Liabilities & Provisions']
-    temp2 = cashflow_data_uncategorized['Other Liabilities']
-    temp3 = cashflow_data_uncategorized['Other Current Liabilities & Provisions']
-    a = temp['current'] + temp2['current'] + temp3['current'] - \
-        (temp['previous'] + temp2['previous'] + temp3['previous'])
-    b = temp['previous'] + temp2['previous'] + temp3['previous'] - \
-        (temp['pre_prev'] + temp2['pre_prev'] + temp3['pre_prev'])
-    cashflow_data['cashflow_from_operating_activities'].append({
+    temporary_storage = cashflow_data_uncategorized['Other long term Liabilities & Provisions']
+    temporary_storage2 = cashflow_data_uncategorized['Other Liabilities']
+    temporary_storage3 = cashflow_data_uncategorized['Other Current Liabilities & Provisions']
+    a = temporary_storage['current'] + temporary_storage2['current'] + temporary_storage3['current'] - \
+        (temporary_storage['previous'] +
+         temporary_storage2['previous'] + temporary_storage3['previous'])
+    b = temporary_storage['previous'] + temporary_storage2['previous'] + temporary_storage3['previous'] - \
+        (temporary_storage['pre_prev'] +
+         temporary_storage2['pre_prev'] + temporary_storage3['pre_prev'])
+    cashflow_data[cashflow_from_operating_activities].append({
         'activity': 'Increase / Decrease in Other Liability',
         'current': a,
         'previous': b,
         'per_change': 0 if b == 0 else round((a/b-1)*100)
     })
 
-    for key in cashflow_data['cashflow_from_operating_activities']:
+    for key in cashflow_data[cashflow_from_operating_activities]:
         cashflow_data['net_cash_a']['current'] += key['current']
         cashflow_data['net_cash_a']['previous'] += key['previous']
     cashflow_data['net_cash_a']['per_change'] = 0 if cashflow_data['net_cash_a']['previous'] == 0 else round(
         (cashflow_data['net_cash_a']['current']/cashflow_data['net_cash_a']['previous']-1)*100)
 
-    temp = cashflow_data_uncategorized['Tangible Assets']
-    cashflow_data['cashflow_from_investing_activities'].append({
+    temporary_storage = cashflow_data_uncategorized['Tangible Assets']
+    cashflow_data[cashflow_from_investing_activities].append({
         'activity': 'Investments in Property & Equipment',
-        'current': temp['previous'] - temp['current'],
-        'previous': temp['pre_prev'] - temp['previous'],
-        'per_change': 0 if (temp['pre_prev'] - temp['previous']) == 0 else round(((temp['previous'] - temp['current'])/(temp['pre_prev'] - temp['previous'])-1)*100)
+        'current': temporary_storage['previous'] - temporary_storage['current'],
+        'previous': temporary_storage['pre_prev'] - temporary_storage['previous'],
+        'per_change': 0 if (temporary_storage['pre_prev'] - temporary_storage['previous']) == 0 else round(((temporary_storage['previous'] - temporary_storage['current'])/(temporary_storage['pre_prev'] - temporary_storage['previous'])-1)*100)
     })
 
-    cashflow_data['cashflow_from_investing_activities'].append({
+    cashflow_data[cashflow_from_investing_activities].append({
         'activity': 'Purchase / Sale of investments',
         'current': 0,
         'previous': 0,
         'per_change': 0
     })
 
-    for key in cashflow_data['cashflow_from_investing_activities']:
+    for key in cashflow_data[cashflow_from_investing_activities]:
         cashflow_data['net_cash_b']['current'] += key['current']
         cashflow_data['net_cash_b']['previous'] += key['previous']
     cashflow_data['net_cash_b']['per_change'] = 0 if cashflow_data['net_cash_b']['previous'] == 0 else round(
         (cashflow_data['net_cash_b']['current']/cashflow_data['net_cash_b']['previous']-1)*100)
 
-    temp = cashflow_data_uncategorized['Short-term borrowings']
-    temp2 = cashflow_data_uncategorized['Long Term Borrowing']
-    temp3 = cashflow_data_uncategorized['Short Term Loans & Advances']
-    temp4 = cashflow_data_uncategorized['Long Term Loans & Advances']
-    a = temp['current'] + temp2['current'] - temp['previous'] - temp2['previous'] + \
-        temp3['previous'] + temp4['previous'] - \
-        temp3['current'] - temp4['current']
-    b = temp['previous'] + temp2['previous'] - temp['pre_prev'] - temp2['pre_prev'] + \
-        temp3['pre_prev'] + temp4['pre_prev'] - \
-        temp3['previous'] - temp4['previous']
-    cashflow_data['cashflow_from_financing_activities'].append({
+    temporary_storage = cashflow_data_uncategorized['Short-term borrowings']
+    temporary_storage2 = cashflow_data_uncategorized['Long Term Borrowing']
+    temporary_storage3 = cashflow_data_uncategorized['Short Term Loans & Advances']
+    temporary_storage4 = cashflow_data_uncategorized['Long Term Loans & Advances']
+    a = temporary_storage['current'] + temporary_storage2['current'] - temporary_storage['previous'] - temporary_storage2['previous'] + \
+        temporary_storage3['previous'] + temporary_storage4['previous'] - \
+        temporary_storage3['current'] - temporary_storage4['current']
+    b = temporary_storage['previous'] + temporary_storage2['previous'] - temporary_storage['pre_prev'] - temporary_storage2['pre_prev'] + \
+        temporary_storage3['pre_prev'] + temporary_storage4['pre_prev'] - \
+        temporary_storage3['previous'] - temporary_storage4['previous']
+    cashflow_data[cashflow_from_financing_activities].append({
         'activity': 'Issuance (repayment) of debt',
         'current': a,
         'previous': b,
         'per_change': 0 if b == 0 else round((a/b-1)*100)
     })
 
-    temp = cashflow_data_uncategorized['Share Capital']
-    cashflow_data['cashflow_from_financing_activities'].append({
+    temporary_storage = cashflow_data_uncategorized['Share Capital']
+    cashflow_data[cashflow_from_financing_activities].append({
         'activity': 'Issuance (repayment) of equity',
-        'current': temp['current'] - temp['previous'],
-        'previous': temp['previous'] - temp['pre_prev'],
-        'per_change': 0 if temp['previous'] - temp['pre_prev'] == 0 else round(((temp['current'] - temp['previous'])/(temp['previous'] - temp['pre_prev'])-1)*100)
+        'current': temporary_storage['current'] - temporary_storage['previous'],
+        'previous': temporary_storage['previous'] - temporary_storage['pre_prev'],
+        'per_change': 0 if temporary_storage['previous'] - temporary_storage['pre_prev'] == 0 else round(((temporary_storage['current'] - temporary_storage['previous'])/(temporary_storage['previous'] - temporary_storage['pre_prev'])-1)*100)
     })
 
-    for key in cashflow_data['cashflow_from_financing_activities']:
+    for key in cashflow_data[cashflow_from_financing_activities]:
         cashflow_data['net_cash_c']['current'] += key['current']
         cashflow_data['net_cash_c']['previous'] += key['previous']
     cashflow_data['net_cash_c']['per_change'] = 0 if cashflow_data['net_cash_c']['previous'] == 0 else round(
@@ -510,3 +519,60 @@ def cashflow_get(period):
 
     return cashflow_data
 
+
+def get_earnings(period):
+    earnings_accounts_data = ZohoAccount.objects.filter(
+        account_type__in=('income', 'expense',
+                          'other_expense', 'cost_of_goods_sold')
+    ).values_list('account_id', 'account_type')
+
+    transactions_related_to_earnings = ZohoTransaction.objects.filter(
+        account_id__in=(tup[0] for tup in earnings_accounts_data)
+    )
+
+    accounts_map = {}
+    for account in earnings_accounts_data:
+        accounts_map[account[0]] = account[1]
+
+    current_year_period = date(2022, 4, 1)
+    previous_period = period.replace(day=1)+relativedelta(days=-1)
+
+    cy_income, cy_cogs, cy_expenses = {'current': 0, 'previous': 0}, {
+        'current': 0, 'previous': 0}, {'current': 0, 'previous': 0}
+    ret_income, ret_cogs, ret_expenses = {'current': 0, 'previous': 0}, {
+        'current': 0, 'previous': 0}, {'current': 0, 'previous': 0}
+    for transaction in transactions_related_to_earnings:
+        credit_minus_debit = transaction.credit_amount - transaction.debit_amount
+        debit_minus_credit = transaction.debit_amount - transaction.credit_amount
+        if transaction.transaction_date >= current_year_period:
+            if accounts_map[transaction.account_id] == 'income':
+                cy_income['current'] += credit_minus_debit
+            if accounts_map[transaction.account_id] == 'cost_of_goods_sold':
+                cy_cogs['current'] += debit_minus_credit
+            if accounts_map[transaction.account_id] in ('expense', 'other_expense'):
+                cy_expenses['current'] += debit_minus_credit
+        if transaction.transaction_date >= current_year_period and transaction.transaction_date <= previous_period:
+            if accounts_map[transaction.account_id] == 'income':
+                cy_income['previous'] += credit_minus_debit
+            if accounts_map[transaction.account_id] == 'cost_of_goods_sold':
+                cy_cogs['previous'] += debit_minus_credit
+            if accounts_map[transaction.account_id] in ('expense', 'other_expense'):
+                cy_expenses['previous'] += debit_minus_credit
+        if transaction.transaction_date < current_year_period:
+            if accounts_map[transaction.account_id] == 'income':
+                ret_income['current'] += credit_minus_debit
+            if accounts_map[transaction.account_id] == 'cost_of_goods_sold':
+                ret_cogs['current'] += debit_minus_credit
+            if accounts_map[transaction.account_id] in ('expense', 'other_expense'):
+                ret_expenses['current'] += debit_minus_credit
+
+    current_year_earnings = {
+        'current': cy_income['current']-cy_cogs['current']-cy_expenses['current'],
+        'previous': cy_income['previous']-cy_cogs['previous']-cy_expenses['previous'],
+    }
+    retained_earnings = {
+        'current': ret_income['current']-ret_cogs['current']-ret_expenses['current'],
+        'previous': ret_income['current']-ret_cogs['current']-ret_expenses['current'],
+    }
+
+    return current_year_earnings, retained_earnings

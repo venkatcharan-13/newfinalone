@@ -53,7 +53,7 @@ class PnlData(APIView):
 
     def get(self, request, format=None):
 
-        pnl_data = acc_gets.pnl_get(SELECTED_DATE)
+        pnl_data = acc_gets.get_pnl(SELECTED_DATE)
         pnl_data_response = accounts_util.convert_to_indian_comma_notation(pnl_data)
         return Response(pnl_data_response)
 
@@ -63,57 +63,10 @@ class BalanceSheetData(APIView):
     permission_classes = []
 
     def get(self, request, format=None):
-        bal_sheet_data = acc_gets.balsheet_get(SELECTED_DATE)
+        bal_sheet_data = acc_gets.get_balsheet(SELECTED_DATE)
         bal_sheet_data_response = accounts_util.convert_to_indian_comma_notation(bal_sheet_data)
-
-        earnings_accounts_data = ZohoAccount.objects.filter(
-            account_type__in = ('income', 'expense', 'other_expense', 'cost_of_goods_sold')
-        ).values_list('account_id', 'account_type')
-
-        transactions_related_to_earnings = ZohoTransaction.objects.filter(
-            account_id__in = (tup[0] for tup in earnings_accounts_data)
-        )
-
-        accounts_map = {}
-        for account in earnings_accounts_data:
-            accounts_map[account[0]] = account[1]
-
-        current_year_period = date(2022, 4, 1)
-
-        cy_income, cy_cogs, cy_expenses = {'current': 0, 'previous': 0}, {'current': 0, 'previous': 0}, {'current': 0, 'previous': 0}
-        ret_income, ret_cogs, ret_expenses = {'current': 0, 'previous': 0}, {'current': 0, 'previous': 0}, {'current': 0, 'previous': 0}
-        for transaction in transactions_related_to_earnings:
-            if transaction.transaction_date >= current_year_period:
-                if accounts_map[transaction.account_id] == 'income':
-                    cy_income['current'] += (transaction.credit_amount - transaction.debit_amount)
-                if accounts_map[transaction.account_id] == 'cost_of_goods_sold':
-                    cy_cogs['current'] += (transaction.debit_amount - transaction.credit_amount)
-                if accounts_map[transaction.account_id] in ('expense', 'other_expense'):
-                    cy_expenses['current'] += (transaction.debit_amount - transaction.credit_amount)
-            if transaction.transaction_date >= current_year_period and transaction.transaction_date <= (SELECTED_DATE.replace(day=1)+relativedelta(days=-1)):
-                if accounts_map[transaction.account_id] == 'income':
-                    cy_income['previous'] += (transaction.credit_amount - transaction.debit_amount)
-                if accounts_map[transaction.account_id] == 'cost_of_goods_sold':
-                    cy_cogs['previous'] += (transaction.debit_amount - transaction.credit_amount)
-                if accounts_map[transaction.account_id] in ('expense', 'other_expense'):
-                    cy_expenses['previous'] += (transaction.debit_amount - transaction.credit_amount)
-            if transaction.transaction_date < current_year_period:
-                if accounts_map[transaction.account_id] == 'income':
-                    ret_income['current'] += (transaction.credit_amount - transaction.debit_amount)
-                if accounts_map[transaction.account_id] == 'cost_of_goods_sold':
-                    ret_cogs['current'] += (transaction.debit_amount - transaction.credit_amount)
-                if accounts_map[transaction.account_id] in ('expense', 'other_expense'):
-                    ret_expenses['current'] += (transaction.debit_amount - transaction.credit_amount)
-            
-        current_year_earnings = {
-            'current': cy_income['current']-cy_cogs['current']-cy_expenses['current'],
-            'previous': cy_income['previous']-cy_cogs['previous']-cy_expenses['previous'],
-        }
-        retained_earnings = {
-            'current': ret_income['current']-ret_cogs['current']-ret_expenses['current'],
-            'previous': ret_income['current']-ret_cogs['current']-ret_expenses['current'],
-        }
-
+        current_year_earnings, retained_earnings = acc_gets.get_earnings(SELECTED_DATE)
+        
         bal_sheet_data_response['equity'].extend([
             {
                 "account_header": "Current Year earnings",
@@ -136,7 +89,7 @@ class CashFlowData(APIView):
     permission_classes = []
 
     def get(self, request, format=None):
-        cashflow_data = acc_gets.cashflow_get(SELECTED_DATE)
+        cashflow_data = acc_gets.get_cashflow(SELECTED_DATE)
         cashflow_data_response = accounts_util.convert_to_indian_comma_notation(cashflow_data)
         return Response(cashflow_data_response)
 
@@ -147,9 +100,9 @@ class RatiosData(APIView):
 
     def get(self, request, format=None):
 
-        pnl_data = acc_gets.pnl_get(SELECTED_DATE)
-        balsheet_data = acc_gets.balsheet_get(SELECTED_DATE)
-        cashflow_data = acc_gets.cashflow_get(SELECTED_DATE)
+        pnl_data = acc_gets.get_pnl(SELECTED_DATE)
+        balsheet_data = acc_gets.get_balsheet(SELECTED_DATE)
+        cashflow_data = acc_gets.get_cashflow(SELECTED_DATE)
 
         ratios_data = {}
 
@@ -226,7 +179,6 @@ class RatiosData(APIView):
             'previous': 0 if (accpay['previous']+ocurrl['previous']) == 0 else (accrec['previous']+cash['previous']+bank['previous']+ocurra['previous'])/(accpay['previous']+ocurrl['previous']),
             'three_month_avg': 0 if (accpay['three_month_avg']+ocurrl['three_month_avg']) == 0 else (accrec['three_month_avg']+cash['three_month_avg']+bank['three_month_avg']+ocurra['three_month_avg'])/(accpay['three_month_avg']+ocurrl['three_month_avg'])
         }
-        # print(accpay['previous'], ocurrl['previous'])
         ratios_data['liquidity_ratio'].append(temp)
 
         for account in balsheet_data['other_current_liability']:

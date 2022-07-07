@@ -103,13 +103,12 @@ def get_income_vs_expenses(current_date):
         month_name = calendar.month_name[month]
         tot_income_vs_tot_expenses[month_name] = {'income': 0, 'expenses': 0}
         for transaction in transactions_related_to_income_expenses:
+            credit_minus_debit =  transaction.credit_amount - transaction.debit_amount
             if transaction.account_id in accounts_dic['income'] and transaction.transaction_date.month == month and transaction.transaction_date.year == current_date.year:
-                tot_income_vs_tot_expenses[month_name]['income'] += (
-                    transaction.credit_amount - transaction.debit_amount)
+                tot_income_vs_tot_expenses[month_name]['income'] += credit_minus_debit
 
             if (transaction.account_id in accounts_dic['expense'] or transaction.account_id in accounts_dic['other_expense']) and transaction.transaction_date.month == month and transaction.transaction_date.year == current_date.year:
-                tot_income_vs_tot_expenses[month_name]['expenses'] += (
-                    transaction.credit_amount - transaction.debit_amount)
+                tot_income_vs_tot_expenses[month_name]['expenses'] += credit_minus_debit
 
         tot_income_vs_tot_expenses[month_name]['income'] = round(
             tot_income_vs_tot_expenses[month_name]['income'])
@@ -232,19 +231,17 @@ def get_gross_profit_and_net_profit(current_date):
             'gross_profit_per': 0, 'net_profit_per': 0}
         tot_income, direct_income, expenses, cogs = 0, 0, 0, 0
         for transaction in transactions_related_to_profit:
+            credit_minus_debit = transaction.credit_amount - transaction.debit_amount
+            debit_minus_credit = transaction.debit_amount - transaction.credit_amount
             if transaction.transaction_date.month == month and transaction.transaction_date.year == 2022:
                 if transaction.account_id in income_accounts:
-                    tot_income += (transaction.credit_amount -
-                                   transaction.debit_amount)
+                    tot_income += credit_minus_debit
                 if transaction.account_id in direct_income_accounts:
-                    direct_income += (transaction.credit_amount -
-                                      transaction.debit_amount)
+                    direct_income += credit_minus_debit
                 if transaction.account_id in expenses_accounts:
-                    expenses += (transaction.debit_amount -
-                                 transaction.credit_amount)
+                    expenses += debit_minus_credit
                 if transaction.account_id in cogs_accounts:
-                    cogs += (transaction.debit_amount -
-                             transaction.credit_amount)
+                    cogs += debit_minus_credit
         gross_profit = tot_income - cogs
         pbt = gross_profit - expenses
         gross_profit_and_net_profit[month_name]['gross_profit_per'] = round(
@@ -654,13 +651,14 @@ def get_balance_sheet_summary(current_date):
         balance_sheet_summary['months'][i] = calendar.month_name[month][:3] + '-' + str(year % 100)
         assets, liabilities, equity = 0, 0, 0,
         for transaction in transactions_related_to_balancesheet:
+            credit_minus_debit = transaction.credit_amount - transaction.debit_amount
             if transaction.transaction_date <= prev_six_months[i]:
                 if accounts_map[transaction.account_id] in ('fixed_asset', 'accounts_receivable', 'other_asset', 'bank', 'cash', 'other_current_asset', 'stock'):
                     assets += (transaction.debit_amount - transaction.credit_amount)
                 if accounts_map[transaction.account_id] in ('accounts_payable', 'long_term_liability', 'other_liability', 'other_current_liability'):
-                    liabilities += (transaction.credit_amount - transaction.debit_amount)
+                    liabilities += credit_minus_debit
                 if accounts_map[transaction.account_id] in ('equity'):
-                    equity += (transaction.credit_amount - transaction.debit_amount)
+                    equity += credit_minus_debit
 
         balance_sheet_summary['Assets'][i] = locale.format("%d", assets, grouping=True)
         balance_sheet_summary['Liabilities'][i] = locale.format("%d", liabilities, grouping=True)

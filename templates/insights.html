@@ -1,7 +1,83 @@
 {% extends 'analytics_base.html' %}
-
+{% load static %}
 {% block title %}Insights{% endblock title %}
 {% block active2 %}active{% endblock active2 %}
 {% block body %}
-  <h1>Insights Part</h1>
+<h1>Insights</h1>
+<div class="fortable1">
+  
+  <table class="table table-striped table-bordered" id="insigts_table">
+    <thead>
+      <tr>
+        <th scope="col" style="width: 40%;">Expense</th>
+        <th scope="col" style="width: 15%; text-align: right;">Current</th>
+        <th scope="col" style="width: 15%; text-align: right;">Previous</th>
+        <th scope="col" style="width: 15%; text-align: center;">% Change</th>
+        <th scope="col" style="width: 15%; text-align: right;">Avg of last 3 months</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr id="advt_and_marketing">
+        <th scope="row" colspan="7">Advertising and Marketing Expenses</th>
+      </tr>
+      <tr>
+        <td colspan="7">
+          <table class="table mb-0" id="advt_and_marketing_insights">
+            <tbody>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      <tr id="employement">
+        <th scope="row" colspan="7">Employment Expenses</th>
+      </tr>
+      <tr>
+        <td colspan="7">
+          <table class="table mb-0" id="employement_insights">
+            <tbody>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      <tr id="rent_rate_repair">
+        <th scope="row" colspan="7">Rent, Rates & Repairs Expenses</th>
+      </tr>
+      <tr>
+        <td colspan="7">
+          <table class="table mb-0" id="rent_rate_repair_insights">
+            <tbody>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      <tr id="brokerage_commission">
+        <th scope="row" colspan="7">Brokerage & Commission Charges</th>
+      </tr>
+      <tr>
+        <td colspan="7">
+          <table class="table mb-0" id="brokerage_commission_insights">
+            <tbody>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      <tr id="general_and_admin">
+        <th scope="row" colspan="7">General & Admin Charges</th>
+      </tr>
+      <tr>
+        <td colspan="7">
+          <table class="table mb-0" id="general_and_admin_insights">
+            <tbody>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
 {% endblock body %}
+
+{% block script %}
+  <script src="{% static 'js/insights.js' %}"></script>
+{% endblock script %}
