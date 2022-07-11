@@ -556,16 +556,16 @@ def get_deep_insight_twelve(current_period):
         account_id__in = accounts_map, transaction_date__gte = current_month_start
     )
 
-    temporary_storageorary_storage = {}
+    temporary_storage = {}
     double_transactions = {}
     for transaction in transactions_related_to_bank:
         credit_minus_debit = transaction.credit_amount - transaction.debit_amount
         trans_date = transaction.transaction_date
         key = transaction.payee
-        if key not in temporary_storageorary_storage:
-            temporary_storageorary_storage[key] = (credit_minus_debit, trans_date)
+        if key not in temporary_storage:
+            temporary_storage[key] = (credit_minus_debit, trans_date)
         else:
-            if temporary_storageorary_storage[key] == (credit_minus_debit, trans_date):
+            if temporary_storage[key] == (credit_minus_debit, trans_date):
                 double_transactions[transaction.payee] = (accounts_map[transaction.account_id], trans_date, credit_minus_debit)
 
     deep_insight_twelve_data = []
