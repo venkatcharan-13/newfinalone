@@ -1,14 +1,10 @@
-from datetime import datetime, date
+from datetime import date
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from dateutil.relativedelta import relativedelta
-from accounts.models import ZohoAccount, ZohoTransaction
-from utility import analytics_util
-import locale
-from django.db.models import Sum
+from utility import analytics_util, insights_util
 
-CURRENT_DATE = datetime.now()
+SELECTED_DATE = date(2022, 6, 30)
 
 # Create your views here.
 def analytics(request):
@@ -16,7 +12,6 @@ def analytics(request):
 
 
 def insights(request):
-
     return render(request, 'insights.html')
 
 
@@ -29,18 +24,18 @@ class ReportData(APIView):
     permission_classes = []
 
     def get(self, request, format=None):
-        monthly_sales, quarterly_sales, yearly_sales = analytics_util.get_sales_performance(CURRENT_DATE)
-        tot_income_vs_tot_expenses = analytics_util.get_income_vs_expenses(CURRENT_DATE)
-        cash_inflow_vs_outflow = analytics_util.get_cash_inflow_outflow(CURRENT_DATE)
-        closing_bank_balance_trend = analytics_util.get_closing_bank_balance_trend(CURRENT_DATE)
-        gross_profit_and_net_profit = analytics_util.get_gross_profit_and_net_profit(CURRENT_DATE)
-        monthly_runaway = analytics_util.get_monthly_runaway(CURRENT_DATE)
-        gp_vs_expenses_vs_ebitda = analytics_util.get_gp_vs_expenses_ebitda(CURRENT_DATE)
+        monthly_sales, quarterly_sales, yearly_sales = analytics_util.get_sales_performance(SELECTED_DATE)
+        tot_income_vs_tot_expenses = analytics_util.get_income_vs_expenses(SELECTED_DATE)
+        cash_inflow_vs_outflow = analytics_util.get_cash_inflow_outflow(SELECTED_DATE)
+        closing_bank_balance_trend = analytics_util.get_closing_bank_balance_trend(SELECTED_DATE)
+        gross_profit_and_net_profit = analytics_util.get_gross_profit_and_net_profit(SELECTED_DATE)
+        monthly_runaway = analytics_util.get_monthly_runaway(SELECTED_DATE)
+        gp_vs_expenses_vs_ebitda = analytics_util.get_gp_vs_expenses_ebitda(SELECTED_DATE)
         gp_vs_expenses_vs_ebitda_values = tuple(gp_vs_expenses_vs_ebitda.values())
-        monthly_cashflow_statements = analytics_util.get_monthly_cashflow_statement(CURRENT_DATE)
-        pnl_summary = analytics_util.get_pnl_summary(CURRENT_DATE)
-        balance_sheet_summary = analytics_util.get_balance_sheet_summary(CURRENT_DATE)
-        cashflow_statement_summary = analytics_util.get_cashflow_summary(CURRENT_DATE)
+        monthly_cashflow_statements = analytics_util.get_monthly_cashflow_statement(SELECTED_DATE)
+        pnl_summary = analytics_util.get_pnl_summary(SELECTED_DATE)
+        balance_sheet_summary = analytics_util.get_balance_sheet_summary(SELECTED_DATE)
+        cashflow_statement_summary = analytics_util.get_cashflow_summary(SELECTED_DATE)
         
         data = {
             "monthly_sales_performance": {
@@ -160,114 +155,42 @@ class InsightsData(APIView):
 
     def get(self, request, format=None):
 
-        parent_summary = {
-            'Advertising and Marketing Expenses': 0, 
-            'Employment Expenses': 0, 
-            'General & Admin Charges': 0, 
-            'Brokerage & Commission Charges': 0, 
-            'Rent, Rates & Repairs Expenses': 0
+        insights_data_response = insights_util.get_insights(SELECTED_DATE)
+        return Response(insights_data_response)
+
+
+class DeepInsightsData(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request, format=None):
+
+        deep_insight_one = insights_util.get_deep_insight_one(SELECTED_DATE)
+        deep_insight_two = insights_util.get_deep_insight_two(SELECTED_DATE)
+        deep_insight_three = insights_util.get_deep_insight_three(SELECTED_DATE)
+        deep_insight_four = insights_util.get_deep_insight_four(SELECTED_DATE)
+        deep_insight_five = insights_util.get_deep_insight_five(SELECTED_DATE)
+        deep_insight_six = insights_util.get_deep_insight_six(SELECTED_DATE)
+        deep_insight_seven = insights_util.get_deep_insight_seven(SELECTED_DATE)
+        deep_insight_eight = insights_util.get_deep_insight_eight(SELECTED_DATE)
+        deep_insight_nine = insights_util.get_deep_insight_nine(SELECTED_DATE)
+        deep_insight_ten = insights_util.get_deep_insight_ten(SELECTED_DATE)
+        deep_insight_eleven = insights_util.get_deep_insight_eleven(SELECTED_DATE)
+        deep_insight_twelve = insights_util.get_deep_insight_twelve(SELECTED_DATE)
+
+        deep_insights_response = {
+            'deep_insight_one': deep_insight_one,
+            'deep_insight_two': deep_insight_two,
+            'deep_insight_three': deep_insight_three,
+            'deep_insight_four': deep_insight_four,
+            'deep_insight_five': deep_insight_five,
+            'deep_insight_six': deep_insight_six,
+            'deep_insight_seven': deep_insight_seven,
+            'deep_insight_eight': deep_insight_eight,
+            'deep_insight_nine': deep_insight_nine,
+            'deep_insight_ten': deep_insight_ten,
+            'deep_insight_eleven': deep_insight_eleven,
+            'deep_insight_twelve': deep_insight_twelve,
         }
-
-        accounts_related_to_expenses = ZohoAccount.objects.filter(
-            account_type__in = ('expense', 'other_expense')
-        ).values_list('account_id', 'account_for_coding', 'parent_account_name')
-
-        accounts_map = {}
-        for account in accounts_related_to_expenses:
-            accounts_map[account[0]] = account[2]
         
-        prev_three_months = []
-        current_date = CURRENT_DATE
-        for i in range(3):
-            last_date_of_previous_month = current_date.replace(
-                day=1) + relativedelta(days=-1)
-            prev_three_months.append(last_date_of_previous_month.date())
-            current_date = last_date_of_previous_month
-        
-        transactions_for_last_three_months = ZohoTransaction.objects.filter(
-            transaction_date__gte = prev_three_months[-1], account_id__in = accounts_map
-        )
-
-        transactions_map = {}
-        for transaction in transactions_for_last_three_months:
-            parent_account = accounts_map[transaction.account_id]
-            if parent_account not in transactions_map:
-                transactions_map[parent_account] = []
-            transactions_map[parent_account].append(transaction)
-
-        current, previous = prev_three_months[0], prev_three_months[1]
-        for expense_head in parent_summary:
-            temp = {
-                "current": 0,
-                "previous": 0,
-                "per_change": 0,
-                "three_month_avg": 0
-            }
-            if expense_head in transactions_map:
-                for transaction in transactions_map[expense_head]:
-                    if transaction.transaction_date.month == current.month and transaction.transaction_date.year == current.year:
-                        temp['current'] += (transaction.debit_amount - transaction.credit_amount)
-                    if transaction.transaction_date.month == previous.month and transaction.transaction_date.year == previous.year:
-                        temp['previous'] += (transaction.debit_amount - transaction.credit_amount)
-                    temp['three_month_avg'] += (transaction.debit_amount - transaction.credit_amount)
-
-            temp['per_change'] = 0 if temp['previous'] == 0 else round((temp['current']/temp['previous']-1)*100)
-            temp['three_month_avg'] = locale.format("%d", temp['three_month_avg'] / 3, grouping=True)
-            temp['change'] = locale.format("%d", temp['current'] -  temp['previous'], grouping=True)
-            temp['current'] = locale.format("%d", temp['current'], grouping=True)
-            temp['previous'] = locale.format("%d", temp['previous'], grouping=True)
-            parent_summary[expense_head] = temp
-
-        current_month_payees = {}
-        previous_month_payees = {}
-        for expense_head in parent_summary:
-            current_month_payees[expense_head] = {}
-            previous_month_payees[expense_head] = {}
-            if expense_head in transactions_map:
-                temp_curr = current_month_payees[expense_head]
-                temp_prev = previous_month_payees[expense_head]
-                for transaction in transactions_map[expense_head]:
-                    if transaction.transaction_date.month == current.month and transaction.transaction_date.year == current.year:
-                        if transaction.payee not in temp_curr:
-                            temp_curr[transaction.payee] = 0
-                        temp_curr[transaction.payee] += (transaction.debit_amount - transaction.credit_amount)
-                    if transaction.transaction_date.month == previous.month and transaction.transaction_date.year == previous.year:
-                        if transaction.payee not in temp_prev:
-                            temp_prev[transaction.payee] = 0
-                        temp_prev[transaction.payee] += (transaction.debit_amount - transaction.credit_amount)
-        
-        insights_data = {}
-        for key in parent_summary:
-            insights_data[key] = []
-            curr_dic = current_month_payees[key]
-            prev_dic = previous_month_payees[key]
-            for k in curr_dic:
-                if k not in prev_dic:
-                    insights_data[key].append(
-                        {
-                            'payee': k,
-                            'additional': locale.format("%d", curr_dic[k], grouping=True)
-                        }
-                    )
-                elif curr_dic[k] > prev_dic[k]:
-                    insights_data[key].append(
-                        {
-                            'payee': k,
-                            'additional': locale.format("%d", curr_dic[k] - prev_dic[k], grouping=True)
-                        }
-                    )
-
-        data = {
-            'advt_and_marketing_header': parent_summary['Advertising and Marketing Expenses'],
-            'advt_and_marketing_insights': insights_data['Advertising and Marketing Expenses'],
-            'employement_header':parent_summary['Employment Expenses'],
-            'employement_insights':insights_data['Employment Expenses'],
-            'rent_rates_and_repairs_header':parent_summary['Rent, Rates & Repairs Expenses'],
-            'rent_rates_and_repairs_insights':insights_data['Rent, Rates & Repairs Expenses'],
-            'brokerage_and_commission_header': parent_summary['Brokerage & Commission Charges'],
-            'brokerage_and_commission_insights':insights_data['Brokerage & Commission Charges'],
-            'general_and_admin_header': parent_summary['General & Admin Charges'],
-            'general_and_admin_insights':insights_data['General & Admin Charges']
-        }
-
-        return Response(data)
+        return Response(deep_insights_response)

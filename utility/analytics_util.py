@@ -22,13 +22,23 @@ def get_sales_performance(current_date):
 
     monthly_sale = {}
 
-    for i in range(5, -1, -1):
-        month = (current_date.replace(day=1) +
-                 relativedelta(days=-1)).month - i
+    prev_six_months = [current_date]
+    temp = current_date
+    for i in range(5):
+        last_date_of_previous_month = temp.replace(
+            day=1) + relativedelta(days=-1)
+        prev_six_months.append(last_date_of_previous_month)
+        temp = last_date_of_previous_month
+    prev_six_months.sort()
+
+    for period in prev_six_months:
+        month = period.month
+        year = period.year
         month_name = calendar.month_name[month]
         monthly_sale[month_name] = 0
         for transaction in transactions_related_to_income:
-            if transaction.transaction_date.month == month and transaction.transaction_date.year == current_date.year:
+            trans_date = transaction.transaction_date
+            if (trans_date.month, trans_date.year) == (month, year):
                 monthly_sale[month_name] += (
                     transaction.credit_amount - transaction.debit_amount)
         monthly_sale[month_name] = round(monthly_sale[month_name])
@@ -40,26 +50,32 @@ def get_sales_performance(current_date):
         'Oct-Dec': 0
     }
 
+    # THIS PART HAS BEEN HARD CODED, WILL BE CHANGED LATER
+
     for transaction in transactions_related_to_income:
-        if transaction.transaction_date <= date(2022, 6, 30) and transaction.transaction_date >= date(2022, 4, 1):
+        trans_date = transaction.transaction_date
+        if trans_date <= date(2022, 6, 30) and trans_date >= date(2022, 4, 1):
             quarterly_sale["Apr-Jun"] += (
                 transaction.credit_amount - transaction.debit_amount)
     quarterly_sale["Apr-Jun"] = round(quarterly_sale["Apr-Jun"])
 
     for transaction in transactions_related_to_income:
-        if transaction.transaction_date <= date(2022, 3, 31) and transaction.transaction_date >= date(2022, 1, 1):
+        trans_date = transaction.transaction_date
+        if trans_date <= date(2022, 3, 31) and trans_date >= date(2022, 1, 1):
             quarterly_sale["Jan-Mar"] += (
                 transaction.credit_amount - transaction.debit_amount)
     quarterly_sale["Jan-Mar"] = round(quarterly_sale["Jan-Mar"])
 
     for transaction in transactions_related_to_income:
-        if transaction.transaction_date <= date(2021, 12, 31) and transaction.transaction_date >= date(2021, 10, 1):
+        trans_date = transaction.transaction_date
+        if trans_date <= date(2021, 12, 31) and trans_date >= date(2021, 10, 1):
             quarterly_sale["Oct-Dec"] += (
                 transaction.credit_amount - transaction.debit_amount)
     quarterly_sale["Oct-Dec"] = round(quarterly_sale["Oct-Dec"])
 
     for transaction in transactions_related_to_income:
-        if transaction.transaction_date <= date(2021, 9, 30) and transaction.transaction_date >= date(2021, 7, 1):
+        trans_date = transaction.transaction_date
+        if trans_date <= date(2021, 9, 30) and trans_date >= date(2021, 7, 1):
             quarterly_sale["Jul-Sep"] += (
                 transaction.credit_amount - transaction.debit_amount)
     quarterly_sale["Jul-Sep"] = round(quarterly_sale["Jul-Sep"])
@@ -78,9 +94,9 @@ def get_sales_performance(current_date):
 
 
 def get_income_vs_expenses(current_date):
-    accounts_related_to_income_expenses = list(ZohoAccount.objects.filter(
+    accounts_related_to_income_expenses = ZohoAccount.objects.filter(
         account_type__in=('income', 'expense', 'other_expense')
-    ).values_list('account_id', 'account_type'))
+    ).values_list('account_id', 'account_type')
 
     transactions_related_to_income_expenses = ZohoTransaction.objects.filter(
         account_id__in=(tup[0] for tup in accounts_related_to_income_expenses)
@@ -89,25 +105,27 @@ def get_income_vs_expenses(current_date):
     for tup in accounts_related_to_income_expenses:
         accounts_dic[tup[1]].append(tup[0])
 
-    prev_six_months = []
-    for i in range(6):
+    prev_six_months = [current_date]
+    for i in range(5):
         last_date_of_previous_month = current_date.replace(
             day=1) + relativedelta(days=-1)
-        prev_six_months.append(last_date_of_previous_month.date())
+        prev_six_months.append(last_date_of_previous_month)
         current_date = last_date_of_previous_month
 
     tot_income_vs_tot_expenses = {}
 
     for i in range(5, -1, -1):
         month = prev_six_months[i].month
-        month_name = calendar.month_name[month]
+        year = prev_six_months[i].year
+        month_name = calendar.month_name[month][:3] + '-' + str(year)[2:]
         tot_income_vs_tot_expenses[month_name] = {'income': 0, 'expenses': 0}
         for transaction in transactions_related_to_income_expenses:
+            trans_date = transaction.transaction_date
             credit_minus_debit =  transaction.credit_amount - transaction.debit_amount
-            if transaction.account_id in accounts_dic['income'] and transaction.transaction_date.month == month and transaction.transaction_date.year == current_date.year:
+            if transaction.account_id in accounts_dic['income'] and trans_date.month == month and trans_date.year == current_date.year:
                 tot_income_vs_tot_expenses[month_name]['income'] += credit_minus_debit
 
-            if (transaction.account_id in accounts_dic['expense'] or transaction.account_id in accounts_dic['other_expense']) and transaction.transaction_date.month == month and transaction.transaction_date.year == current_date.year:
+            if (transaction.account_id in accounts_dic['expense'] or transaction.account_id in accounts_dic['other_expense']) and trans_date.month == month and trans_date.year == current_date.year:
                 tot_income_vs_tot_expenses[month_name]['expenses'] += credit_minus_debit
 
         tot_income_vs_tot_expenses[month_name]['income'] = round(
@@ -127,21 +145,23 @@ def get_cash_inflow_outflow(current_date):
         account_id__in=(tup[0] for tup in accounts_related_to_bank)
     )
 
-    prev_six_months = []
-    for i in range(6):
+    prev_six_months = [current_date]
+    for i in range(5):
         last_date_of_previous_month = current_date.replace(
             day=1) + relativedelta(days=-1)
-        prev_six_months.append(last_date_of_previous_month.date())
+        prev_six_months.append(last_date_of_previous_month)
         current_date = last_date_of_previous_month
 
     cash_inflow_vs_outflow = {}
 
     for i in range(5, -1, -1):
         month = prev_six_months[i].month
-        month_name = calendar.month_name[month]
+        year = prev_six_months[i].year
+        month_name = calendar.month_name[month][:3] + '-' + str(year)[2:]
         cash_inflow_vs_outflow[month_name] = {'credit': 0, 'debit': 0}
         for transaction in transactions_related_to_bank:
-            if transaction.transaction_date.month == month and transaction.transaction_date.year == 2022:
+            trans_date = transaction.transaction_date
+            if trans_date.month == month and trans_date.year == year:
                 cash_inflow_vs_outflow[month_name]['credit'] += transaction.credit_amount
                 cash_inflow_vs_outflow[month_name]['debit'] += transaction.debit_amount
 
@@ -162,18 +182,19 @@ def get_closing_bank_balance_trend(current_date):
         account_id__in=(tup[0] for tup in accounts_related_to_bank)
     )
 
-    prev_six_months = []
-    for i in range(6):
+    prev_six_months = [current_date]
+    for i in range(5):
         last_date_of_previous_month = current_date.replace(
             day=1) + relativedelta(days=-1)
-        prev_six_months.append(last_date_of_previous_month.date())
+        prev_six_months.append(last_date_of_previous_month)
         current_date = last_date_of_previous_month
 
     closing_bank_balance_trend = {}
 
     for i in range(5, -1, -1):
         month = prev_six_months[i].month
-        month_name = calendar.month_name[month]
+        year = prev_six_months[i].year
+        month_name = calendar.month_name[month][:3] + '-' + str(year)[2:]
         closing_bank_balance_trend[month_name] = 0
         for transaction in transactions_related_to_bank:
             if transaction.transaction_date <= prev_six_months[i]:
@@ -201,16 +222,16 @@ def get_gross_profit_and_net_profit(current_date):
         if account[2] not in accounts_map[key]:
             accounts_map[key][account[2]] = []
         accounts_map[key][account[2]].append(account[0])
-
+    
     transactions_related_to_profit = ZohoTransaction.objects.filter(
         account_id__in=(tup[0] for tup in accounts_related_to_profit)
     )
 
-    prev_six_months = []
-    for i in range(6):
+    prev_six_months = [current_date]
+    for i in range(5):
         last_date_of_previous_month = current_date.replace(
             day=1) + relativedelta(days=-1)
-        prev_six_months.append(last_date_of_previous_month.date())
+        prev_six_months.append(last_date_of_previous_month)
         current_date = last_date_of_previous_month
 
     gross_profit_and_net_profit = {}
@@ -226,14 +247,16 @@ def get_gross_profit_and_net_profit(current_date):
 
     for i in range(5, -1, -1):
         month = prev_six_months[i].month
-        month_name = calendar.month_name[month]
+        year = prev_six_months[i].year
+        month_name = calendar.month_name[month][:3] + '-' + str(year)[2:]
         gross_profit_and_net_profit[month_name] = {
             'gross_profit_per': 0, 'net_profit_per': 0}
         tot_income, direct_income, expenses, cogs = 0, 0, 0, 0
         for transaction in transactions_related_to_profit:
+            trans_date = transaction.transaction_date
             credit_minus_debit = transaction.credit_amount - transaction.debit_amount
             debit_minus_credit = transaction.debit_amount - transaction.credit_amount
-            if transaction.transaction_date.month == month and transaction.transaction_date.year == 2022:
+            if trans_date.month == month and trans_date.year == 2022:
                 if transaction.account_id in income_accounts:
                     tot_income += credit_minus_debit
                 if transaction.account_id in direct_income_accounts:
@@ -245,9 +268,9 @@ def get_gross_profit_and_net_profit(current_date):
         gross_profit = tot_income - cogs
         pbt = gross_profit - expenses
         gross_profit_and_net_profit[month_name]['gross_profit_per'] = round(
-            (gross_profit/direct_income)*100)
+            0 if direct_income == 0 else (gross_profit/direct_income)*100)
         gross_profit_and_net_profit[month_name]['net_profit_per'] = round(
-            (pbt/direct_income)*100)
+            0 if direct_income == 0 else (pbt/direct_income)*100)
 
     return gross_profit_and_net_profit
 
@@ -262,26 +285,29 @@ def get_monthly_runaway(current_date):
         account_id__in=(tup[0] for tup in accounts_related_to_balance)
     )
 
-    prev_seven_months = []
-    for i in range(7):
+    prev_seven_months = [current_date]
+    for i in range(6):
         last_date_of_previous_month = current_date.replace(
             day=1) + relativedelta(days=-1)
-        prev_seven_months.append(last_date_of_previous_month.date())
+        prev_seven_months.append(last_date_of_previous_month)
         current_date = last_date_of_previous_month
 
     monthly_runway = {}
 
     for i in range(5, -1, -1):
         month = prev_seven_months[i].month
-        month_name = calendar.month_name[month]
+        year = prev_seven_months[i].year
+        month_name = calendar.month_name[month][:3] + '-' + str(year)[2:]
         monthly_runway[month_name] = 0
         curr, prev = 0, 0
         for transaction in transactions_related_to_balance:
-            if transaction.transaction_date <= prev_seven_months[i]:
-                curr += (transaction.debit_amount - transaction.credit_amount)
-            if transaction.transaction_date <= prev_seven_months[i+1]:
-                prev += (transaction.debit_amount - transaction.credit_amount)
-        monthly_runway[month_name] = round(curr/(curr-prev))
+            trans_date = transaction.transaction_date
+            debit_minus_credit = (transaction.debit_amount - transaction.credit_amount)
+            if trans_date <= prev_seven_months[i]:
+                curr += debit_minus_credit
+            if trans_date <= prev_seven_months[i+1]:
+                prev += debit_minus_credit
+        monthly_runway[month_name] = round(0 if curr-prev == 0 else curr/(curr-prev))
 
     return monthly_runway
 
@@ -322,39 +348,43 @@ def get_gp_vs_expenses_ebitda(current_date):
         account_id__in = (tup[0] for tup in accounts_related_to_expenses)
     )
     
-    prev_six_months = []
-    for i in range(6):
+    prev_six_months = [current_date]
+    for i in range(5):
         last_date_of_previous_month = current_date.replace(
             day=1) + relativedelta(days=-1)
-        prev_six_months.append(last_date_of_previous_month.date())
+        prev_six_months.append(last_date_of_previous_month)
         current_date = last_date_of_previous_month
 
     gp_vs_expenses_ebitda = {}
     for i in range(5, -1, -1):
         month = prev_six_months[i].month
         year = prev_six_months[i].year
-        month_name = calendar.month_name[month]
+        month_name = calendar.month_name[month][:3] + '-' + str(year)[2:]
         gp_vs_expenses_ebitda[month_name] = {
             'gross_profit': 0, 'expenses': 0, 'ebitda': 0
         }
         income, direct_income, cogs, expenses = 0, 0, 0, 0
         for transaction in transactions_related_to_income:
-            if transaction.transaction_date.month == month and transaction.transaction_date.year == year:
+            trans_date = transaction.transaction_date
+            if trans_date.month == month and trans_date.year == year:
                 income += (transaction.credit_amount - transaction.debit_amount)
         for transaction in transactions_related_to_direct_income:
-            if transaction.transaction_date.month == month and transaction.transaction_date.year == year:
+            trans_date = transaction.transaction_date
+            if trans_date.month == month and trans_date.year == year:
                 direct_income += (transaction.credit_amount - transaction.debit_amount)
         for transaction in transactions_related_to_cogs:
-            if transaction.transaction_date.month == month and transaction.transaction_date.year == year:
+            trans_date = transaction.transaction_date
+            if trans_date.month == month and trans_date.year == year:
                 cogs += (transaction.debit_amount - transaction.credit_amount)
         for transaction in transactions_related_to_expenses:
-            if transaction.transaction_date.month == month and transaction.transaction_date.year == year:
+            trans_date = transaction.transaction_date
+            if trans_date.month == month and trans_date.year == year:
                 expenses += (transaction.debit_amount - transaction.credit_amount)
         
         pbt = income - cogs - expenses
         gp_vs_expenses_ebitda[month_name]['gross_profit'] = round(income-cogs)
         gp_vs_expenses_ebitda[month_name]['expenses'] = round(expenses)
-        gp_vs_expenses_ebitda[month_name]['ebitda'] = round(pbt/direct_income * 100)
+        gp_vs_expenses_ebitda[month_name]['ebitda'] = 0 if direct_income == 0 else round(pbt/direct_income * 100)
         
     return gp_vs_expenses_ebitda
 
@@ -378,7 +408,7 @@ def get_monthly_cashflow_statement(current_date):
         'Share Capital'
     )
 
-     # Fetching data related to cashflow accounts
+    # Fetching data related to cashflow accounts
     cashflow_accounts_data = ZohoAccount.objects.filter(
         account_for_coding__in = cashflow_accounts
     ).values_list('account_id', 'account_for_coding', 'account_type')
@@ -390,21 +420,19 @@ def get_monthly_cashflow_statement(current_date):
     accounts_related_to_pbt = ZohoAccount.objects.filter(
         account_type__in = ('income', 'expense', 'other_expense', 'cost_of_goods_sold')
     ).values_list('account_id', 'account_type')
+
+    accounts_map = dict(accounts_related_to_pbt)
     
     transactions_related_to_pbt = ZohoTransaction.objects.filter(
-        account_id__in = (tup[0] for tup in accounts_related_to_pbt)
+        account_id__in = accounts_map
     )
-
-    accounts_map = {}
-    for account in accounts_related_to_pbt:
-        accounts_map[account[0]] = account[1]
     
-    prev_six_months = []
+    prev_six_months = [current_date]
     temp_date = current_date
-    for i in range(6):
+    for i in range(5):
         last_date_of_previous_month = temp_date.replace(
             day=1) + relativedelta(days=-1)
-        prev_six_months.append(last_date_of_previous_month.date())
+        prev_six_months.append(last_date_of_previous_month)
         temp_date = last_date_of_previous_month
 
     pbt_lst = []
@@ -413,13 +441,16 @@ def get_monthly_cashflow_statement(current_date):
         year = prev_six_months[i].year
         income, cogs, expenses = 0, 0, 0,
         for transaction in transactions_related_to_pbt:
-            if transaction.transaction_date.month == month and transaction.transaction_date.year == year:
+            trans_date = transaction.transaction_date
+            credit_minus_debit = (transaction.credit_amount - transaction.debit_amount)
+            debit_mius_credit = (transaction.debit_amount - transaction.credit_amount)
+            if trans_date.month == month and trans_date.year == year:
                 if accounts_map[transaction.account_id] == 'income':
-                    income += (transaction.credit_amount - transaction.debit_amount)
+                    income += credit_minus_debit
                 if accounts_map[transaction.account_id] == 'cost_of_goods_sold':
-                    cogs += (transaction.debit_amount - transaction.credit_amount)
+                    cogs += debit_mius_credit
                 if accounts_map[transaction.account_id] in ('expense', 'other_expense'):
-                    expenses += (transaction.debit_amount - transaction.credit_amount)
+                    expenses += debit_mius_credit
         pbt_lst.append(round(income-cogs-expenses))
  
     # Defining structure for API response
@@ -448,11 +479,11 @@ def get_monthly_cashflow_statement(current_date):
                 transactions_map[acccount_header] = []
             transactions_map[acccount_header].append(transaction)
 
-    prev_seven_months = []
-    for i in range(7):
+    prev_seven_months = [current_date]
+    for i in range(6):
         last_date_of_previous_month = current_date.replace(
             day=1) + relativedelta(days=-1)
-        prev_seven_months.append(last_date_of_previous_month.date())
+        prev_seven_months.append(last_date_of_previous_month)
         current_date = last_date_of_previous_month
     prev_seven_months.reverse()
     assets_related_types = ('fixed_asset', 'accounts_receivable', 'other_asset', 'bank', 'cash', 'other_current_asset', 'stock')
@@ -557,20 +588,19 @@ def get_pnl_summary(current_date):
     accounts_related_to_pnl = ZohoAccount.objects.filter(
         account_type__in = ('income', 'expense', 'other_expense', 'cost_of_goods_sold')
     ).values_list('account_id', 'account_type')
+
+    accounts_map = dict(accounts_related_to_pnl)
     
     transactions_related_to_pnl = ZohoTransaction.objects.filter(
-        account_id__in = (tup[0] for tup in accounts_related_to_pnl)
+        account_id__in = accounts_map
     )
 
-    accounts_map = {}
-    for account in accounts_related_to_pnl:
-        accounts_map[account[0]] = account[1]
     
-    prev_six_months = []
-    for i in range(6):
+    prev_six_months = [current_date]
+    for i in range(5):
         last_date_of_previous_month = current_date.replace(
             day=1) + relativedelta(days=-1)
-        prev_six_months.append(last_date_of_previous_month.date())
+        prev_six_months.append(last_date_of_previous_month)
         current_date = last_date_of_previous_month
     prev_six_months.reverse()
 
@@ -588,13 +618,16 @@ def get_pnl_summary(current_date):
         pnl_summary['months'][i] = calendar.month_name[month][:3] + '-' + str(year % 100)
         income, cogs, expenses = 0, 0, 0,
         for transaction in transactions_related_to_pnl:
-            if transaction.transaction_date.month == month and transaction.transaction_date.year == year:
+            trans_date = transaction.transaction_date
+            credit_minus_debit = transaction.credit_amount - transaction.debit_amount
+            debit_minus_credit = transaction.debit_amount - transaction.credit_amount
+            if trans_date.month == month and trans_date.year == year:
                 if accounts_map[transaction.account_id] == 'income':
-                    income += (transaction.credit_amount - transaction.debit_amount)
+                    income += credit_minus_debit
                 if accounts_map[transaction.account_id] == 'cost_of_goods_sold':
-                    cogs += (transaction.debit_amount - transaction.credit_amount)
+                    cogs += debit_minus_credit
                 if accounts_map[transaction.account_id] in ('expense', 'other_expense'):
-                    expenses += (transaction.debit_amount - transaction.credit_amount)
+                    expenses += debit_minus_credit
         pnl_summary['Income'][i] = locale.format("%d", income, grouping=True)
         pnl_summary['Cost of Goods Sold'][i] = locale.format("%d", cogs, grouping=True)
         pnl_summary['Expenses'][i] = locale.format("%d", expenses, grouping=True)
@@ -623,19 +656,17 @@ def get_balance_sheet_summary(current_date):
         )
     ).values_list('account_id', 'account_type')
 
+    accounts_map = dict(accounts_related_to_balancesheet)
+
     transactions_related_to_balancesheet = ZohoTransaction.objects.filter(
-        account_id__in = (tup[0] for tup in accounts_related_to_balancesheet)
+        account_id__in = accounts_map
     )
     
-    accounts_map = {}
-    for account in accounts_related_to_balancesheet:
-        accounts_map[account[0]] = account[1]
-    
-    prev_six_months = []
-    for i in range(6):
+    prev_six_months = [current_date]
+    for i in range(5):
         last_date_of_previous_month = current_date.replace(
             day=1) + relativedelta(days=-1)
-        prev_six_months.append(last_date_of_previous_month.date())
+        prev_six_months.append(last_date_of_previous_month)
         current_date = last_date_of_previous_month
     prev_six_months.reverse()
 
@@ -648,13 +679,14 @@ def get_balance_sheet_summary(current_date):
     for i in range(5, -1, -1):
         month = prev_six_months[i].month
         year = prev_six_months[i].year
-        balance_sheet_summary['months'][i] = calendar.month_name[month][:3] + '-' + str(year % 100)
+        balance_sheet_summary['months'][i] = calendar.month_name[month][:3] + '-' + str(year)[2:]
         assets, liabilities, equity = 0, 0, 0,
         for transaction in transactions_related_to_balancesheet:
+            debit_minus_credit = transaction.debit_amount - transaction.credit_amount
             credit_minus_debit = transaction.credit_amount - transaction.debit_amount
             if transaction.transaction_date <= prev_six_months[i]:
                 if accounts_map[transaction.account_id] in ('fixed_asset', 'accounts_receivable', 'other_asset', 'bank', 'cash', 'other_current_asset', 'stock'):
-                    assets += (transaction.debit_amount - transaction.credit_amount)
+                    assets += debit_minus_credit
                 if accounts_map[transaction.account_id] in ('accounts_payable', 'long_term_liability', 'other_liability', 'other_current_liability'):
                     liabilities += credit_minus_debit
                 if accounts_map[transaction.account_id] in ('equity'):
@@ -668,11 +700,11 @@ def get_balance_sheet_summary(current_date):
 
 def get_cashflow_summary(current_date):
     monthly_cashflow_data = get_monthly_cashflow_statement(current_date)
-    prev_six_months = []
-    for i in range(6):
+    prev_six_months = [current_date]
+    for i in range(5):
         last_date_of_previous_month = current_date.replace(
             day=1) + relativedelta(days=-1)
-        prev_six_months.append(last_date_of_previous_month.date())
+        prev_six_months.append(last_date_of_previous_month)
         current_date = last_date_of_previous_month
     prev_six_months.reverse()
 
