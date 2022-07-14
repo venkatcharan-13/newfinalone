@@ -3,7 +3,18 @@
 {% block title %}Deep Insights{% endblock title %}
 {% block active3 %}active{% endblock active3 %}
 {% block body %}
-  <br><h1>Deep Insights</h1>
+<div class="month-dropdown float-end">
+  <select class="form-select" id="periodSelector" onchange="changePeriod(this.value)" style="width:auto;">
+    <option value="Choose Month">Choose Month</option>
+    <option value="2022-01-31">January</option>
+    <option value="2022-02-28">February</option>
+    <option value="2022-03-31">March</option>
+    <option value="2022-04-30">April</option>
+    <option value="2022-05-31">May</option>
+    <option value="2022-06-30">June</option>
+  </select>
+</div>
+  <h1>Deep Insights</h1><br>
   <div class="accordion" id="accordionExample">
     <div class="accordion-item">
       <h2 class="accordion-header">

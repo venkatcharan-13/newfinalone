@@ -1,8 +1,21 @@
 var endpoint = 'api/reportData/';
+var choosen_month = sessionStorage.getItem("choosen_month") ? sessionStorage.getItem("choosen_month"): "2022-06-30";
+
+$(document).ready(function() {
+  if(sessionStorage.getItem("choosen_month")){
+    $('#periodSelector').val(sessionStorage.getItem("choosen_month"));
+  }
+  else{
+    $('#periodSelector').val("Choose Month");
+  }
+});
 
 $.ajax({
   method: "GET",
   url: endpoint,
+  data: {
+    selected_date: choosen_month
+  },
   success: function (graphData) {
     console.log("Graph data loaded");
     salesPerformanceGraph(graphData.monthly_sales_performance, "sales_performance1");
@@ -24,6 +37,11 @@ $.ajax({
     console.log(error_data);
   }
 })
+
+function changePeriod(params) {
+  sessionStorage.setItem("choosen_month", params);
+  location.reload();
+}
 
 function salesPerformanceGraph(data, id) {
   var labels = data.labels;
@@ -250,7 +268,6 @@ function cogsBreakdownGraph(data, id) {
 }
 
 function montlhyCashFlowGraph(data, id) {
-  console.log(data);
   var labels = data.labels;
   var chartLabel = data.chartLabel;
   var dataset = data.dataset;

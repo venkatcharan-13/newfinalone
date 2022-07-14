@@ -5,6 +5,11 @@ import locale
 
 
 def get_insights(current_period):
+    if current_period is None:
+        current_period = date(2022, 6, 30)
+    elif not isinstance(current_period, date):
+        current_period = datetime.strptime(current_period, '%Y-%m-%d').date()
+
     parent_summary = {
         'Advertising and Marketing Expenses': 0, 
         'Employment Expenses': 0, 
@@ -123,6 +128,10 @@ def get_insights(current_period):
 
 
 def get_deep_insight_one(current_period):
+    if current_period is None:
+        current_period = date(2022, 6, 30)
+    elif not isinstance(current_period, date):
+        current_period = datetime.strptime(current_period, '%Y-%m-%d').date()
 
     accounts_related_to_cash = ZohoAccount.objects.filter(
         account_type = 'cash'
@@ -155,13 +164,13 @@ def get_deep_insight_one(current_period):
         current_date += relativedelta(days=1)
     
     deep_insight_one_data = []
-    for date in datewise_transactions:
-        for key in datewise_transactions[date]:
+    for dt in datewise_transactions:
+        for key in datewise_transactions[dt]:
             cash_expense = {
                 'account_name': key[1],
                 'payee': key[0],
-                'date': date,
-                'amount': locale.format("%d",  datewise_transactions[date][key], grouping=True)
+                'date': dt,
+                'amount': locale.format("%d",  datewise_transactions[dt][key], grouping=True)
             }
         deep_insight_one_data.append(cash_expense)
     
@@ -169,6 +178,10 @@ def get_deep_insight_one(current_period):
 
 
 def get_deep_insight_two(current_period):
+    if current_period is None:
+        current_period = date(2022, 6, 30)
+    elif not isinstance(current_period, date):
+        current_period = datetime.strptime(current_period, '%Y-%m-%d').date()
     
     accounts_related_to_loans = ZohoAccount.objects.filter(
         account_for_coding__in = ('Long Term Borrowing', 'Short-term borrowings')
@@ -196,8 +209,13 @@ def get_deep_insight_two(current_period):
 
 
 def get_deep_insight_three(current_period):
+    if current_period is None:
+        current_period = date(2022, 6, 30)
+    elif not isinstance(current_period, date):
+        current_period = datetime.strptime(current_period, '%Y-%m-%d').date()
 
-    start_of_current_fy = date(current_period.year, 4, 1)
+    month, year = current_period.month, current_period.year
+    start_of_current_fy = date(year, 4, 1) if  month >= 4 else date(year-1, 4, 1)
 
     accounts_related_to_revenue = ZohoAccount.objects.filter(
         account_for_coding = 'Direct Income'
@@ -217,6 +235,10 @@ def get_deep_insight_three(current_period):
 
 
 def get_deep_insight_four(current_period):
+    if current_period is None:
+        current_period = date(2022, 6, 30)
+    elif not isinstance(current_period, date):
+        current_period = datetime.strptime(current_period, '%Y-%m-%d').date()
 
     current_month_start = current_period.replace(day=1)
     previous_month_start = (current_month_start + relativedelta(days=-1)).replace(day=1)
@@ -273,6 +295,10 @@ def get_deep_insight_four(current_period):
 
 
 def get_deep_insight_five(current_period):
+    if current_period is None:
+        current_period = date(2022, 6, 30)
+    elif not isinstance(current_period, date):
+        current_period = datetime.strptime(current_period, '%Y-%m-%d').date()
 
     accounts_related_to_assets = ZohoAccount.objects.filter(
         account_type__in = (
@@ -342,6 +368,10 @@ def get_deep_insight_five(current_period):
 
 
 def get_deep_insight_six(current_period):
+    if current_period is None:
+        current_period = date(2022, 6, 30)
+    elif not isinstance(current_period, date):
+        current_period = datetime.strptime(current_period, '%Y-%m-%d').date()
 
     accounts_for_payable_receivable = ZohoAccount.objects.filter(
         account_name__in = ('Accounts Payable', 'Accounts Receivable')
@@ -389,7 +419,13 @@ def get_deep_insight_six(current_period):
 
 
 def get_deep_insight_seven(current_period):
-    start_of_current_fy = date(current_period.year, 4, 1)
+    if current_period is None:
+        current_period = date(2022, 6, 30)
+    elif not isinstance(current_period, date):
+        current_period = datetime.strptime(current_period, '%Y-%m-%d').date()
+
+    month, year = current_period.month, current_period.year
+    start_of_current_fy = date(year, 4, 1) if  month >= 4 else date(year-1, 4, 1)
 
     accounts_related_to_rent_expenses = ZohoAccount.objects.filter(
         account_for_coding = 'Rent Expenses'
@@ -417,7 +453,13 @@ def get_deep_insight_seven(current_period):
     return deep_insight_seven_data
 
 def get_deep_insight_eight(current_period):
-    start_of_current_fy = date(current_period.year, 4, 1)
+    if current_period is None:
+        current_period = date(2022, 6, 30)
+    elif not isinstance(current_period, date):
+        current_period = datetime.strptime(current_period, '%Y-%m-%d').date()
+
+    month, year = current_period.month, current_period.year
+    start_of_current_fy = date(year, 4, 1) if  month >= 4 else date(year-1, 4, 1)
 
     accounts_related_to_commission = ZohoAccount.objects.filter(
         account_for_coding = 'Brokerage & Commission Charges'
@@ -445,7 +487,13 @@ def get_deep_insight_eight(current_period):
     return deep_insight_eight_data
 
 def get_deep_insight_nine(current_period):
-    start_of_current_fy = date(current_period.year, 4, 1)
+    if current_period is None:
+        current_period = date(2022, 6, 30)
+    elif not isinstance(current_period, date):
+        current_period = datetime.strptime(current_period, '%Y-%m-%d').date()
+
+    month, year = current_period.month, current_period.year
+    start_of_current_fy = date(year, 4, 1) if  month >= 4 else date(year-1, 4, 1)
 
     accounts_related_to_professional_fees = ZohoAccount.objects.filter(
         account_for_coding = 'Legal & Professional fees'
@@ -473,6 +521,10 @@ def get_deep_insight_nine(current_period):
     return deep_insight_nine_data
 
 def get_deep_insight_ten(current_period):
+    if current_period is None:
+        current_period = date(2022, 6, 30)
+    elif not isinstance(current_period, date):
+        current_period = datetime.strptime(current_period, '%Y-%m-%d').date()
 
     accounts_related_to_expenses = ZohoAccount.objects.filter(
         account_type__in = ('expense', 'other_expense')
@@ -524,6 +576,11 @@ def get_deep_insight_ten(current_period):
     return deep_insight_ten_data
 
 def get_deep_insight_eleven(current_period):
+    if current_period is None:
+        current_period = date(2022, 6, 30)
+    elif not isinstance(current_period, date):
+        current_period = datetime.strptime(current_period, '%Y-%m-%d').date()
+
     current_month_start = current_period.replace(day=1)
 
     accounts_related_to_uncategorized = ZohoAccount.objects.filter(
@@ -544,6 +601,11 @@ def get_deep_insight_eleven(current_period):
     return deep_insight_eleven_data
 
 def get_deep_insight_twelve(current_period):
+    if current_period is None:
+        current_period = date(2022, 6, 30)
+    elif not isinstance(current_period, date):
+        current_period = datetime.strptime(current_period, '%Y-%m-%d').date()
+
     current_month_start = current_period.replace(day=1)
 
     accounts_related_to_bank = ZohoAccount.objects.filter(

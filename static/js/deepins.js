@@ -1,28 +1,47 @@
 const endpoint = 'api/deepinsData/';
+var choosen_month = sessionStorage.getItem("choosen_month") ? sessionStorage.getItem("choosen_month"): "2022-06-30";
+
+$(document).ready(function() {
+  if(sessionStorage.getItem("choosen_month")){
+    $('#periodSelector').val(sessionStorage.getItem("choosen_month"));
+  }
+  else{
+    $('#periodSelector').val("Choose Month");
+  }
+});
 
 $.ajax({
   method: "GET",
   url: endpoint,
-  success: function (data) {
+  data: {
+    selected_date: choosen_month
+  },
+  success: function (response) {
     console.log("Success Deep Insights");
-    fillDeepInsightOne(data.deep_insight_one, "deep_insight_one");
-    fillDeepInsightTwo(data.deep_insight_two, "deep_insight_two");
-    document.getElementById("deep_insight_three").innerHTML = data.deep_insight_three;
-    fillDeepInsightFour(data.deep_insight_four, "deep_insight_four");
-    fillDeepInsightFive(data.deep_insight_five, "deep_insight_five");
-    fillDeepInsightSix(data.deep_insight_six, "deep_insight_six");
-    fillDeepInsightSeventoNine(data.deep_insight_seven, "deep_insight_seven");
-    fillDeepInsightSeventoNine(data.deep_insight_eight, "deep_insight_eight");
-    fillDeepInsightSeventoNine(data.deep_insight_nine, "deep_insight_nine");
-    fillDeepInsightTen(data.deep_insight_ten, "deep_insight_ten");
-    document.getElementById("deep_insight_eleven").innerHTML = data.deep_insight_eleven;
-    fillDeepInsightTweleve(data.deep_insight_twelve, "deep_insight_twelve");
+    fillDeepInsightOne(response.deep_insight_one, "deep_insight_one");
+    fillDeepInsightTwo(response.deep_insight_two, "deep_insight_two");
+    document.getElementById("deep_insight_three").innerHTML = response.deep_insight_three;
+    fillDeepInsightFour(response.deep_insight_four, "deep_insight_four");
+    fillDeepInsightFive(response.deep_insight_five, "deep_insight_five");
+    fillDeepInsightSix(response.deep_insight_six, "deep_insight_six");
+    fillDeepInsightSeventoNine(response.deep_insight_seven, "deep_insight_seven");
+    fillDeepInsightSeventoNine(response.deep_insight_eight, "deep_insight_eight");
+    fillDeepInsightSeventoNine(response.deep_insight_nine, "deep_insight_nine");
+    fillDeepInsightTen(response.deep_insight_ten, "deep_insight_ten");
+    document.getElementById("deep_insight_eleven").innerHTML = response.deep_insight_eleven;
+    fillDeepInsightTweleve(response.deep_insight_twelve, "deep_insight_twelve");
   },
   error: function (error_data) {
     console.log("Error Deep Insights");
     console.log(error_data);
   }
 })
+
+function changePeriod(params) {
+  console.log(params);
+  sessionStorage.setItem("choosen_month", params);
+  location.reload();
+}
 
 function fillDeepInsightOne(data, tid) {
   var table = document.getElementById(tid);
@@ -47,7 +66,6 @@ function fillDeepInsightTwo(data, tid) {
 }
 
 function fillDeepInsightFour(data, tid) {
-  console.log(data);
   var table = document.getElementById(tid);
   data.forEach(function (object) {
     var tr = document.createElement('tr');
@@ -100,7 +118,6 @@ function fillDeepInsightTen(data, tid) {
 }
 
 function fillDeepInsightTweleve(data, tid) {
-  console.log(data);
   var table = document.getElementById(tid);
   data.forEach(function (object) {
     var tr = document.createElement('tr');

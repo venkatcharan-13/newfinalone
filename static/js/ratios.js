@@ -1,22 +1,40 @@
 const endpoint = 'api/ratiosData/';
+var choosen_month = sessionStorage.getItem("choosen_month") ? sessionStorage.getItem("choosen_month"): "2022-06-30";
+
+$(document).ready(function() {
+    if(sessionStorage.getItem("choosen_month")){
+      $('#periodSelector').val(sessionStorage.getItem("choosen_month"));
+    }
+    else{
+      $('#periodSelector').val("Choose Month");
+    }
+});
 
 $.ajax({
     method: "GET",
     url: endpoint,
-    success: function (data) {
+    data: {
+        selected_date: choosen_month
+    },
+    success: function (response) {
         console.log("Success PNL");
-        fillRatiosHead(data.gross_profit, 'gross_profit', 'Gross Profit');
-        fillRatiosHead(data.pbt, 'pbt', 'PBT');
-        fillRatiosTableRows(data.profit_ratios, 'profit_ratios');
-        fillRatiosTableRows(data.liquidity_ratio, 'liquidity_ratio');
-        fillRatiosTableRows(data.op_eff_ratios, 'op_eff_ratios');
-        fillRatiosTableRows(data.solvency_ratios, 'solvency_ratios');
+        fillRatiosHead(response.gross_profit, 'gross_profit', 'Gross Profit');
+        fillRatiosHead(response.pbt, 'pbt', 'PBT');
+        fillRatiosTableRows(response.profit_ratios, 'profit_ratios');
+        fillRatiosTableRows(response.liquidity_ratio, 'liquidity_ratio');
+        fillRatiosTableRows(response.op_eff_ratios, 'op_eff_ratios');
+        fillRatiosTableRows(response.solvency_ratios, 'solvency_ratios');
     },
     error: function (error_data) {
         console.log("Error4");
         console.log(error_data);
     }
 })
+
+function changePeriod(params) {
+    sessionStorage.setItem("choosen_month", params);
+    location.reload();
+}
 
 function fillRatiosHead(object, tid, head) {
     document.getElementById(tid).innerHTML = '<th style="width:40%">' + head + '</th>' +

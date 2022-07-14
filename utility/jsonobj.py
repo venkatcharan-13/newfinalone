@@ -1,6 +1,12 @@
 json_structure = {
     'pnl_data': {
-        'income': [],
+        'income': {
+            'current': 0,
+            'previous': 0,
+            'per_change': 0,
+            'three_month_avg': 0,
+            'data': []
+        },
         'expense': {},
         'cost_of_goods_sold': [],
         'gross_profit': {},
@@ -9,7 +15,8 @@ json_structure = {
         'pbit': {},
         'interest_expenses': [],
         'pbt': {},
-        'total_income': {}
+        'total_income': {},
+        'total_expense': {}
     },
     'bal_sheet_data': {
         'accounts_payable': [],

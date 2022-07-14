@@ -24,18 +24,20 @@ class ReportData(APIView):
     permission_classes = []
 
     def get(self, request, format=None):
-        monthly_sales, quarterly_sales, yearly_sales = analytics_util.get_sales_performance(SELECTED_DATE)
-        tot_income_vs_tot_expenses = analytics_util.get_income_vs_expenses(SELECTED_DATE)
-        cash_inflow_vs_outflow = analytics_util.get_cash_inflow_outflow(SELECTED_DATE)
-        closing_bank_balance_trend = analytics_util.get_closing_bank_balance_trend(SELECTED_DATE)
-        gross_profit_and_net_profit = analytics_util.get_gross_profit_and_net_profit(SELECTED_DATE)
-        monthly_runaway = analytics_util.get_monthly_runaway(SELECTED_DATE)
-        gp_vs_expenses_vs_ebitda = analytics_util.get_gp_vs_expenses_ebitda(SELECTED_DATE)
+        selected_month = self.request.query_params.get('selected_date')
+
+        monthly_sales, quarterly_sales, yearly_sales = analytics_util.get_sales_performance(selected_month)
+        tot_income_vs_tot_expenses = analytics_util.get_income_vs_expenses(selected_month)
+        cash_inflow_vs_outflow = analytics_util.get_cash_inflow_outflow(selected_month)
+        closing_bank_balance_trend = analytics_util.get_closing_bank_balance_trend(selected_month)
+        gross_profit_and_net_profit = analytics_util.get_gross_profit_and_net_profit(selected_month)
+        monthly_runaway = analytics_util.get_monthly_runaway(selected_month)
+        gp_vs_expenses_vs_ebitda = analytics_util.get_gp_vs_expenses_ebitda(selected_month)
         gp_vs_expenses_vs_ebitda_values = tuple(gp_vs_expenses_vs_ebitda.values())
-        monthly_cashflow_statements = analytics_util.get_monthly_cashflow_statement(SELECTED_DATE)
-        pnl_summary = analytics_util.get_pnl_summary(SELECTED_DATE)
-        balance_sheet_summary = analytics_util.get_balance_sheet_summary(SELECTED_DATE)
-        cashflow_statement_summary = analytics_util.get_cashflow_summary(SELECTED_DATE)
+        monthly_cashflow_statements = analytics_util.get_monthly_cashflow_statement(selected_month)
+        pnl_summary = analytics_util.get_pnl_summary(selected_month)
+        balance_sheet_summary = analytics_util.get_balance_sheet_summary(selected_month)
+        cashflow_statement_summary = analytics_util.get_cashflow_summary(selected_month)
         
         data = {
             "monthly_sales_performance": {
@@ -154,8 +156,9 @@ class InsightsData(APIView):
     permission_classes = []
 
     def get(self, request, format=None):
+        selected_month = self.request.query_params.get('selected_date')
 
-        insights_data_response = insights_util.get_insights(SELECTED_DATE)
+        insights_data_response = insights_util.get_insights(selected_month)
         return Response(insights_data_response)
 
 
@@ -164,19 +167,20 @@ class DeepInsightsData(APIView):
     permission_classes = []
 
     def get(self, request, format=None):
+        selected_month = self.request.query_params.get('selected_date')
 
-        deep_insight_one = insights_util.get_deep_insight_one(SELECTED_DATE)
-        deep_insight_two = insights_util.get_deep_insight_two(SELECTED_DATE)
-        deep_insight_three = insights_util.get_deep_insight_three(SELECTED_DATE)
-        deep_insight_four = insights_util.get_deep_insight_four(SELECTED_DATE)
-        deep_insight_five = insights_util.get_deep_insight_five(SELECTED_DATE)
-        deep_insight_six = insights_util.get_deep_insight_six(SELECTED_DATE)
-        deep_insight_seven = insights_util.get_deep_insight_seven(SELECTED_DATE)
-        deep_insight_eight = insights_util.get_deep_insight_eight(SELECTED_DATE)
-        deep_insight_nine = insights_util.get_deep_insight_nine(SELECTED_DATE)
-        deep_insight_ten = insights_util.get_deep_insight_ten(SELECTED_DATE)
-        deep_insight_eleven = insights_util.get_deep_insight_eleven(SELECTED_DATE)
-        deep_insight_twelve = insights_util.get_deep_insight_twelve(SELECTED_DATE)
+        deep_insight_one = insights_util.get_deep_insight_one(selected_month)
+        deep_insight_two = insights_util.get_deep_insight_two(selected_month)
+        deep_insight_three = insights_util.get_deep_insight_three(selected_month)
+        deep_insight_four = insights_util.get_deep_insight_four(selected_month)
+        deep_insight_five = insights_util.get_deep_insight_five(selected_month)
+        deep_insight_six = insights_util.get_deep_insight_six(selected_month)
+        deep_insight_seven = insights_util.get_deep_insight_seven(selected_month)
+        deep_insight_eight = insights_util.get_deep_insight_eight(selected_month)
+        deep_insight_nine = insights_util.get_deep_insight_nine(selected_month)
+        deep_insight_ten = insights_util.get_deep_insight_ten(selected_month)
+        deep_insight_eleven = insights_util.get_deep_insight_eleven(selected_month)
+        deep_insight_twelve = insights_util.get_deep_insight_twelve(selected_month)
 
         deep_insights_response = {
             'deep_insight_one': deep_insight_one,

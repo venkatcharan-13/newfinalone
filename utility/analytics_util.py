@@ -1,6 +1,6 @@
 from accounts.models import ZohoAccount, ZohoTransaction
 from django.db.models import Q
-from datetime import date
+from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 import calendar
 import locale
@@ -8,6 +8,11 @@ import locale
 locale.setlocale(locale.LC_ALL, 'en_IN.utf8')
 
 def get_sales_performance(current_date):
+    if current_date is None:
+        current_date = date(2022, 6, 30)
+    elif not isinstance(current_date, date):
+        current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
+
     accounts_related_to_income = list(ZohoAccount.objects.filter(
         account_type='income'
     ).values_list('account_id'))
@@ -94,6 +99,11 @@ def get_sales_performance(current_date):
 
 
 def get_income_vs_expenses(current_date):
+    if current_date is None:
+        current_date = date(2022, 6, 30)
+    elif not isinstance(current_date, date):
+        current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
+
     accounts_related_to_income_expenses = ZohoAccount.objects.filter(
         account_type__in=('income', 'expense', 'other_expense')
     ).values_list('account_id', 'account_type')
@@ -122,10 +132,10 @@ def get_income_vs_expenses(current_date):
         for transaction in transactions_related_to_income_expenses:
             trans_date = transaction.transaction_date
             credit_minus_debit =  transaction.credit_amount - transaction.debit_amount
-            if transaction.account_id in accounts_dic['income'] and trans_date.month == month and trans_date.year == current_date.year:
+            if transaction.account_id in accounts_dic['income'] and trans_date.month == month and trans_date.year == year:
                 tot_income_vs_tot_expenses[month_name]['income'] += credit_minus_debit
 
-            if (transaction.account_id in accounts_dic['expense'] or transaction.account_id in accounts_dic['other_expense']) and trans_date.month == month and trans_date.year == current_date.year:
+            if (transaction.account_id in accounts_dic['expense'] or transaction.account_id in accounts_dic['other_expense']) and trans_date.month == month and trans_date.year == year:
                 tot_income_vs_tot_expenses[month_name]['expenses'] += credit_minus_debit
 
         tot_income_vs_tot_expenses[month_name]['income'] = round(
@@ -137,6 +147,11 @@ def get_income_vs_expenses(current_date):
 
 
 def get_cash_inflow_outflow(current_date):
+    if current_date is None:
+        current_date = date(2022, 6, 30)
+    elif not isinstance(current_date, date):
+        current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
+
     accounts_related_to_bank = ZohoAccount.objects.filter(
         account_for_coding='Bank Balance'
     ).values_list('account_id')
@@ -174,6 +189,11 @@ def get_cash_inflow_outflow(current_date):
 
 
 def get_closing_bank_balance_trend(current_date):
+    if current_date is None:
+        current_date = date(2022, 6, 30)
+    elif not isinstance(current_date, date):
+        current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
+
     accounts_related_to_bank = ZohoAccount.objects.filter(
         account_for_coding='Bank Balance'
     ).values_list('account_id')
@@ -208,6 +228,10 @@ def get_closing_bank_balance_trend(current_date):
 
 
 def get_gross_profit_and_net_profit(current_date):
+    if current_date is None:
+        current_date = date(2022, 6, 30)
+    elif not isinstance(current_date, date):
+        current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
     accounts_related_to_profit = ZohoAccount.objects.filter(
         account_type__in=['income', 'expense',
@@ -256,7 +280,7 @@ def get_gross_profit_and_net_profit(current_date):
             trans_date = transaction.transaction_date
             credit_minus_debit = transaction.credit_amount - transaction.debit_amount
             debit_minus_credit = transaction.debit_amount - transaction.credit_amount
-            if trans_date.month == month and trans_date.year == 2022:
+            if trans_date.month == month and trans_date.year == year:
                 if transaction.account_id in income_accounts:
                     tot_income += credit_minus_debit
                 if transaction.account_id in direct_income_accounts:
@@ -276,6 +300,10 @@ def get_gross_profit_and_net_profit(current_date):
 
 
 def get_monthly_runaway(current_date):
+    if current_date is None:
+        current_date = date(2022, 6, 30)
+    elif not isinstance(current_date, date):
+        current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
     accounts_related_to_balance = ZohoAccount.objects.filter(
         account_for_coding__in=('Bank Balance', 'Cash Balance')
@@ -313,6 +341,10 @@ def get_monthly_runaway(current_date):
 
 
 def get_gp_vs_expenses_ebitda(current_date):
+    if current_date is None:
+        current_date = date(2022, 6, 30)
+    elif not isinstance(current_date, date):
+        current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
     accounts_related_to_income = ZohoAccount.objects.filter(
         account_type = 'income'
@@ -390,6 +422,11 @@ def get_gp_vs_expenses_ebitda(current_date):
 
 
 def get_monthly_cashflow_statement(current_date):
+    if current_date is None:
+        current_date = date(2022, 6, 30)
+    elif not isinstance(current_date, date):
+        current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
+
     cashflow_accounts = (
         'Bank Balance',
         'Cash Balance',
@@ -584,6 +621,10 @@ def get_monthly_cashflow_statement(current_date):
 
 
 def get_pnl_summary(current_date):
+    if current_date is None:
+        current_date = date(2022, 6, 30)
+    elif not isinstance(current_date, date):
+        current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
     accounts_related_to_pnl = ZohoAccount.objects.filter(
         account_type__in = ('income', 'expense', 'other_expense', 'cost_of_goods_sold')
@@ -638,6 +679,10 @@ def get_pnl_summary(current_date):
 
 
 def get_balance_sheet_summary(current_date):
+    if current_date is None:
+        current_date = date(2022, 6, 30)
+    elif not isinstance(current_date, date):
+        current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
     accounts_related_to_balancesheet = ZohoAccount.objects.filter(
         account_type__in = (
@@ -699,6 +744,11 @@ def get_balance_sheet_summary(current_date):
     return balance_sheet_summary
 
 def get_cashflow_summary(current_date):
+    if current_date is None:
+        current_date = date(2022, 6, 30)
+    elif not isinstance(current_date, date):
+        current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
+        
     monthly_cashflow_data = get_monthly_cashflow_statement(current_date)
     prev_six_months = [current_date]
     for i in range(5):

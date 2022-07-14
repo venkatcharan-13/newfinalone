@@ -47,9 +47,10 @@ class PnlData(APIView):
     permission_classes = []
 
     def get(self, request, format=None):
+        selected_month = self.request.query_params.get('selected_date')
 
-        pnl_data = acc_gets.get_pnl(SELECTED_DATE)[0]
-        pnl_data_response = accounts_util.convert_to_indian_comma_notation(pnl_data)
+        pnl_data = acc_gets.get_pnl(selected_month)[0]
+        pnl_data_response = accounts_util.convert_to_indian_comma_notation('pnl', pnl_data)
         return Response(pnl_data_response)
 
 
@@ -58,9 +59,11 @@ class BalanceSheetData(APIView):
     permission_classes = []
 
     def get(self, request, format=None):
-        bal_sheet_data = acc_gets.get_balsheet(SELECTED_DATE)
-        bal_sheet_data_response = accounts_util.convert_to_indian_comma_notation(bal_sheet_data)
-        current_year_earnings, retained_earnings = acc_gets.get_earnings(SELECTED_DATE)
+        selected_month = self.request.query_params.get('selected_date')
+
+        bal_sheet_data = acc_gets.get_balsheet(selected_month)
+        bal_sheet_data_response = accounts_util.convert_to_indian_comma_notation('balsheet', bal_sheet_data)
+        current_year_earnings, retained_earnings = acc_gets.get_earnings(selected_month)
         
         bal_sheet_data_response['equity'].extend([
             {
@@ -84,8 +87,10 @@ class CashFlowData(APIView):
     permission_classes = []
 
     def get(self, request, format=None):
-        cashflow_data = acc_gets.get_cashflow(SELECTED_DATE)
-        cashflow_data_response = accounts_util.convert_to_indian_comma_notation(cashflow_data)
+        selected_month = self.request.query_params.get('selected_date')
+
+        cashflow_data = acc_gets.get_cashflow(selected_month)
+        cashflow_data_response = accounts_util.convert_to_indian_comma_notation('cashflow', cashflow_data)
         return Response(cashflow_data_response)
 
 
@@ -94,10 +99,11 @@ class RatiosData(APIView):
     permission_classes = []
 
     def get(self, request, format=None):
+        selected_month = self.request.query_params.get('selected_date')
 
-        pnl_data = acc_gets.get_pnl(SELECTED_DATE)
-        balsheet_data = acc_gets.get_balsheet(SELECTED_DATE)
-        cashflow_data = acc_gets.get_cashflow(SELECTED_DATE)
+        pnl_data = acc_gets.get_pnl(selected_month)[0]
+        balsheet_data = acc_gets.get_balsheet(selected_month)
+        cashflow_data = acc_gets.get_cashflow(selected_month)
 
         ratios_data = {}
         ratio_head, current, previous, three_month_avg = "ratio_head", "current", "previous", "three_month_avg"
@@ -116,43 +122,42 @@ class RatiosData(APIView):
             three_month_avg:  locale.format("%d", pbt[three_month_avg], grouping=True)
         }
 
-
         ratios_data['profit_ratios'] = []
         income = pnl_data['total_income']
 
-        temp = {
+        temporary_storage = {
             ratio_head: 'Gross Profit Margin',
             current: 0 if income[current] == 0 else gross_profit[current]/income[current],
             previous: 0 if income[previous] == 0 else gross_profit[previous]/income[previous],
             three_month_avg: 0 if income[three_month_avg] == 0 else gross_profit[three_month_avg]/income[three_month_avg]
         }
-        ratios_data['profit_ratios'].append(temp)
+        ratios_data['profit_ratios'].append(temporary_storage)
 
-        temp = {
+        temporary_storage = {
             ratio_head: 'Net Profit Margin',
             current: 0 if income[current] == 0 else pbt[current]/income[current],
             previous: 0 if income[previous] == 0 else pbt[previous]/income[previous],
             three_month_avg: 0 if income[three_month_avg] == 0 else pbt[three_month_avg]/income[three_month_avg]
         }
-        ratios_data['profit_ratios'].append(temp)
+        ratios_data['profit_ratios'].append(temporary_storage)
 
         equity = balsheet_data['equity'][0]
-        temp = {
+        temporary_storage = {
             ratio_head: 'Return on Equity',
             current: 0 if equity[current] == 0 else pbt[current]/equity[current],
             previous: 0 if equity[previous] == 0 else pbt[previous]/equity[previous],
             three_month_avg:0 if equity[three_month_avg] == 0 else pbt[three_month_avg]/equity[three_month_avg]
         }
-        ratios_data['profit_ratios'].append(temp)
+        ratios_data['profit_ratios'].append(temporary_storage)
 
         cf_operations = cashflow_data['net_cash_a']
-        temp = {
+        temporary_storage = {
             ratio_head: 'Operating Cash Flow to Sales Ratio',
             current: 0 if income[current] == 0 else cf_operations[current]/income[current],
             previous: 0 if income[previous] == 0 else cf_operations[previous]/income[previous],
             three_month_avg: 0
         }
-        ratios_data['profit_ratios'].append(temp)
+        ratios_data['profit_ratios'].append(temporary_storage)
 
         ratios_data['liquidity_ratio'] = []
         
@@ -168,13 +173,13 @@ class RatiosData(APIView):
             ocurrl[previous] += account[previous]
             ocurrl[three_month_avg] += account[three_month_avg]
 
-        temp = {
+        temporary_storage = {
             ratio_head: 'Working Capital Ratio / Current Ratio',
             current: 0 if (accpay[current]+ocurrl[current]) == 0 else (accrec[current]+cash[current]+bank[current]+ocurra[current])/(accpay[current]+ocurrl[current]),
             previous: 0 if (accpay[previous]+ocurrl[previous]) == 0 else (accrec[previous]+cash[previous]+bank[previous]+ocurra[previous])/(accpay[previous]+ocurrl[previous]),
             three_month_avg: 0 if (accpay[three_month_avg]+ocurrl[three_month_avg]) == 0 else (accrec[three_month_avg]+cash[three_month_avg]+bank[three_month_avg]+ocurra[three_month_avg])/(accpay[three_month_avg]+ocurrl[three_month_avg])
         }
-        ratios_data['liquidity_ratio'].append(temp)
+        ratios_data['liquidity_ratio'].append(temporary_storage)
 
         for account in balsheet_data['other_current_liability']:
             if account['account_header'] == 'Short-term borrowings':
@@ -189,14 +194,14 @@ class RatiosData(APIView):
         else:
             lt_borrow = {current: 0, previous: 0, three_month_avg: 0}
 
-        temp = {
+        temporary_storage = {
             ratio_head: 'Cashflow to Debt Ratio',
             current: 0 if (st_borrow[current] + lt_borrow[current]) == 0 else cf_operations[current]/(st_borrow[current] + lt_borrow[current]),
             previous: 0 if (st_borrow[current] + lt_borrow[current]) == 0 else cf_operations[previous]/(st_borrow[previous] + lt_borrow[previous]),
             three_month_avg: 0
         }
 
-        ratios_data['liquidity_ratio'].append(temp)
+        ratios_data['liquidity_ratio'].append(temporary_storage)
 
         ratios_data['op_eff_ratios'] = []
         
@@ -214,41 +219,41 @@ class RatiosData(APIView):
                 current: 0, previous: 0, 'pre_prev': 0, three_month_avg: 0
             }
 
-        temp = {
+        temporary_storage = {
             ratio_head: 'Inventory turnover',
             current: 0 if (inventory[current] + inventory[previous]) == 0 else cogs[current]/(inventory[current] + inventory[previous]) * 2,
             previous: 0 if (inventory[previous] + inventory['pre_prev']) == 0 else cogs[previous]/(inventory[previous] + inventory['pre_prev']) * 2,
             three_month_avg: 0 if (inventory[three_month_avg]) == 0 else cogs[three_month_avg]/(inventory[three_month_avg])
         }
-        ratios_data['op_eff_ratios'].append(temp)
+        ratios_data['op_eff_ratios'].append(temporary_storage)
 
-        temp = {
+        temporary_storage = {
             ratio_head: 'Accounts receivable turnover',
             current: 0 if (accrec[current] + accrec[previous]) == 0 else income[current]/((accrec[current] + accrec[previous])/2),
             previous: 0 if (accrec[previous] + accrec['pre_prev']) == 0 else income[previous]/((accrec[previous] + accrec['pre_prev'])/2),
             three_month_avg: 0 if (accrec[three_month_avg]) == 0 else income[three_month_avg]/(accrec[three_month_avg]),
         }
-        ratios_data['op_eff_ratios'].append(temp)
+        ratios_data['op_eff_ratios'].append(temporary_storage)
 
-        temp = {
+        temporary_storage = {
             ratio_head: 'Days payable outstanding (DPO)',
             current: 0 if cogs[current] == 0 else (accpay[current] + accpay[previous])/(2*cogs[current])*365,
             previous: 0 if cogs[previous] == 0 else (accpay[previous] + accpay['pre_prev'])/(2*cogs[previous])*365,
             three_month_avg: 0 if cogs[three_month_avg] == 0 else (accpay[three_month_avg])/(cogs[three_month_avg])*365,
         }
-        ratios_data['op_eff_ratios'].append(temp)
+        ratios_data['op_eff_ratios'].append(temporary_storage)
         
 
         ratios_data['solvency_ratios'] = []
         
         share_cap = balsheet_data['equity'][0]
-        temp = {
+        temporary_storage = {
             ratio_head: 'Debt to equity ratio',
             current: 0 if share_cap[current] == 0 else (st_borrow[current] + lt_borrow[current])/share_cap[current],
             previous: 0 if share_cap[previous] == 0 else (st_borrow[previous] + lt_borrow[previous])/share_cap[previous],
             three_month_avg: 0 if share_cap[three_month_avg] == 0 else (st_borrow[three_month_avg] + lt_borrow[three_month_avg])/share_cap[three_month_avg]
         }
-        ratios_data['solvency_ratios'].append(temp)
+        ratios_data['solvency_ratios'].append(temporary_storage)
 
         mbr = {
             ratio_head: 'Monthly Burn Rate',
@@ -258,13 +263,13 @@ class RatiosData(APIView):
         }
         ratios_data['solvency_ratios'].append(mbr)
 
-        temp = {
+        temporary_storage = {
             ratio_head: 'Runaway',
             current: 0 if mbr[current] == 0 else (cash[current] + bank[current])/mbr[current],
             previous: 0 if mbr[previous] == 0 else (cash[previous] + bank[previous])/mbr[previous],
             three_month_avg: 0 if mbr[three_month_avg] == 0 else (cash[three_month_avg] + bank[three_month_avg])/mbr[three_month_avg],
         }
-        ratios_data['solvency_ratios'].append(temp)
+        ratios_data['solvency_ratios'].append(temporary_storage)
 
         for obj in ratios_data:
             if type(ratios_data[obj]) == list:

@@ -1,20 +1,33 @@
 const endpoint = 'api/insightsData/';
+var choosen_month = sessionStorage.getItem("choosen_month") ? sessionStorage.getItem("choosen_month"): "2022-06-30";
+
+$(document).ready(function() {
+  if(sessionStorage.getItem("choosen_month")){
+    $('#periodSelector').val(sessionStorage.getItem("choosen_month"));
+  }
+  else{
+    $('#periodSelector').val("Choose Month");
+  }
+});
 
 $.ajax({
   method: "GET",
   url: endpoint,
-  success: function (data) {
+  data: {
+    selected_date: choosen_month
+  },
+  success: function (response) {
     console.log("Success Insights");
-    fillExpenseHeader(data.advt_and_marketing_header, "advt_and_marketing", "Advertising and Marketing Expenses");
-    fillExpenseHeader(data.employement_header, "employement", "Employment Expenses");
-    fillExpenseHeader(data.rent_rates_and_repairs_header, "rent_rate_repair", "Rent, Rates & Repairs Expenses");
-    fillExpenseHeader(data.brokerage_and_commission_header, "brokerage_commission", "Brokerage & Commission Charges");
-    fillExpenseHeader(data.general_and_admin_header, "general_and_admin", "General & Admin Charges");
-    fillInsightsData(data.advt_and_marketing_insights, "advt_and_marketing_insights");
-    fillInsightsData(data.employement_insights, "employement_insights");
-    fillInsightsData(data.rent_rates_and_repairs_insights, "rent_rate_repair_insights");
-    fillInsightsData(data.brokerage_and_commission_insights, "brokerage_commission_insights");
-    fillInsightsData(data.general_and_admin_insights, "general_and_admin_insights");
+    fillExpenseHeader(response.advt_and_marketing_header, "advt_and_marketing", "Advertising and Marketing Expenses");
+    fillExpenseHeader(response.employement_header, "employement", "Employment Expenses");
+    fillExpenseHeader(response.rent_rates_and_repairs_header, "rent_rate_repair", "Rent, Rates & Repairs Expenses");
+    fillExpenseHeader(response.brokerage_and_commission_header, "brokerage_commission", "Brokerage & Commission Charges");
+    fillExpenseHeader(response.general_and_admin_header, "general_and_admin", "General & Admin Charges");
+    fillInsightsData(response.advt_and_marketing_insights, "advt_and_marketing_insights");
+    fillInsightsData(response.employement_insights, "employement_insights");
+    fillInsightsData(response.rent_rates_and_repairs_insights, "rent_rate_repair_insights");
+    fillInsightsData(response.brokerage_and_commission_insights, "brokerage_commission_insights");
+    fillInsightsData(response.general_and_admin_insights, "general_and_admin_insights");
   },
   error: function (error_data) {
     console.log("Error Insights");
@@ -22,8 +35,13 @@ $.ajax({
   }
 })
 
+function changePeriod(params) {
+  console.log(params);
+  sessionStorage.setItem("choosen_month", params);
+  location.reload();
+}
+
 function fillExpenseHeader(object, tid, head) {
-  console.log(object);
   document.getElementById(tid).innerHTML = '<th style="width:40%">' + head + '<br><em>Change: ' + object.change + '</em></th>' +
     '<td style="width: 15%; text-align:right;">' + object.current + '</td>' +
     '<td style="width: 15%; text-align:right;">' + object.previous + '</td>' +
