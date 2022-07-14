@@ -25,10 +25,11 @@ def cashflow(request):
 
 
 def pnl_transaction(request, account):
+    selected_month = request.GET.get('selected_date')
 
     # Fetching PNL transactions for each payee related to an account
     response_data, totals = accounts_util.fetch_pnl_transactions(
-        SELECTED_DATE, account)
+        selected_month, account)
 
     context = {
         'account': account,

@@ -1,6 +1,7 @@
 import decimal
 from accounts.models import ZohoAccount, ZohoTransaction
 from dateutil.relativedelta import relativedelta
+from datetime import date, datetime
 import locale
 
 locale.setlocale(locale.LC_ALL, 'en_IN.utf8')
@@ -141,6 +142,11 @@ def convert_to_indian_comma_notation(table, response_data):
 
 
 def fetch_pnl_transactions(period, account):
+    if period is None:
+        period = date(2022, 6, 30)
+    elif not isinstance(period, date):
+        period = datetime.strptime(period, '%Y-%m-%d').date()
+
     accounts_for_pnl_account = ZohoAccount.objects.filter(
         account_for_coding=account
     ).values_list('account_id', 'account_for_coding')

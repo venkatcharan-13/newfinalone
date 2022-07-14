@@ -1,0 +1,59 @@
+
+.sidenav {
+	height: 100%;
+	width: 200px;
+	position: fixed;
+	z-index: 1;
+	top: 0;
+	left: 0;
+	background-color: #111;
+	overflow-x: hidden;
+	padding-top: 40px;
+}
+
+.sidenav a {
+	padding: 20px 6px 6px 32px;
+	text-decoration: none;
+	font-size: 25px;
+	color: #818181;
+	display: block;
+}
+
+.sidenav a:hover {
+	color: #f6f6f6;
+}
+
+.sidenav .current {
+	color: #f6f6f6;
+}
+
+.main {
+	margin-left: 250px;
+	margin-right: 50px;
+	width: 60%;
+	/* Same as the width of the sidenav */
+}
+
+.month-dropdown {
+	margin: 15px 0px 15px 0px;
+}
+
+.main .accordion .accordion-item {
+	margin-bottom: 40px;
+	border: 1px solid rgb(0, 0, 0);
+}
+
+li.list-group-item {
+	margin-bottom: 15px;
+	border: 1px black solid !important;
+}
+
+@media screen and (max-height: 450px) {
+	.sidenav {
+		padding-top: 15px;
+	}
+
+	.sidenav a {
+		font-size: 18px;
+	}
+}

@@ -60,7 +60,7 @@ function fillPnlTableIncome(data, tid) {
   var table = document.getElementById(tid);
   data.forEach(function (object) {
     var tr = document.createElement('tr');
-    tr.innerHTML = '<td style="width:35%;"> <a href="' + 'pnl/' + object.account_header + '" style="text-decoration: none">' + object.account_header + '</a></td>' +
+    tr.innerHTML = '<td style="width:35%;"> <a href="pnl/' + object.account_header + '/?selected_date=' + choosen_month + '" style="text-decoration: none">' + object.account_header + '</a></td>' +
       '<td style="width: 12%; text-align:right;">' + object.current + '</td>' +
       '<td style="width: 8%; text-align:right;">' + '' + '</td>' +
       '<td style="width: 12%; text-align:right;">' + object.previous + '</td>' +
@@ -106,7 +106,7 @@ function fillPnlTableExpenses(data, tid) {
     table.appendChild(tr)
     data[category]['data'].forEach(function (object) {
       var tr = document.createElement('tr');
-      tr.innerHTML = '<td style="width:35%;"> <a href="' + 'pnl/' + object.account_header + '" style="text-decoration: none">' + object.account_header + '</a></td>' +
+      tr.innerHTML = '<td style="width:35%;"> <a href="pnl/' + object.account_header + '/?selected_date=' + choosen_month + '" style="text-decoration: none">' + object.account_header + '</a></td>' +
         '<td style="width: 12%; text-align:right;">' + object.current + '</td>' +
         '<td style="width: 8%; text-align:right;">' + '' + '</td>' +
         '<td style="width: 12%; text-align:right;">' + object.previous + '</td>' +

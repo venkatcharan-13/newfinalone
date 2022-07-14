@@ -30,9 +30,6 @@ def add_watchout_remark(request, pk):
     watchout_point.save()
     return JsonResponse({'Message': 'Success'})
 
-def taxes(request):
-    return HttpResponse("This will be Taxes Page")
-
 def help(request):
     return HttpResponse("This will be Help Page")
 
