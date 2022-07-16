@@ -29,11 +29,7 @@ cashflow_accounts = (
 
 
 def get_pnl(period):
-    if period is None:
-        period = date(2022, 6, 30)
-    elif not isinstance(period, date):
-        period = datetime.strptime(period, '%Y-%m-%d').date()
-
+    
     # Fetching accounts and transactions from database
     pnl_accounts_data, transactions_data = accounts_util.fetch_data_from_db(
         'pnl',
@@ -75,7 +71,8 @@ def get_pnl(period):
 
     # current month and previous month
     curr_month, curr_year = period.month, period.year
-    prev_month, prev_year = (12, curr_year-1) if period.month == 1 else (period.month - 1, curr_year)
+    prev_month, prev_year = (
+        12, curr_year-1) if period.month == 1 else (period.month - 1, curr_year)
 
     # Filling up API response with relevant data
     for account_header in transactions_map:
@@ -107,6 +104,10 @@ def get_pnl(period):
             temporary_storage[per_change_str] = (
                 temporary_storage[current_str]/temporary_storage[previous_str] - 1) * 100
 
+        # Checking if there are no values for current and previous month
+        if (abs(round(temporary_storage[current_str])), abs(round(temporary_storage[previous_str]))) == (0, 0):
+            continue
+
         # Finally updating the data in response
         if account_header[1] in ('Direct Income', 'Indirect Income'):
             pnl_data[account_header[0]][data_str].append(temporary_storage)
@@ -122,10 +123,9 @@ def get_pnl(period):
                 }
             pnl_data[account_header[0]][account_header[2]][data_str].append(
                 temporary_storage)
-        
+
         else:
             pnl_data[account_header[0]].append(temporary_storage)
-
 
     # Changing sign for income
     for acc in pnl_data['income'][data_str]:
@@ -169,7 +169,7 @@ def get_pnl(period):
         cogs_total[previous_str] = cogs_data[previous_str]
         cogs_total[three_month_avg_str] = cogs_data[three_month_avg_str]
         cogs_total[per_change_str] = 0 if cogs_total[previous_str] == 0 else round((
-        cogs_total[current_str] / cogs_total[previous_str] - 1) * 100)
+            cogs_total[current_str] / cogs_total[previous_str] - 1) * 100)
     else:
         pnl_data['cost_of_goods_sold'] = {
             current_str: 0,
@@ -188,7 +188,11 @@ def get_pnl(period):
         cat_dic[per_change_str] = 0 if cat_dic[previous_str] == 0 else (
             cat_dic[current_str]/cat_dic[previous_str] - 1
         ) * 100
-    
+        cat_dic['curr_per'] = 0 if income_total[current_str] == 0 else cat_dic[current_str] / \
+            income_total[current_str] * 100
+        cat_dic['prev_per'] = 0 if income_total[previous_str] == 0 else cat_dic[previous_str] / \
+            income_total[previous_str] * 100
+
     # Calculating total expense
     expense_total = {
         current_str: 0,
@@ -207,7 +211,7 @@ def get_pnl(period):
 
     for k in (current_str, previous_str, per_change_str, three_month_avg_str):
         pnl_data['total_expense'][k] = expense_total[k]
-    
+
     # Calculating gross profit and EBITDA
     for k in income_total:
         pnl_data['gross_profit'][k] = income_total[k] - cogs_total[k]
@@ -227,7 +231,8 @@ def get_pnl(period):
         current_str: pnl_data['ebitda'][current_str] - pnl_data['depreciation_expenses'][current_str],
         previous_str: pnl_data['ebitda'][previous_str] - pnl_data['depreciation_expenses'][previous_str],
         per_change_str: pnl_data['ebitda'][per_change_str] - pnl_data['depreciation_expenses'][per_change_str],
-        three_month_avg_str: pnl_data['ebitda'][three_month_avg_str] - pnl_data['depreciation_expenses'][three_month_avg_str]
+        three_month_avg_str: pnl_data['ebitda'][three_month_avg_str] -
+        pnl_data['depreciation_expenses'][three_month_avg_str]
     }
 
     # Calculating PBT
@@ -244,14 +249,15 @@ def get_pnl(period):
         current_str: pnl_data['pbit'][current_str] - pnl_data['interest_expenses'][current_str],
         previous_str: pnl_data['pbit'][previous_str] - pnl_data['interest_expenses'][previous_str],
         per_change_str: pnl_data['pbit'][per_change_str] - pnl_data['interest_expenses'][per_change_str],
-        three_month_avg_str: pnl_data['pbit'][three_month_avg_str] - pnl_data['interest_expenses'][three_month_avg_str]
+        three_month_avg_str: pnl_data['pbit'][three_month_avg_str] -
+        pnl_data['interest_expenses'][three_month_avg_str]
     }
 
-    for k in ('gross_profit', 'ebitda', 'depreciation_expenses', 'pbit', 'interest_expenses', 'pbt'):
-        pnl_data[k]['curr_per'] = 0 if income_total[current_str] == 0 else round(
-            pnl_data[k][current_str]/income_total[current_str] * 100)
-        pnl_data[k]['prev_per'] = 0 if income_total[previous_str] == 0 else round(
-            pnl_data[k][previous_str]/income_total[previous_str] * 100)
+    for k in ('gross_profit', 'ebitda', 'depreciation_expenses', 'pbit', 'interest_expenses', 'pbt', 'total_expense'):
+        pnl_data[k]['curr_per'] = 0 if income_total[current_str] == 0 else pnl_data[k][current_str] / \
+            income_total[current_str] * 100
+        pnl_data[k]['prev_per'] = 0 if income_total[previous_str] == 0 else pnl_data[k][previous_str] / \
+            income_total[previous_str] * 100
 
     pnl_pbt = copy.deepcopy(pnl_data['pbt'])
     pnl_dep_exp = copy.deepcopy(pnl_data['depreciation_expenses'])
@@ -420,12 +426,7 @@ def get_earnings(period):
     return current_year_earnings, retained_earnings
 
 
-
 def get_cashflow(period):
-    if period is None:
-        period = date(2022, 6, 30)
-    elif not isinstance(period, date):
-        period = datetime.strptime(period, '%Y-%m-%d').date()
 
     # Fetching data related to cashflow accounts
     cashflow_accounts_data, transactions_data = accounts_util.fetch_data_from_db(

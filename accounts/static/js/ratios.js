@@ -18,12 +18,14 @@ $.ajax({
     },
     success: function (response) {
         console.log("Success PNL");
-        fillRatiosHead(response.gross_profit, 'gross_profit', 'Gross Profit');
-        fillRatiosHead(response.pbt, 'pbt', 'PBT');
-        fillRatiosTableRows(response.profit_ratios, 'profit_ratios');
-        fillRatiosTableRows(response.liquidity_ratio, 'liquidity_ratio');
-        fillRatiosTableRows(response.op_eff_ratios, 'op_eff_ratios');
-        fillRatiosTableRows(response.solvency_ratios, 'solvency_ratios');
+        document.getElementById("current_month").innerHTML = response.current_period;
+        document.getElementById("previous_month").innerHTML = response.previous_period;
+        fillRatiosHead(response.response_data.gross_profit, 'gross_profit', 'Gross Profit');
+        fillRatiosHead(response.response_data.pbt, 'pbt', 'PBT');
+        fillRatiosTableRows(response.response_data.profit_ratios, 'profit_ratios');
+        fillRatiosTableRows(response.response_data.liquidity_ratio, 'liquidity_ratio');
+        fillRatiosTableRows(response.response_data.op_eff_ratios, 'op_eff_ratios');
+        fillRatiosTableRows(response.response_data.solvency_ratios, 'solvency_ratios');
     },
     error: function (error_data) {
         console.log("Error4");
@@ -38,9 +40,9 @@ function changePeriod(params) {
 
 function fillRatiosHead(object, tid, head) {
     document.getElementById(tid).innerHTML = '<th style="width:40%">' + head + '</th>' +
-        '<td style="width: 10%; text-align:right;">' + object.current + '</td>' +
-        '<td style="width: 10%; text-align:right;">' + object.previous + '</td>' +
-        '<td style="width: 20%; text-align:center;">' + object.three_month_avg + '</td>' +
+        '<td style="width: 15%; text-align:right;">' + object.current + '</td>' +
+        '<td style="width: 15%; text-align:right;">' + object.previous + '</td>' +
+        '<td style="width: 10%; text-align:center;">' + object.three_month_avg + '</td>' +
         '<td style="width: 20%; text-align:center;"></td>';
 }
 
@@ -50,9 +52,9 @@ function fillRatiosTableRows(data, tid) {
     data.forEach(function (object) {
         var tr = document.createElement('tr');
         tr.innerHTML = '<th style="width:40%">' + object.ratio_head + '</th>' +
-            '<td style="width: 10%; text-align:right;">' + object.current + '</td>' +
-            '<td style="width: 10%; text-align:right;">' + object.previous + '</td>' +
-            '<td style="width: 20%; text-align:center;">' + object.three_month_avg + '</td>' +
+            '<td style="width: 15%; text-align:right;">' + object.current + '</td>' +
+            '<td style="width: 15%; text-align:right;">' + object.previous + '</td>' +
+            '<td style="width: 10%; text-align:center;">' + object.three_month_avg + '</td>' +
             '<td style="width: 20%; text-align:center;"></td>';
         table.appendChild(tr);
     })

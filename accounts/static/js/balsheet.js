@@ -18,21 +18,27 @@ $.ajax({
   },
   success: function (response) {
     console.log("Success Balance Sheet");
-    fillBalsheetRows(response.cash, 'cash');
-    fillBalsheetRows(response.bank, 'bank');
-    fillBalsheetRows(response.accounts_receivable, 'acc_rec');
-    fillBalsheetRows(response.fixed_asset, 'fixasset');
-    fillBalsheetRows(response.other_current_asset, 'ocasset');
-    fillBalsheetRows(response.other_asset, 'othasset');
-    fillBalsheetRows(response.stock, 'stock');
-    fillBalsheetRows(response.accounts_payable, 'acc_pay');
-    fillBalsheetRows(response.long_term_liability, 'ltliab');
-    fillBalsheetRows(response.other_current_liability, 'ocliab');
-    fillBalsheetRows(response.other_liability, 'othliab');
-    fillBalsheetRows(response.equity, 'equity');
-    document.getElementById('head_equity').innerHTML = response.total_equity;
-    document.getElementById('head_liabilities').innerHTML = response.total_liabilities;
-    document.getElementById('head_assets').innerHTML = response.total_assets;
+    document.getElementById("current_month_assets").innerHTML = response.current_period;
+    document.getElementById("previous_month_assets").innerHTML = response.previous_period;
+    document.getElementById("current_month_liabilities").innerHTML = response.current_period;
+    document.getElementById("previous_month_liabilities").innerHTML = response.previous_period;
+    document.getElementById("current_month_equity").innerHTML = response.current_period;
+    document.getElementById("previous_month_equity").innerHTML = response.previous_period;
+    fillBalsheetRows(response.response_data.cash, 'cash');
+    fillBalsheetRows(response.response_data.bank, 'bank');
+    fillBalsheetRows(response.response_data.accounts_receivable, 'acc_rec');
+    fillBalsheetRows(response.response_data.fixed_asset, 'fixasset');
+    fillBalsheetRows(response.response_data.other_current_asset, 'ocasset');
+    fillBalsheetRows(response.response_data.other_asset, 'othasset');
+    fillBalsheetRows(response.response_data.stock, 'stock');
+    fillBalsheetRows(response.response_data.accounts_payable, 'acc_pay');
+    fillBalsheetRows(response.response_data.long_term_liability, 'ltliab');
+    fillBalsheetRows(response.response_data.other_current_liability, 'ocliab');
+    fillBalsheetRows(response.response_data.other_liability, 'othliab');
+    fillBalsheetRows(response.response_data.equity, 'equity');
+    document.getElementById('head_equity').innerHTML = response.response_data.total_equity;
+    document.getElementById('head_liabilities').innerHTML = response.response_data.total_liabilities;
+    document.getElementById('head_assets').innerHTML = response.response_data.total_assets;
   },
   error: function (error_data) {
     console.log("Error2");

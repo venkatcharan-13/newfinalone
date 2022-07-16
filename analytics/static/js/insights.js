@@ -54,7 +54,7 @@ function fillInsightsData(data, tid) {
   var table = document.getElementById(tid);
   data.forEach(function (object) {
     var tr = document.createElement('tr');
-    tr.innerHTML = '<li> This month Additional amount of ' + object.additional + ' is paid to<b>' + (object.payee ? object.payee : 'Unknown') + '</b></li>';
+    tr.innerHTML = `<li> This month Additional amount of ${object.additional} is paid to<b> ${object.payee ? object.payee : 'Unknown'} </b></li>`;
     table.appendChild(tr);
   })
 }

@@ -96,20 +96,24 @@ def get_insights(current_period):
         curr_dic = current_month_payees[key]
         prev_dic = previous_month_payees[key]
         for k in curr_dic:
+            new_amount = curr_dic[k]
             if k not in prev_dic:
-                insights_data[key].append(
-                    {
-                        'payee': k,
-                        'additional': locale.format("%d", curr_dic[k], grouping=True)
-                    }
-                )
-            elif curr_dic[k] > prev_dic[k]:
-                insights_data[key].append(
-                    {
-                        'payee': k,
-                        'additional': locale.format("%d", curr_dic[k] - prev_dic[k], grouping=True)
-                    }
-                )
+                if new_amount >= 5000:
+                    insights_data[key].append(
+                        {
+                            'payee': k,
+                            'additional': locale.format("%d", new_amount, grouping=True)
+                        }
+                    )
+            else:
+                addn_amount =  curr_dic[k] - prev_dic[k]
+                if addn_amount >= 5000:
+                    insights_data[key].append(
+                        {
+                            'payee': k,
+                            'additional': locale.format("%d", curr_dic[k] - prev_dic[k], grouping=True)
+                        }
+                    )
 
     insights_data = {
         'advt_and_marketing_header': parent_summary['Advertising and Marketing Expenses'],
