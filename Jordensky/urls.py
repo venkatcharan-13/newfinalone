@@ -25,5 +25,6 @@ urlpatterns = [
     path('', include('home.urls')),
     path('analytics/', include('analytics.urls')),
     path('accounts/', include('accounts.urls')),
-    path('taxes/', include('taxes.urls'))
+    path('taxes/', include('taxes.urls')),
+    path('profile/', include('cprofile.urls'))
 ]

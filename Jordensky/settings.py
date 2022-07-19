@@ -41,7 +41,9 @@ INSTALLED_APPS = [
     'analytics.apps.AnalyticsConfig',
     'accounts.apps.AccountsConfig',
     'taxes.apps.TaxesConfig',
-    'rest_framework'
+    'cprofile.apps.CprofileConfig',
+    'rest_framework',
+    'phonenumber_field',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,234 @@
+{% extends 'profiles_base.html' %}
+{% load static %}
+{% block title %}Company{% endblock title %}
+{% block active2 %}active{% endblock active2 %}
+{% block body %}
+<br>
+<div class="info">
+  <div class="accordion" id="accordionExample">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingOne">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+          aria-expanded="false" aria-controls="collapseOne">
+          <h4>Basic info</h4>
+        </button>
+      </h2>
+      <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+        data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+          <div class="form-group col-md-6">
+            <label for="company_name">Company</label>
+            <input type="text" class="form-control" id="company_name" value="">
+          </div>
+          <div class="form-group col-md-4">
+            <label for="industry">Industry</label>
+            <select id="industry" class="form-control">
+              <option selected> </option>
+              <option>Agency & Sales Housing</option>
+              <option>Art & Design</option>
+              <option>Automation</option>
+              <option>Construction</option>
+              <option>Consulting</option>
+              <option>Consumer Packaged Goods</option>
+              <option>Education</option>
+              <option>Engineering</option>
+              <option>Entertainment</option>
+              <option>Financial Services</option>
+              <option>Food Services (Restaurants/Fast Food)</option>
+              <option>Gaming</option>
+              <option>Government</option>
+              <option>Health Care</option>
+              <option>Interior Design</option>
+              <option>Internal</option>
+              <option>Legal</option>
+              <option>Manufacturing</option>
+              <option>Marketing</option>
+              <option>Mining and Logistics</option>
+              <option>Non-Profit</option>
+              <option>Publishing and Web Media</option>
+              <option>Real Estate</option>
+              <option>Retail (E-Commerce and Retails)</option>
+              <option>Services</option>
+              <option>Technology</option>
+              <option>Telecommunications</option>
+              <option>Travel/Hospitality</option>
+              <option>Web Designing</option>
+              <option>Web Development</option>
+              <option>Writers</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingTwo">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo"
+          aria-expanded="false" aria-controls="collapseTwo">
+          <h4>Address</h4>
+        </button>
+      </h2>
+      <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+        data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+          <form>
+            <div class="form-group">
+              <label for="address">Address</label>
+              <input type="text" class="form-control" id="address" value="">
+            </div>
+            <div class="form-row">
+              <div class="row">
+                <div class="col-6"><label for="city">City</label>
+                  <input type="text" class="form-control" id="city" value="">
+                </div>
+                <div class="col-6"><label for="state">State</label>
+                  <select id="state" class="form-control">
+                    <option value="Maharashtra"> Maharashtra </option>
+                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                    <option>Arunachal Pradesh</option>
+                    <option>Assam</option>
+                    <option>Bihar</option>
+                    <option>Chhattisgarh</option>
+                    <option>Goa</option>
+                    <option value="Delhi">Delhi</option>
+                    <option>Gujarat</option>
+                    <option value="Haryana">Haryana</option>
+                    <option>Himachal Pradesh</option>
+                    <option>Jammu and Kashmir</option>
+                    <option>Jharkhand</option>
+                    <option>Karnataka</option>
+                    <option>Kerala</option>
+                    <option>Madhya Pradesh</option>
+                    <option>Manipur</option>
+                    <option>Meghalaya</option>
+                    <option>Mizoram</option>
+                    <option>Nagaland</option>
+                    <option>Odisha</option>
+                    <option>Punjab</option>
+                    <option>Rajasthan</option>
+                    <option>Sikkim</option>
+                    <option>Tamil Nadu</option>
+                    <option>Telangana</option>
+                    <option>Tripura</option>
+                    <option>Uttar Pradesh</option>
+                    <option>Uttarakhand</option>
+                    <option>West Bengal</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group col-4">
+                  <label for="zip">Zip Code</label>
+                  <input type="number" class="form-control" id="zip" value="">
+                </div>
+                <div class="form-group col-6">
+                  <label for="country">Country</label>
+                  <input type="text" class="form-control" id="country" value="" disabled>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingThree">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+          data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+          <h4>Contact Info</h4>
+        </button>
+      </h2>
+      <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+        data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+          <div class="form-row">
+            <div class="row">
+              <div class="col-6">
+                <div>
+                  <label for="contact_email">Primary Contact Email Address</label>
+                  <input type="email" class="form-control" id="contact_email" placeholder="Email" value="">
+                </div>
+              </div>
+              <div class="col-6">
+                <div>
+                  <label for="contact_num">Phone number</label>
+                  <input type="text" class="form-control" id="contact_num" value="">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingFour">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+          data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+          <h4>KYC Docs</h4>
+        </button>
+      </h2>
+      <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
+        data-bs-parent="#accordionExample">
+        <div class="accordion-body" style="text-align: center;">
+          <div class="innertable">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td> GST No</td>
+                  <td><input type="text" value="" id="gst_no"></td>
+                  <td class="rowsstyle">
+                    <form method="post" class="post-form" enctype="multipart/form-data" action="">
+                      <input type="file" id="myFile" name="filename">
+                      <input type="submit" id="myFilee">
+                    </form>
+                  </td>
+                </tr>
+                <tr>
+                  <td> PAN No</td>
+                  <td><input type="text" id="pan_no" value=""></td>
+                  <td class="rowsstyle">
+                    <form method="post" class="post-form" enctype="multipart/form-data" action="">
+                      <input type="file" id="myFile" name="filename">
+                      <input type="submit" id="myFilee">
+                    </form>
+                  </td>
+                </tr>
+                <tr>
+                  <td> PF No</td>
+                  <td><input type="text" id="pf_no" value=""></td>
+                  <td>
+                    <form class="post-form" enctype="multipart/form-data" method="post" action="">
+                      <input type="file" id="myFile" name="filename">
+                      <input type="submit" id="myFilee">
+                    </form>
+                  </td>
+                </tr>
+                <tr>
+                  <td> ESIC No</td>
+                  <td><input type="text" id="esic_no" value=""></td>
+                  <td class="rowsstyle">
+                    <form method="post" class="post-form" enctype="multipart/form-data" action="">
+                      <input type="file" id="myFile" name="filename">
+                      <input type="submit" id="myFilee">
+                    </form>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="for_btn" style="text-align: right;margin:10px;">
+    <button type="button" class="btn btn-primary btn-lg btn-block float-right" id="Save_context"
+      onclick="save_company_info()">Save</button>
+  </div>
+</div>
+{% endblock body %}
+
+{% block script %}
+<script src="{% static 'js/company.js' %}"></script>
+{% endblock script %}

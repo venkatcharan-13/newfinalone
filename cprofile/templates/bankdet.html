@@ -1,0 +1,31 @@
+{% extends 'profiles_base.html' %}
+{% load static %}
+{% block title %}Bank Details{% endblock title %}
+{% block active5 %}active{% endblock active5 %}
+{% block body %}
+<br>
+<h1>Bank Details</h1><br>
+<div class="bankdetails" style="padding: 20px; border-style: solid;">
+  <div class="row">
+    <div class="col-3">
+      <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+      </div>
+    </div>
+    <div class="col-9">
+      <div class="tab-content" id="v-pills-tabContent">
+      </div>
+    </div>
+  </div>
+</div>
+<div class="for_btn" style="text-align: right;">
+  <button type="button" class="btn btn-primary float-right" id="add_new" style="margin:5px;">Add More</button>
+  <button type="button" class="btn btn-primary float-right" id="save_bank_details" style="margin-right:250px;"
+    onclick="">Save</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+{% endblock body %}
+
+{% block script %}
+<script src="{% static 'js/bankdet.js' %}"></script>
+{% endblock script %}

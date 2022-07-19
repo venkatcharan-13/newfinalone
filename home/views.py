@@ -33,5 +33,3 @@ def add_watchout_remark(request, pk):
 def help(request):
     return HttpResponse("This will be Help Page")
 
-def profile(request):
-    return HttpResponse("This will be Profile Page")

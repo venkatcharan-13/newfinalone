@@ -71,11 +71,18 @@ function salesPerformanceGraph(data, id) {
       }]
     },
     options: {
+      locale: 'en-IN',
       scales: {
-        yAxes: [{
-          ticks: {
-            beginAtZero: true
-          }
+        y: [{
+          beginAtZero: true
+          // ticks: {
+          //   callback: (value) => {
+          //     return new Intl.NumberFormat('en-IN', {
+          //       style: 'currency',
+          //       currency: 'INR',
+          //     }).format(value)
+          //   }
+          // }
         }]
       }
     }
@@ -103,6 +110,7 @@ function incomeExpensesGraph(data, id) {
       }],
     },
     options: {
+      locale: 'en-IN',
       title: {
         display: true,
         text: chartLabel
@@ -139,6 +147,7 @@ function inflowOutflowGraph(data, id) {
       }]
     },
     options: {
+      locale: 'en-IN',
       title: {
         display: true,
         text: chartLabel
@@ -167,7 +176,7 @@ function grossAndNetProfitGraph(data, id) {
         backgroundColor: "#8e5ea2",
         data: dataset[1].netProfitValues
       }],
-    }
+    },
   })
 }
 
@@ -221,6 +230,7 @@ function gpExpensesEbitdaGraph(data, id) {
       ]
     },
     options: {
+      locale: 'en-IN',
       barPercentage: 1,
       title: {
         display: true,
@@ -238,30 +248,6 @@ function gpExpensesEbitdaGraph(data, id) {
             drawOnChartArea: false
           }
         }
-      }
-    }
-  });
-}
-
-function cogsBreakdownGraph(data, id) {
-  var labels = data.labels;
-  var chartLabel = data.chartLabel;
-  var chartdata = data.chartdata;
-  var ctx = document.getElementById(id).getContext('2d');
-  var myChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: chartLabel,
-        backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850"],
-        data: chartdata
-      }]
-    },
-    options: {
-      title: {
-        display: true,
-        text: "Let's check"
       }
     }
   });
@@ -294,6 +280,9 @@ function montlhyCashFlowGraph(data, id) {
         borderColor:  "#00a300",
         data: dataset[2].cashflowFinancing
       }],
+    },
+    options: {
+      locale: 'en-IN',
     }
   })
 }

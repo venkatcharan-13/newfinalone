@@ -39,7 +39,7 @@ def get_sales_performance(current_date):
     for period in prev_six_months:
         month = period.month
         year = period.year
-        month_name = calendar.month_name[month]
+        month_name = calendar.month_name[month][:3] + '-' + str(year)[2:]
         monthly_sale[month_name] = 0
         for transaction in transactions_related_to_income:
             trans_date = transaction.transaction_date
@@ -611,7 +611,8 @@ def get_monthly_cashflow_statement(current_date):
     monthly_cashflow_statement = {}
     for i in range(0, 6):
         month = prev_seven_months[i+1].month
-        month_name = calendar.month_name[month]
+        year = prev_seven_months[i+1].year
+        month_name = calendar.month_name[month][:3] + '-' + str(year)[2:]
         monthly_cashflow_statement[month_name] = {
             'cf_from_operations': round(cashflow_data['net_cash_a'][i]),
             'cf_from_investing': round(cashflow_data['net_cash_b'][i]),

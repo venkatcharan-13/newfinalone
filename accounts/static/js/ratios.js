@@ -46,16 +46,25 @@ function fillRatiosHead(object, tid, head) {
         '<td style="width: 20%; text-align:center;"></td>';
 }
 
-
 function fillRatiosTableRows(data, tid) {
     var table = document.getElementById(tid);
     data.forEach(function (object) {
         var tr = document.createElement('tr');
-        tr.innerHTML = '<th style="width:40%">' + object.ratio_head + '</th>' +
-            '<td style="width: 15%; text-align:right;">' + object.current + '</td>' +
-            '<td style="width: 15%; text-align:right;">' + object.previous + '</td>' +
-            '<td style="width: 10%; text-align:center;">' + object.three_month_avg + '</td>' +
-            '<td style="width: 20%; text-align:center;"></td>';
+        tr.style.cssText = 'border-bottom: 1px solid black';
+        var idealRatio =  object.ideal_ratio.min ?
+        `<td style="width: 15%; text-align:center;">
+            Min ${object.ideal_ratio.min}<br>
+            Avg ${object.ideal_ratio.avg}<br>
+            Great ${object.ideal_ratio.great}<br>
+        </td>`:
+        `<td style="width: 15%; text-align:center;">
+            ${object.ideal_ratio}
+        </td>`;
+        tr.innerHTML = `<th style="width:40%"> ${object.ratio_head}<span class="fa fa-info-circle" title="${object.ratio_info}"></span></th>` +
+            `<td style="width: 15%; text-align:right;"> ${object.current + object.ratio_format} </td>` +
+            `<td style="width: 15%; text-align:right;"> ${object.previous + object.ratio_format} </td>` +
+            `<td style="width: 15%; text-align:center;"> ${object.three_month_avg + object.ratio_format} </td>` +
+            idealRatio;
         table.appendChild(tr);
     })
 }
