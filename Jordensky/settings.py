@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'authentication.apps.AuthenticationConfig',
     'home.apps.HomeConfig',
     'analytics.apps.AnalyticsConfig',
     'accounts.apps.AccountsConfig',
@@ -139,3 +140,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Login redirect URL
+LOGIN_URL = '/auth/login/'
+LOGIN_REDIRECT_URL = '/'

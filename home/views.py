@@ -3,10 +3,12 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from home.models import PendingActionable, WatchOutPoint
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
 
+@login_required()
 def index(request):
     pending_actionables = PendingActionable.objects.all()
     watch_out_points = WatchOutPoint.objects.all()

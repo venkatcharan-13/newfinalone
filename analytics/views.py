@@ -1,5 +1,6 @@
 from datetime import date
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from utility import analytics_util, insights_util
@@ -7,14 +8,15 @@ from utility import analytics_util, insights_util
 SELECTED_DATE = date(2022, 6, 30)
 
 # Create your views here.
+@login_required()
 def analytics(request):
     return render(request, 'analytics.html')
 
-
+@login_required()
 def insights(request):
     return render(request, 'insights.html')
 
-
+@login_required()
 def deep_insights(request):
     return render(request, 'deep_insights.html')
 

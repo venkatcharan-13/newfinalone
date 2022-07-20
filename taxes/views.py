@@ -1,18 +1,20 @@
 from datetime import datetime
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from taxes.models import TaxAlert, ITMonthlyStatus, ITQuarterlyStatus, GSTMonthlyStatus, GSTQuarterlyStatus
 
 # Create your views here.
+@login_required()
 def taxes(request):
     return render(request, 'taxes.html')
 
-
+@login_required()
 def gst(request):
     return render(request, 'gst.html')
 
-
+@login_required()
 def other_taxes(request):
     return render(request, 'other_taxes.html')
 

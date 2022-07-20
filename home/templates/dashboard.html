@@ -18,7 +18,11 @@
 </head>
 
 <body>
-  <h1>JordenSky</h1>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid d-flex flex-row-reverse">
+      <a class="navbar-brand" href="/auth/logout/">Logout</a>
+    </div>
+  </nav>
   <div class="sidenav">
     <a href="/" class="current">Home</a>
     <a href="/accounts">Accounts</a>
@@ -28,7 +32,9 @@
     <a href="/profile">Profile</a>
   </div>
   <div class="main">
-    <h2>JordenSky</h2>
+    {% if user.is_authenticated %}
+    <h2>Hello {{ user.first_name }}</h2>
+    {% endif %}
     <div class="month-dropdown">
       <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
         aria-expanded="false">

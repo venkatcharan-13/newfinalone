@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import JsonResponse
@@ -8,11 +9,11 @@ from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
-
+@login_required()
 def profiles(request):
     return render(request, 'overview.html')
 
-
+@login_required()
 def company(request):
     return render(request, 'company.html')
 
@@ -36,6 +37,7 @@ def save_company_info(request):
 
     return JsonResponse({'Message': 'Success'})
 
+@login_required()
 def context(request):
     return render(request, 'context.html')
 
@@ -53,10 +55,11 @@ def save_company_context(request):
 
     return JsonResponse({'Message': 'Success'})
 
+@login_required()
 def connections(request):
     return render(request, 'connections.html')
 
-
+@login_required()
 def bank_details(request):
     return render(request, 'bankdet.html')
     

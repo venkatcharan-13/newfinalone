@@ -1,5 +1,5 @@
 import calendar
-import copy
+from django.contrib.auth.decorators import login_required
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 import locale
@@ -17,19 +17,19 @@ config_file = open("config/accounts_config.json")
 config_data = json.load(config_file)
 # Create your views here.
 
-
+@login_required()
 def accounts(request):
     return render(request, 'accounts.html')
 
-
+@login_required()
 def balsheet(request):
     return render(request, 'balsheet.html')
 
-
+@login_required()
 def cashflow(request):
     return render(request, 'cashflow.html')
 
-
+@login_required()
 def pnl_transaction(request, account):
     selected_month = request.GET.get('selected_date')
 
