@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class ZohoAccount(models.Model):
+    def __str__(self):
+        return self.account_name
+
     client = models.ForeignKey(User, on_delete=models.CASCADE)
     account_id = models.CharField(max_length=30, primary_key=True)
     account_name = models.CharField(max_length=100)
@@ -26,6 +29,9 @@ class ZohoAccount(models.Model):
     last_modified_time = models.DateTimeField(auto_now=False, auto_now_add=False)
 
 class ZohoTransaction(models.Model):
+    def __str__(self):
+        return self.categorized_transaction_id
+
     categorized_transaction_id = models.CharField(max_length=30, primary_key=True)
     transaction_type = models.CharField(max_length=100, null=True)
     transaction_status = models.CharField(max_length=50, null=True)
@@ -34,7 +40,7 @@ class ZohoTransaction(models.Model):
     transaction_id = models.CharField(max_length=30)
     transaction_date = models.DateField(auto_now=False, auto_now_add=False)
     transaction_type_formatted = models.CharField(max_length=100)
-    account_id = models.CharField(max_length=30)
+    account_id = models.ForeignKey(ZohoAccount, on_delete=models.CASCADE)
     parent_account_id = models.CharField(max_length=30)
     customer_id = models.CharField(max_length=30)
     payee = models.CharField(max_length=100)

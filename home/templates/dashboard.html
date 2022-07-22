@@ -145,7 +145,33 @@
         <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
           data-bs-parent="#accordionExample">
           <div class="accordion-body">
-            <h3>Will Be Updated Soon</h3>
+            <table class="table table-warning">
+              <thead>
+                <tr>
+                  <th style="width: 40%;"></th>
+                  <th style="width: 15%;">Current month due date</th>
+                  <th style="width: 15%;">Status</th>
+                  <th style="width: 15%;">Last month Status</th>
+                  <th style="width: 15%;">Last month Completion date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for tax_head, compliances in statutory_compliances.items %}
+                <tr>
+                  <th scope="row" colspan="5">{{ tax_head }}</th>
+                </tr>
+                  {% for compliance in compliances %}
+                  <tr>
+                    <td scope="row" style="width: 40%;">{{ compliance.compliance }}</td>
+                    <td style="width: 15%;">{{ compliance.current_month }}</td>
+                    <td style="width: 15%;">{{ compliance.current_status }}</td>
+                    <td style="width: 15%;">{{ compliance.last_status }}</td>
+                    <td style="width: 15%;">{{ compliance.last_month }}</td>
+                  </tr>
+                  {% endfor %}
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

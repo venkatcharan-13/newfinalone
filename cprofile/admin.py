@@ -2,7 +2,28 @@ from django.contrib import admin
 from cprofile.models import Company, CompanyAddress, CompanyContext, BankDetail
 
 # Register your models here.
-admin.site.register(Company)
+class CompanyContextInline(admin.TabularInline):
+    model = CompanyContext
+class CompanyAddressInline(admin.TabularInline):
+    model = CompanyAddress
+class BankDetailsInline(admin.TabularInline):
+    model = BankDetail
+    
+
 admin.site.register(CompanyAddress)
 admin.site.register(CompanyContext)
-admin.site.register(BankDetail)
+
+class BankDetailAdmin(admin.ModelAdmin):
+    list_filter = ['company']
+
+admin.site.register(BankDetail, BankDetailAdmin)
+
+class CompanyAdmin(admin.ModelAdmin):
+    list_filter = ['client']
+    inlines = [
+        CompanyContextInline,
+        CompanyAddressInline,
+        BankDetailsInline
+    ]
+
+admin.site.register(Company, CompanyAdmin)
