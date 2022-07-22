@@ -10,8 +10,13 @@ from django.contrib.auth.decorators import login_required
 
 @login_required()
 def index(request):
-    pending_actionables = PendingActionable.objects.all()
-    watch_out_points = WatchOutPoint.objects.all()
+    logged_client_id = request.user.id
+    pending_actionables = PendingActionable.objects.filter(
+        client_id=logged_client_id
+    )
+    watch_out_points = WatchOutPoint.objects.filter(
+        client_id=logged_client_id
+    )
     context = {
         'pending_points': pending_actionables,
         'watch_out_points': watch_out_points,

@@ -8,6 +8,8 @@ from utility import accounts_util, acc_gets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import json
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 locale.setlocale(locale.LC_ALL, 'en_IN.utf8')
 SELECTED_DATE = date(2022, 6, 30)
@@ -32,6 +34,7 @@ def cashflow(request):
 @login_required()
 def pnl_transaction(request, account):
     selected_month = request.GET.get('selected_date')
+    logged_client_id = request.user.id
 
     if selected_month is None:
         selected_month = date(2022, 6, 30)
@@ -40,7 +43,8 @@ def pnl_transaction(request, account):
 
     # Fetching PNL transactions for each payee related to an account
     response_data, totals, prev_three_months = accounts_util.fetch_pnl_transactions(
-        selected_month, account)
+        selected_month, logged_client_id, account
+    )
     current_month = prev_three_months[0]
     previous_month = prev_three_months[1]
     pre_previous_month = prev_three_months[2]
@@ -60,10 +64,11 @@ def ratios(request):
 
 
 class PnlData(APIView):
-    authentication_classes = []
-    permission_classes = []
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
+        logged_client_id = self.request.user.id
         selected_month = self.request.query_params.get('selected_date')
         expenses_order = (
             'Advertising and Marketing Expenses',
@@ -83,7 +88,7 @@ class PnlData(APIView):
         previous_month = (selected_month.replace(day=1) + relativedelta(days=-1)).month
         previous_month_year = (selected_month.replace(day=1) + relativedelta(days=-1)).year
 
-        pnl_data = acc_gets.get_pnl(selected_month)[0]
+        pnl_data = acc_gets.get_pnl(selected_month, logged_client_id)[0]
 
         # sorting account heads in standard order
         pnl_data['income']['data'] = sorted(
@@ -104,11 +109,12 @@ class PnlData(APIView):
 
 
 class BalanceSheetData(APIView):
-    authentication_classes = []
-    permission_classes = []
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         selected_month = self.request.query_params.get('selected_date')
+        logged_client_id = self.request.user.id
 
         if selected_month is None:
             selected_month = date(2022, 6, 30)
@@ -118,12 +124,12 @@ class BalanceSheetData(APIView):
         previous_month = (selected_month.replace(day=1) + relativedelta(days=-1)).month
         previous_month_year = (selected_month.replace(day=1) + relativedelta(days=-1)).year
 
-        bal_sheet_data = acc_gets.get_balsheet(selected_month)
+        bal_sheet_data = acc_gets.get_balsheet(selected_month, logged_client_id)
         bal_sheet_data_response = {}
         bal_sheet_data_response[current_period_str] = calendar.month_name[current_month] + '-' + str(current_month_year)[2:]
         bal_sheet_data_response[previous_period_str] = calendar.month_name[previous_month] + '-' + str(previous_month_year)[2:]
         bal_sheet_data_response[response_data_str] = accounts_util.convert_to_indian_comma_notation('balsheet', bal_sheet_data)
-        current_year_earnings, retained_earnings = acc_gets.get_earnings(selected_month)
+        current_year_earnings, retained_earnings = acc_gets.get_earnings(selected_month, logged_client_id)
         
         bal_sheet_data_response[response_data_str]['equity'].extend([
             {
@@ -148,11 +154,12 @@ class BalanceSheetData(APIView):
 
 
 class CashFlowData(APIView):
-    authentication_classes = []
-    permission_classes = []
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         selected_month = self.request.query_params.get('selected_date')
+        logged_client_id = self.request.user.id
 
         if selected_month is None:
             selected_month = date(2022, 6, 30)
@@ -162,7 +169,7 @@ class CashFlowData(APIView):
         previous_month = (selected_month.replace(day=1) + relativedelta(days=-1)).month
         previous_month_year = (selected_month.replace(day=1) + relativedelta(days=-1)).year
 
-        cashflow_data = acc_gets.get_cashflow(selected_month)
+        cashflow_data = acc_gets.get_cashflow(selected_month, logged_client_id)
         
         cashflow_data_response = {}
         cashflow_data_response[current_period_str] = calendar.month_name[current_month] + '-' + str(current_month_year)[2:]
@@ -173,11 +180,12 @@ class CashFlowData(APIView):
 
 
 class RatiosData(APIView):
-    authentication_classes = []
-    permission_classes = []
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         selected_month = self.request.query_params.get('selected_date')
+        logged_client_id = self.request.user.id
 
         if selected_month is None:
             selected_month = date(2022, 6, 30)
@@ -188,7 +196,7 @@ class RatiosData(APIView):
         previous_month = (selected_month.replace(day=1) + relativedelta(days=-1)).month
         previous_month_year = (selected_month.replace(day=1) + relativedelta(days=-1)).year
         
-        ratios_data = acc_gets.get_ratios(selected_month)
+        ratios_data = acc_gets.get_ratios(selected_month, logged_client_id)
 
         ratios_data_response = {}
         ratios_data_response[current_period_str] = calendar.month_name[current_month] + '-' + str(current_month_year)[2:]

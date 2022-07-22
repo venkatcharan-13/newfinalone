@@ -6,6 +6,8 @@ from django.http import JsonResponse
 import json
 from cprofile.models import Company, CompanyAddress, CompanyContext, BankDetail
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 
@@ -19,7 +21,11 @@ def company(request):
 
 @csrf_exempt
 def save_company_info(request):
-    company = Company.objects.get(id=1)
+    logged_client_id = request.user.id
+
+    company = Company.objects.get(
+        client_id=logged_client_id
+    )
     company_address = CompanyAddress.objects.get(company=company.id)
     request_body = json.loads(request.body)
     
@@ -43,7 +49,11 @@ def context(request):
 
 @csrf_exempt
 def save_company_context(request):
-    company = Company.objects.get(id=1)
+    logged_client_id = request.user.id
+
+    company = Company.objects.get(
+        client_id=logged_client_id
+    )
     company_context = CompanyContext.objects.get(company=company.id)
     request_body = json.loads(request.body)
 
@@ -65,11 +75,14 @@ def bank_details(request):
     
 
 class CompanyInfo(APIView):
-    authentication_classes = []
-    permission_classes = []
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
-        company = Company.objects.get(id=1)
+        logged_client_id = self.request.user.id
+        company = Company.objects.get(
+            client_id=logged_client_id
+        )
         company_address = CompanyAddress.objects.get(company=company.id)
     
         company_information_response = {
@@ -91,11 +104,14 @@ class CompanyInfo(APIView):
         return Response(company_information_response)
 
 class ContextData(APIView):
-    authentication_classes = []
-    permission_classes = []
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
-        company = Company.objects.get(id=1)
+        logged_client_id = self.request.user.id
+        company = Company.objects.get(
+            client_id=logged_client_id
+        )
         company_context = CompanyContext.objects.get(company=company.id)
 
         context_response = {
@@ -109,11 +125,14 @@ class ContextData(APIView):
 
 
 class BanksData(APIView):
-    authentication_classes = []
-    permission_classes = []
-
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None):
-        company = Company.objects.get(id=1)
+        logged_client_id = self.request.user.id
+        company = Company.objects.get(
+            client_id=logged_client_id
+        )
         related_banks = BankDetail.objects.filter(
             company = company.id
         ).values()

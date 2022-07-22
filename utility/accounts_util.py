@@ -9,13 +9,15 @@ curr_per_str, prev_per_str = "curr_per", "prev_per"
 per_change_str, prev_per_change_str, three_month_avg_str = "per_change", "prev_per_change", "three_month_avg"
 
 
-def fetch_data_from_db(table, period, account_filter):
+def fetch_data_from_db(table, client_id, period, account_filter):
     if table == 'cashflow':
         accounts_data = ZohoAccount.objects.filter(
-            account_for_coding__in=account_filter)
+            account_for_coding__in=account_filter, client_id=client_id
+        )
     else:
         accounts_data = ZohoAccount.objects.filter(
-            account_type__in=account_filter)
+            account_type__in=account_filter, client_id=client_id
+        )
 
     if table == 'pnl':
         transactions_data = ZohoTransaction.objects.filter(
@@ -118,9 +120,10 @@ def convert_to_indian_comma_notation(table, response_data):
     return response_data
 
 
-def fetch_pnl_transactions(period, account):
+def fetch_pnl_transactions(period, client_id, account):
 
     accounts_for_pnl_account = ZohoAccount.objects.filter(
+        client_id=client_id,
         account_for_coding=account
     ).values_list('account_id', 'account_for_coding')
 

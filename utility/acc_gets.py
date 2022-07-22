@@ -32,11 +32,12 @@ config_file = open("config/accounts_config.json")
 config_data = json.load(config_file)
 
 
-def get_pnl(period):
+def get_pnl(period, logged_client_id):
     
     # Fetching accounts and transactions from database
     pnl_accounts_data, transactions_data = accounts_util.fetch_data_from_db(
         'pnl',
+        logged_client_id,
         period,
         ['income', 'expense', 'other_expense', 'cost_of_goods_sold']
     )
@@ -269,7 +270,7 @@ def get_pnl(period):
     return pnl_data, pnl_pbt, pnl_dep_exp
 
 
-def get_balsheet(period):
+def get_balsheet(period, logged_client_id):
     if period is None:
         period = date(2022, 6, 30)
     elif not isinstance(period, date):
@@ -278,6 +279,7 @@ def get_balsheet(period):
     # Fetching accounts and transactions from database
     bal_accounts_data, transactions_data = accounts_util.fetch_data_from_db(
         'balsheet',
+        logged_client_id,
         period,
         (
             'accounts_payable',
@@ -362,13 +364,14 @@ def get_balsheet(period):
     return bal_sheet_data
 
 
-def get_earnings(period):
+def get_earnings(period, logged_client_id):
     if period is None:
         period = date(2022, 6, 30)
     elif not isinstance(period, date):
         period = datetime.strptime(period, '%Y-%m-%d').date()
 
     earnings_accounts_data = ZohoAccount.objects.filter(
+        client_id=logged_client_id,
         account_type__in=('income', 'expense',
                           'other_expense', 'cost_of_goods_sold')
     ).values_list('account_id', 'account_type')
@@ -430,11 +433,12 @@ def get_earnings(period):
     return current_year_earnings, retained_earnings
 
 
-def get_cashflow(period):
+def get_cashflow(period, logged_client_id):
 
     # Fetching data related to cashflow accounts
     cashflow_accounts_data, transactions_data = accounts_util.fetch_data_from_db(
         'cashflow',
+        logged_client_id,
         period,
         cashflow_accounts
     )
@@ -514,7 +518,7 @@ def get_cashflow(period):
             ((temporary_storage[previous_str] + temporary_storage2[previous_str]) / (temporary_storage[pre_prev_str] + temporary_storage2[pre_prev_str])-1) * 100)
     }
 
-    pnl_pbt, pnl_dep_exp = get_pnl(period)[1:]
+    pnl_pbt, pnl_dep_exp = get_pnl(period, logged_client_id)[1:]
 
     for act, val in {'Net Income': pnl_pbt, 'Plus: Depreciation & Amortization': pnl_dep_exp}.items():
         cashflow_data[cashflow_from_operating_activities].append({
@@ -645,13 +649,13 @@ def get_cashflow(period):
     return cashflow_data
 
 
-def get_ratios(period):
+def get_ratios(period, logged_client_id):
 
     ratio_config_data = config_data['ratios_info']
 
-    pnl_data = get_pnl(period)[0]
-    balsheet_data = get_balsheet(period)
-    cashflow_data = get_cashflow(period)
+    pnl_data = get_pnl(period, logged_client_id)[0]
+    balsheet_data = get_balsheet(period, logged_client_id)
+    cashflow_data = get_cashflow(period, logged_client_id)
 
     ratios_data = {}
     ratio_head, ratio_info, ideal_ratio, ratio_format = "ratio_head", "ratio_info", "ideal_ratio", "ratio_format"
@@ -696,7 +700,18 @@ def get_ratios(period):
     }
     ratios_data['profit_ratios'].append(temporary_storage)
 
-    equity = balsheet_data['equity'][0]
+    if balsheet_data['equity']:
+        equity = balsheet_data['equity'][0]
+    else:
+        equity = {
+            "account_header": "Share Capital",
+            "current": 0,
+            "previous": 0,
+            "pre_prev": 0,
+            "per_change": 0,
+            "three_month_avg": 0
+        }
+
     temporary_storage = {
         ratio_head: ratio_config_data['return_on_equity']['head'],
         ratio_info: ratio_config_data['return_on_equity']['info'],
@@ -722,7 +737,7 @@ def get_ratios(period):
 
     ratios_data['liquidity_ratio'] = []
     
-    if balsheet_data['accounts_receivable'][0]:
+    if balsheet_data['accounts_receivable']:
         accrec = balsheet_data['accounts_receivable'][0]
     else:
         accrec = {
@@ -731,9 +746,10 @@ def get_ratios(period):
             "previous": 0,
             "pre_prev": 0,
             "per_change": 0,
+            "three_month_avg": 0
         }
 
-    if balsheet_data['cash'][0]:
+    if balsheet_data['cash']:
         cash = balsheet_data['cash'][0]
     else:
         cash = {
@@ -742,9 +758,10 @@ def get_ratios(period):
             "previous": 0,
             "pre_prev": 0,
             "per_change": 0,
+            "three_month_avg": 0
         }
 
-    if balsheet_data['bank'][0]:
+    if balsheet_data['bank']:
         bank = balsheet_data['bank'][0]
     else:
         bank = {
@@ -753,9 +770,10 @@ def get_ratios(period):
             "previous": 0,
             "pre_prev": 0,
             "per_change": 0,
+            "three_month_avg": 0
         }
 
-    if balsheet_data['other_current_asset'][0]:
+    if balsheet_data['other_current_asset']:
         ocurra = balsheet_data['other_current_asset'][0]
     else:
         ocurra = {
@@ -764,9 +782,10 @@ def get_ratios(period):
             "previous": 0,
             "pre_prev": 0,
             "per_change": 0,
+            "three_month_avg": 0
         }
 
-    if balsheet_data['accounts_payable'][0]:
+    if balsheet_data['accounts_payable']:
         accpay = balsheet_data['accounts_payable'][0]
     else:
         accpay = {
@@ -775,6 +794,7 @@ def get_ratios(period):
             "previous": 0,
             "pre_prev": 0,
             "per_change": 0,
+            "three_month_avg": 0
         }
 
     
@@ -872,7 +892,7 @@ def get_ratios(period):
 
     ratios_data['solvency_ratios'] = []
     
-    share_cap = balsheet_data['equity'][0]
+    share_cap = equity
     temporary_storage = {
         ratio_head: ratio_config_data['debt_to_equity_ratio']['head'],
         ratio_info: ratio_config_data['debt_to_equity_ratio']['info'],

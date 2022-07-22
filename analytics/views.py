@@ -4,6 +4,8 @@ from django.contrib.auth.decorators import login_required
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from utility import analytics_util, insights_util
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 SELECTED_DATE = date(2022, 6, 30)
 
@@ -22,24 +24,25 @@ def deep_insights(request):
 
 
 class ReportData(APIView):
-    authentication_classes = []
-    permission_classes = []
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         selected_month = self.request.query_params.get('selected_date')
+        logged_client_id = self.request.user.id
 
-        monthly_sales, quarterly_sales, yearly_sales = analytics_util.get_sales_performance(selected_month)
-        tot_income_vs_tot_expenses = analytics_util.get_income_vs_expenses(selected_month)
-        cash_inflow_vs_outflow = analytics_util.get_cash_inflow_outflow(selected_month)
-        closing_bank_balance_trend = analytics_util.get_closing_bank_balance_trend(selected_month)
-        gross_profit_and_net_profit = analytics_util.get_gross_profit_and_net_profit(selected_month)
-        monthly_runaway = analytics_util.get_monthly_runaway(selected_month)
-        gp_vs_expenses_vs_ebitda = analytics_util.get_gp_vs_expenses_ebitda(selected_month)
+        monthly_sales, quarterly_sales, yearly_sales = analytics_util.get_sales_performance(logged_client_id, selected_month)
+        tot_income_vs_tot_expenses = analytics_util.get_income_vs_expenses(logged_client_id, selected_month)
+        cash_inflow_vs_outflow = analytics_util.get_cash_inflow_outflow(logged_client_id, selected_month)
+        closing_bank_balance_trend = analytics_util.get_closing_bank_balance_trend(logged_client_id, selected_month)
+        gross_profit_and_net_profit = analytics_util.get_gross_profit_and_net_profit(logged_client_id, selected_month)
+        monthly_runaway = analytics_util.get_monthly_runaway(logged_client_id, selected_month)
+        gp_vs_expenses_vs_ebitda = analytics_util.get_gp_vs_expenses_ebitda(logged_client_id, selected_month)
         gp_vs_expenses_vs_ebitda_values = tuple(gp_vs_expenses_vs_ebitda.values())
-        monthly_cashflow_statements = analytics_util.get_monthly_cashflow_statement(selected_month)
-        pnl_summary = analytics_util.get_pnl_summary(selected_month)
-        balance_sheet_summary = analytics_util.get_balance_sheet_summary(selected_month)
-        cashflow_statement_summary = analytics_util.get_cashflow_summary(selected_month)
+        monthly_cashflow_statements = analytics_util.get_monthly_cashflow_statement(logged_client_id, selected_month)
+        pnl_summary = analytics_util.get_pnl_summary(logged_client_id, selected_month)
+        balance_sheet_summary = analytics_util.get_balance_sheet_summary(logged_client_id, selected_month)
+        cashflow_statement_summary = analytics_util.get_cashflow_summary(logged_client_id, selected_month)
         
         data = {
             "monthly_sales_performance": {
@@ -154,35 +157,38 @@ class ReportData(APIView):
 
 
 class InsightsData(APIView):
-    authentication_classes = []
-    permission_classes = []
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
         selected_month = self.request.query_params.get('selected_date')
+        logged_client_id = self.request.user.id
 
-        insights_data_response = insights_util.get_insights(selected_month)
+        insights_data_response = insights_util.get_insights(logged_client_id, selected_month)
         return Response(insights_data_response)
 
 
 class DeepInsightsData(APIView):
-    authentication_classes = []
-    permission_classes = []
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
 
     def get(self, request, format=None):
         selected_month = self.request.query_params.get('selected_date')
+        logged_client_id = self.request.user.id
 
-        deep_insight_one = insights_util.get_deep_insight_one(selected_month)
-        deep_insight_two = insights_util.get_deep_insight_two(selected_month)
-        deep_insight_three = insights_util.get_deep_insight_three(selected_month)
-        deep_insight_four = insights_util.get_deep_insight_four(selected_month)
-        deep_insight_five = insights_util.get_deep_insight_five(selected_month)
-        deep_insight_six = insights_util.get_deep_insight_six(selected_month)
-        deep_insight_seven = insights_util.get_deep_insight_seven(selected_month)
-        deep_insight_eight = insights_util.get_deep_insight_eight(selected_month)
-        deep_insight_nine = insights_util.get_deep_insight_nine(selected_month)
-        deep_insight_ten = insights_util.get_deep_insight_ten(selected_month)
-        deep_insight_eleven = insights_util.get_deep_insight_eleven(selected_month)
-        deep_insight_twelve = insights_util.get_deep_insight_twelve(selected_month)
+        deep_insight_one = insights_util.get_deep_insight_one(logged_client_id, selected_month)
+        deep_insight_two = insights_util.get_deep_insight_two(logged_client_id, selected_month)
+        deep_insight_three = insights_util.get_deep_insight_three(logged_client_id, selected_month)
+        deep_insight_four = insights_util.get_deep_insight_four(logged_client_id, selected_month)
+        deep_insight_five = insights_util.get_deep_insight_five(logged_client_id, selected_month)
+        deep_insight_six = insights_util.get_deep_insight_six(logged_client_id, selected_month)
+        deep_insight_seven = insights_util.get_deep_insight_seven(logged_client_id, selected_month)
+        deep_insight_eight = insights_util.get_deep_insight_eight(logged_client_id, selected_month)
+        deep_insight_nine = insights_util.get_deep_insight_nine(logged_client_id, selected_month)
+        deep_insight_ten = insights_util.get_deep_insight_ten(logged_client_id, selected_month)
+        deep_insight_eleven = insights_util.get_deep_insight_eleven(logged_client_id, selected_month)
+        deep_insight_twelve = insights_util.get_deep_insight_twelve(logged_client_id, selected_month)
 
         deep_insights_response = {
             'deep_insight_one': deep_insight_one,

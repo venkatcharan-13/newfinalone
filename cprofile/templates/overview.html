@@ -5,6 +5,9 @@
 {% block body %}
 <br>
 <h1>Overview</h1>
+{% if user.is_authenticated %}
+  <br><h2>Hello {{ user.first_name }} {{ user.last_name }}</h2><br>
+{% endif %}
 {% endblock body %}
 
 {% block script %}

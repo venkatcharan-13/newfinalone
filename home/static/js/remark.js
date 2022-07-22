@@ -1,3 +1,5 @@
+var choosen_month = sessionStorage.getItem("choosen_month") ? sessionStorage.getItem("choosen_month"): "2022-06-30";
+
 function add_actionable_remark(pk) {
     var remark_val = $('#actionRemark' + pk).val();
     $.ajax({
@@ -12,4 +14,9 @@ function add_actionable_remark(pk) {
     }).fail(function (error) {
         console.log("error");
     });
+}
+
+function changePeriod(params) {
+    sessionStorage.setItem("choosen_month", params);
+    location.reload();
 }

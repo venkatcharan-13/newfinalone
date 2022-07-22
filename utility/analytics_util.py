@@ -7,13 +7,14 @@ import locale
 
 locale.setlocale(locale.LC_ALL, 'en_IN.utf8')
 
-def get_sales_performance(current_date):
+def get_sales_performance(client_id, current_date):
     if current_date is None:
         current_date = date(2022, 6, 30)
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
     accounts_related_to_income = list(ZohoAccount.objects.filter(
+        client_id=client_id,
         account_type='income'
     ).values_list('account_id'))
 
@@ -98,13 +99,14 @@ def get_sales_performance(current_date):
     return (monthly_sale, quarterly_sale, yearly_sale)
 
 
-def get_income_vs_expenses(current_date):
+def get_income_vs_expenses(client_id, current_date):
     if current_date is None:
         current_date = date(2022, 6, 30)
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
     accounts_related_to_income_expenses = ZohoAccount.objects.filter(
+        client_id=client_id,
         account_type__in=('income', 'expense', 'other_expense')
     ).values_list('account_id', 'account_type')
 
@@ -146,13 +148,14 @@ def get_income_vs_expenses(current_date):
     return tot_income_vs_tot_expenses
 
 
-def get_cash_inflow_outflow(current_date):
+def get_cash_inflow_outflow(client_id, current_date):
     if current_date is None:
         current_date = date(2022, 6, 30)
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
     accounts_related_to_bank = ZohoAccount.objects.filter(
+        client_id=client_id,
         account_for_coding='Bank Balance'
     ).values_list('account_id')
 
@@ -188,13 +191,14 @@ def get_cash_inflow_outflow(current_date):
     return cash_inflow_vs_outflow
 
 
-def get_closing_bank_balance_trend(current_date):
+def get_closing_bank_balance_trend(client_id, current_date):
     if current_date is None:
         current_date = date(2022, 6, 30)
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
     accounts_related_to_bank = ZohoAccount.objects.filter(
+        client_id=client_id,
         account_for_coding='Bank Balance'
     ).values_list('account_id')
 
@@ -227,13 +231,14 @@ def get_closing_bank_balance_trend(current_date):
     return closing_bank_balance_trend
 
 
-def get_gross_profit_and_net_profit(current_date):
+def get_gross_profit_and_net_profit(client_id, current_date):
     if current_date is None:
         current_date = date(2022, 6, 30)
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
     accounts_related_to_profit = ZohoAccount.objects.filter(
+        client_id=client_id,
         account_type__in=['income', 'expense',
                           'other_expense', 'cost_of_goods_sold']
     ).values_list('account_id', 'account_type', 'account_for_coding')
@@ -299,13 +304,14 @@ def get_gross_profit_and_net_profit(current_date):
     return gross_profit_and_net_profit
 
 
-def get_monthly_runaway(current_date):
+def get_monthly_runaway(client_id, current_date):
     if current_date is None:
         current_date = date(2022, 6, 30)
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
     accounts_related_to_balance = ZohoAccount.objects.filter(
+        client_id=client_id,
         account_for_coding__in=('Bank Balance', 'Cash Balance')
     ).values_list('account_id')
 
@@ -340,28 +346,32 @@ def get_monthly_runaway(current_date):
     return monthly_runway
 
 
-def get_gp_vs_expenses_ebitda(current_date):
+def get_gp_vs_expenses_ebitda(client_id, current_date):
     if current_date is None:
         current_date = date(2022, 6, 30)
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
     accounts_related_to_income = ZohoAccount.objects.filter(
+        client_id=client_id,
         account_type = 'income'
     ).values_list('account_id')
 
     accounts_related_to_direct_income = ZohoAccount.objects.filter(
+        client_id=client_id,
         account_for_coding = 'Direct Income'
     ).values_list('account_id')
 
     accounts_related_to_cogs = ZohoAccount.objects.filter(
+        client_id=client_id,
         account_type = 'cogs'
     ).values_list('account_id')
 
     filter1 = Q(account_type__in = ('expense', 'other_expense'))
     filter2 = ~Q(account_for_coding__in = ('Depreciation expenses', 'Interest Expenses'))
+    filter3 = Q(client_id=client_id)
     accounts_related_to_expenses = ZohoAccount.objects.filter(
-        filter1, filter2
+        filter1, filter2, filter3
     ).values_list('account_id')
 
     transactions_related_to_income = ZohoTransaction.objects.filter(
@@ -421,7 +431,7 @@ def get_gp_vs_expenses_ebitda(current_date):
     return gp_vs_expenses_ebitda
 
 
-def get_monthly_cashflow_statement(current_date):
+def get_monthly_cashflow_statement(client_id, current_date):
     if current_date is None:
         current_date = date(2022, 6, 30)
     elif not isinstance(current_date, date):
@@ -447,6 +457,7 @@ def get_monthly_cashflow_statement(current_date):
 
     # Fetching data related to cashflow accounts
     cashflow_accounts_data = ZohoAccount.objects.filter(
+        client_id=client_id,
         account_for_coding__in = cashflow_accounts
     ).values_list('account_id', 'account_for_coding', 'account_type')
 
@@ -455,6 +466,7 @@ def get_monthly_cashflow_statement(current_date):
     )
 
     accounts_related_to_pbt = ZohoAccount.objects.filter(
+        client_id=client_id,
         account_type__in = ('income', 'expense', 'other_expense', 'cost_of_goods_sold')
     ).values_list('account_id', 'account_type')
 
@@ -621,13 +633,14 @@ def get_monthly_cashflow_statement(current_date):
     return monthly_cashflow_statement
 
 
-def get_pnl_summary(current_date):
+def get_pnl_summary(client_id, current_date):
     if current_date is None:
         current_date = date(2022, 6, 30)
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
     accounts_related_to_pnl = ZohoAccount.objects.filter(
+        client_id=client_id,
         account_type__in = ('income', 'expense', 'other_expense', 'cost_of_goods_sold')
     ).values_list('account_id', 'account_type')
 
@@ -679,13 +692,14 @@ def get_pnl_summary(current_date):
     return pnl_summary
 
 
-def get_balance_sheet_summary(current_date):
+def get_balance_sheet_summary(client_id, current_date):
     if current_date is None:
         current_date = date(2022, 6, 30)
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
     accounts_related_to_balancesheet = ZohoAccount.objects.filter(
+        client_id=client_id,
         account_type__in = (
             'accounts_payable',
             'accounts_receivable',
@@ -744,13 +758,13 @@ def get_balance_sheet_summary(current_date):
     
     return balance_sheet_summary
 
-def get_cashflow_summary(current_date):
+def get_cashflow_summary(client_id, current_date):
     if current_date is None:
         current_date = date(2022, 6, 30)
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
         
-    monthly_cashflow_data = get_monthly_cashflow_statement(current_date)
+    monthly_cashflow_data = get_monthly_cashflow_statement(client_id, current_date)
     prev_six_months = [current_date]
     for i in range(5):
         last_date_of_previous_month = current_date.replace(

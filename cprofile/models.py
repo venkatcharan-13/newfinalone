@@ -1,9 +1,11 @@
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+from django.contrib.auth.models import User
 
 # Create your models here.
 
 class Company(models.Model):
+    client = models.ForeignKey(User, on_delete=models.CASCADE)
     company_name = models.CharField(max_length=100)
     entity_name = models.CharField(max_length=100)
     industry_name = models.CharField(max_length=100)
@@ -13,7 +15,6 @@ class Company(models.Model):
     pan_number = models.CharField(max_length=20)
     pf_number = models.CharField(max_length=20, null=True)
     esic_number = models.CharField(max_length=20, null=True)
-    # user_id = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
 class CompanyAddress(models.Model):
