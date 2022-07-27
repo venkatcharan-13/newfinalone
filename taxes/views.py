@@ -3,6 +3,8 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 from taxes.models import TaxAlert, ITMonthlyStatus, ITQuarterlyStatus, GSTMonthlyStatus, GSTQuarterlyStatus
 
 # Create your views here.
@@ -20,17 +22,23 @@ def other_taxes(request):
 
 
 class TaxesData(APIView):
-    authentication_classes = []
-    permission_classes = []
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
+        logged_client_id = self.request.user.id
         
         tax_alerts = TaxAlert.objects.filter(
+            client_id = logged_client_id,
             taxType = 'income_tax'
         )
 
-        monthly_status = ITMonthlyStatus.objects.all()
-        quarterly_status = ITQuarterlyStatus.objects.all()
+        monthly_status = ITMonthlyStatus.objects.filter(
+            client_id = logged_client_id
+        )
+        quarterly_status = ITQuarterlyStatus.objects.filter(
+            client_id = logged_client_id
+        )
         
         income_tax_data_response = {
             'alerts': [],
@@ -56,17 +64,23 @@ class TaxesData(APIView):
         return Response(income_tax_data_response)
 
 class GSTData(APIView):
-    authentication_classes = []
-    permission_classes = []
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
+        logged_client_id = self.request.user.id
         
         tax_alerts = TaxAlert.objects.filter(
+            client_id = logged_client_id,
             taxType = 'gst'
         )
 
-        monthly_status = GSTMonthlyStatus.objects.all()
-        quarterly_status = GSTQuarterlyStatus.objects.all()
+        monthly_status = GSTMonthlyStatus.objects.filter(
+            client_id = logged_client_id
+        )
+        quarterly_status = GSTQuarterlyStatus.objects.filter(
+            client_id = logged_client_id
+        )
         
         gst_data_response = {
             'alerts': [],

@@ -125,31 +125,33 @@ class BalanceSheetData(APIView):
         previous_month_year = (selected_month.replace(day=1) + relativedelta(days=-1)).year
 
         bal_sheet_data = acc_gets.get_balsheet(selected_month, logged_client_id)
+        current_year_earnings, retained_earnings = acc_gets.get_earnings(selected_month, logged_client_id)
+
+        bal_sheet_data['equity'].extend([
+            {
+                "account_header": "Current Year earnings",
+                "current": current_year_earnings["current"],
+                "previous": current_year_earnings["previous"],
+                "per_change": 0 if current_year_earnings["previous"] == 0 else 
+                    (current_year_earnings["current"]/current_year_earnings["previous"] - 1)*100
+            },
+            {
+                "account_header": "Retained Earnings",
+                "current": retained_earnings["current"],
+                "previous": retained_earnings["previous"],
+                "per_change": 0 if retained_earnings["previous"] == 0 else 
+                    (retained_earnings["current"]/retained_earnings["previous"] - 1)*100
+            }
+        ])
+        
+        bal_sheet_data['total_equity'] += (current_year_earnings["current"] + retained_earnings["current"])
+
         bal_sheet_data_response = {}
         bal_sheet_data_response[current_period_str] = calendar.month_name[current_month] + '-' + str(current_month_year)[2:]
         bal_sheet_data_response[previous_period_str] = calendar.month_name[previous_month] + '-' + str(previous_month_year)[2:]
         bal_sheet_data_response[response_data_str] = accounts_util.convert_to_indian_comma_notation('balsheet', bal_sheet_data)
-        current_year_earnings, retained_earnings = acc_gets.get_earnings(selected_month, logged_client_id)
-        
-        bal_sheet_data_response[response_data_str]['equity'].extend([
-            {
-                "account_header": "Current Year earnings",
-                "current": locale.format("%d", current_year_earnings["current"], grouping=True),
-                "previous": locale.format("%d", current_year_earnings["previous"], grouping=True),
-                "per_change": 0 if current_year_earnings["previous"] == 0 else accounts_util.change_percentage(
-                    (current_year_earnings["current"]/current_year_earnings["previous"] - 1)*100
-                )
-            },
-            {
-                "account_header": "Retained Earnings",
-                "current": locale.format("%d", retained_earnings["current"], grouping=True),
-                "previous": locale.format("%d", retained_earnings["previous"], grouping=True),
-                "per_change": 0 if retained_earnings["previous"] == 0 else accounts_util.change_percentage(
-                    (retained_earnings["current"]/retained_earnings["previous"] - 1)*100
-                )
-            }
-        ])
-        
+       
+       
         return Response(bal_sheet_data_response)
 
 

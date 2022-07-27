@@ -2,6 +2,7 @@ from django.contrib import admin
 from home.models import PendingActionable, WatchOutPoint, StatutoryCompliance
 from django.contrib.auth.models import User
 from cprofile.models import Company
+from taxes.models import TaxAlert, ITMonthlyStatus, ITQuarterlyStatus, GSTMonthlyStatus, GSTQuarterlyStatus
 # from accounts.admin import ZohoAccountInline
 
 # Register your models here.
@@ -32,12 +33,28 @@ class WatchOutPointInline(admin.TabularInline):
 class StatutoryComplianceInline(admin.TabularInline):
     model = StatutoryCompliance
 
+class TaxAlertInline(admin.TabularInline):
+    model = TaxAlert
+class ITMonthlyStatusInline(admin.TabularInline):
+    model = ITMonthlyStatus
+class ITQuarterlyStatusInline(admin.TabularInline):
+    model = ITQuarterlyStatus
+class GSTMonthlyStatusInline(admin.TabularInline):
+    model = GSTMonthlyStatus
+class GSTQuarterlyStatusInline(admin.TabularInline):
+    model = GSTQuarterlyStatus
+
 class UserAdmin(admin.ModelAdmin):
     inlines = [
         CompanyInline,
         PendingActionableInline,
         WatchOutPointInline,
-        StatutoryComplianceInline
+        StatutoryComplianceInline,
+        TaxAlertInline,
+        ITMonthlyStatusInline,
+        ITQuarterlyStatusInline,
+        GSTMonthlyStatusInline,
+        GSTQuarterlyStatusInline
     ]
 
 admin.site.unregister(User)
