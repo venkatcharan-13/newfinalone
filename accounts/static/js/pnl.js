@@ -3,7 +3,7 @@ var choosen_month = sessionStorage.getItem("choosen_month") ? sessionStorage.get
 
 $(document).ready(function() {
   if(sessionStorage.getItem("choosen_month")){
-    $('#periodSelector').val(sessionStorage.getItem("choosen_month"));
+    $('#periodSelector').val(sessionStorage.getItem("choosen_month").substring(0, 7));
   }
   else{
     $('#periodSelector').val("Choose Month");
@@ -44,7 +44,11 @@ $.ajax({
 })
 
 function changePeriod(params) {
-  sessionStorage.setItem("choosen_month", params);
+  console.log(params);
+  var year = params.substring(0, 4);
+  var month = params.substring(5, 7);
+  var choosen_period = params + '-' + new Date(year, month, 0).getDate(); 
+  sessionStorage.setItem("choosen_month", choosen_period);
   location.reload();
 }
 
@@ -72,7 +76,7 @@ function fillPnlTableIncome(data, tid) {
   var table = document.getElementById(tid);
   data.forEach(function (object) {
     var tr = document.createElement('tr');
-    tr.innerHTML = '<td style="width:35%;"> <a href="pnl/' + object.account_header + '/?selected_date=' + choosen_month + '" style="text-decoration: none">' + object.account_header + '</a></td>' +
+    tr.innerHTML = '<td style="width:35%;"> <a href="pnl/' + object.account_for_coding + '/?selected_date=' + choosen_month + '" style="text-decoration: none">' + object.account_header + '</a></td>' +
       '<td style="width: 12%; text-align:right;">' + object.current + '</td>' +
       '<td style="width: 8%; text-align:right;">' + '' + '</td>' +
       '<td style="width: 12%; text-align:right;">' + object.previous + '</td>' +
@@ -127,7 +131,7 @@ function fillPnlTableExpenses(data, tid) {
     table.appendChild(tr)
     data[category]['data'].forEach(function (object) {
       var tr = document.createElement('tr');
-      tr.innerHTML = '<td style="width:35%;"> <a href="pnl/' + object.account_header + '/?selected_date=' + choosen_month + '" style="text-decoration: none">' + object.account_header + '</a></td>' +
+      tr.innerHTML = '<td style="width:35%;"> <a href="pnl/' + object.account_for_coding + '/?selected_date=' + choosen_month + '" style="text-decoration: none">' + object.account_header + '</a></td>' +
         '<td style="width: 12%; text-align:right;">' + object.current + '</td>' +
         '<td style="width: 8%; text-align:right;">' + '' + '</td>' +
         '<td style="width: 12%; text-align:right;">' + object.previous + '</td>' +

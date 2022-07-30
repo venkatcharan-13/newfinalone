@@ -191,7 +191,7 @@ def get_deep_insight_two(client_id, current_period):
     
     accounts_related_to_loans = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding__in = ('Long Term Borrowing', 'Short-term borrowings')
+        account_for_coding__in = ('long_term_borrowings', 'short_term_borrowings')
     ).values_list('account_id', 'account_name')
 
     accounts_map = dict(accounts_related_to_loans)
@@ -226,7 +226,7 @@ def get_deep_insight_three(client_id, current_period):
 
     accounts_related_to_revenue = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding = 'Direct Income'
+        account_for_coding = 'direct_income'
     ).values_list('account_id')
 
     transactions_related_to_revenue = ZohoTransaction.objects.filter(
@@ -265,7 +265,7 @@ def get_deep_insight_four(client_id, current_period):
     transactions_map = {}
     for transaction in transactions_related_to_expense:
         if transaction.account_id in accounts_map:
-            account_header = accounts_map[transaction.account_id]
+            account_header = ' '.join(accounts_map[transaction.account_id].split('_')).title()
             if account_header not in transactions_map:
                 transactions_map[account_header] = []
             transactions_map[account_header].append(transaction)
@@ -441,7 +441,7 @@ def get_deep_insight_seven(client_id, current_period):
 
     accounts_related_to_rent_expenses = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding = 'Rent Expenses'
+        account_for_coding = 'rent_expenses'
     ).values_list('account_id')
 
     transactions_related_to_rent_expenses = ZohoTransaction.objects.filter(
@@ -476,7 +476,7 @@ def get_deep_insight_eight(client_id, current_period):
 
     accounts_related_to_commission = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding = 'Brokerage & Commission Charges'
+        account_for_coding = 'brokerage_and_commission_charges'
     ).values_list('account_id')
 
     transactions_related_to_commission = ZohoTransaction.objects.filter(
@@ -511,7 +511,7 @@ def get_deep_insight_nine(client_id, current_period):
 
     accounts_related_to_professional_fees = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding = 'Legal & Professional fees'
+        account_for_coding = 'legal_and_professional_fees'
     ).values_list('account_id')
 
     transactions_related_to_professional_fees = ZohoTransaction.objects.filter(
@@ -627,7 +627,7 @@ def get_deep_insight_twelve(client_id, current_period):
 
     accounts_related_to_bank = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding = 'Bank Balance'
+        account_for_coding = 'bank_balance'
     ).values_list('account_id', 'account_name')
 
     accounts_map = dict(accounts_related_to_bank)

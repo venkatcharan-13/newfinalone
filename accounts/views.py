@@ -13,7 +13,8 @@ from rest_framework.permissions import IsAuthenticated
 
 locale.setlocale(locale.LC_ALL, 'en_IN.utf8')
 SELECTED_DATE = date(2022, 6, 30)
-current_period_str, previous_period_str, response_data_str = "current_period", "previous_period", "response_data"
+current_period_str, previous_period_str, pre_previous_period_str  = "current_period", "previous_period", "pre_previous_period"
+response_data_str, totals_str = "response_data", "totals"
 
 config_file = open("config/accounts_config.json")
 config_data = json.load(config_file)
@@ -49,14 +50,43 @@ def pnl_transaction(request, account):
     previous_month = prev_three_months[1]
     pre_previous_month = prev_three_months[2]
     context = {
-        'current_period': calendar.month_name[current_month.month] + '-' + str(current_month.year)[2:],
-        'previous_period': calendar.month_name[previous_month.month] + '-' + str(previous_month.year)[2:],
-        'pre_previous_period': calendar.month_name[pre_previous_month.month] + '-' + str(pre_previous_month.year)[2:],
         'account': account,
+        current_period_str: calendar.month_name[current_month.month] + '-' + str(current_month.year)[2:],
+        previous_period_str: calendar.month_name[previous_month.month] + '-' + str(previous_month.year)[2:],
+        pre_previous_period_str: calendar.month_name[pre_previous_month.month] + '-' + str(pre_previous_month.year)[2:],
         response_data_str: response_data,
-        'totals': totals
+        totals_str: totals
     }
     return render(request, 'pnl_trans.html', context)
+
+
+@login_required()
+def cashflow_balances(request, activity):
+    selected_month = request.GET.get('selected_date')
+    codings_lst = request.GET.getlist('codings')
+    logged_client_id = request.user.id
+
+    if selected_month is None:
+        selected_month = date(2022, 6, 30)
+    else:
+        selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
+
+    # Fetching balance for each account related to an account for coding
+    response_data, totals, two_periods = accounts_util.fetch_cashflow_balances(
+        selected_month, logged_client_id, codings_lst
+    )
+    current_month = two_periods[0]
+    previous_month = two_periods[1]
+
+    context = {
+        'activity': activity,
+        current_period_str: calendar.month_name[current_month.month] + '-' + str(current_month.year)[2:],
+        previous_period_str: calendar.month_name[previous_month.month] + '-' + str(previous_month.year)[2:],
+        response_data_str: response_data,
+        totals_str: totals
+    }
+
+    return render(request, 'cashflow_bal.html', context)
 
 
 def ratios(request):

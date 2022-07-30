@@ -3,7 +3,7 @@ var choosen_month = sessionStorage.getItem("choosen_month") ? sessionStorage.get
 
 $(document).ready(function() {
     if(sessionStorage.getItem("choosen_month")){
-      $('#periodSelector').val(sessionStorage.getItem("choosen_month"));
+        $('#periodSelector').val(sessionStorage.getItem("choosen_month").substring(0, 7));
     }
     else{
       $('#periodSelector').val("Choose Month");
@@ -34,9 +34,12 @@ $.ajax({
 })
 
 function changePeriod(params) {
-    sessionStorage.setItem("choosen_month", params);
+    var year = params.substring(0, 4);
+    var month = params.substring(5, 7);
+    var choosen_period = params + '-' + new Date(year, month, 0).getDate(); 
+    sessionStorage.setItem("choosen_month", choosen_period);
     location.reload();
-}
+  }
 
 function fillRatiosHead(object, tid, head) {
     document.getElementById(tid).innerHTML = '<th style="width:40%">' + head + '</th>' +

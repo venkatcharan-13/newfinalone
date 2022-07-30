@@ -3,7 +3,7 @@
 {% block title %}Profit and Loss{% endblock title %}
 {% block active %}active{% endblock active %}
 {% block body %}
-<div class="month-dropdown float-end">
+<!-- <div class="month-dropdown float-end">
   <select class="form-select" id="periodSelector" onchange="changePeriod(this.value)" style="width:auto;">
     <option value="Choose Month">Choose Month</option>
     <option value="2022-01-31">January</option>
@@ -13,7 +13,14 @@
     <option value="2022-05-31">May</option>
     <option value="2022-06-30">June</option>
   </select>
+</div> -->
+<br>
+<div>
+  <form action="" class="form">
+    <input type="month" name="date" id="periodSelector" onchange="changePeriod(this.value)">
+  </form>
 </div>
+
 <div class="box" style="margin-top: 20px;">
   <table class="table" style="border-style: dotted;">
     <h2>Profit & Loss Statement</h2>

@@ -8,6 +8,7 @@ class CompanyAddressInline(admin.TabularInline):
     model = CompanyAddress
 class BankDetailsInline(admin.TabularInline):
     model = BankDetail
+    extra = 0
     
 
 admin.site.register(CompanyAddress)

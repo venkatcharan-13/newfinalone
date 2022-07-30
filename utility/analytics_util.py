@@ -156,7 +156,7 @@ def get_cash_inflow_outflow(client_id, current_date):
 
     accounts_related_to_bank = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding='Bank Balance'
+        account_for_coding='bank_balance'
     ).values_list('account_id')
 
     transactions_related_to_bank = ZohoTransaction.objects.filter(
@@ -199,7 +199,7 @@ def get_closing_bank_balance_trend(client_id, current_date):
 
     accounts_related_to_bank = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding='Bank Balance'
+        account_for_coding='bank_balance'
     ).values_list('account_id')
 
     transactions_related_to_bank = ZohoTransaction.objects.filter(
@@ -264,10 +264,10 @@ def get_gross_profit_and_net_profit(client_id, current_date):
         current_date = last_date_of_previous_month
 
     gross_profit_and_net_profit = {}
-    income_accounts = accounts_map['income']['Direct Income'] + \
-        accounts_map['income']['Indirect Income']
-    direct_income_accounts = accounts_map['income']['Direct Income']
-    cogs_accounts = accounts_map['cost_of_goods_sold']['Cost of Goods Sold']
+    income_accounts = accounts_map['income']['direct_income'] + \
+        accounts_map['income']['indirect_income']
+    direct_income_accounts = accounts_map['income']['direct_income']
+    cogs_accounts = accounts_map['cost_of_goods_sold']['cost_of_goods_sold']
     expenses_accounts = []
     for account in accounts_map['expense']:
         expenses_accounts.extend(accounts_map['expense'][account])
@@ -312,7 +312,7 @@ def get_monthly_runaway(client_id, current_date):
 
     accounts_related_to_balance = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding__in=('Bank Balance', 'Cash Balance')
+        account_for_coding__in=('bank_balance', 'cash_balance')
     ).values_list('account_id')
 
     transactions_related_to_balance = ZohoTransaction.objects.filter(
@@ -359,7 +359,7 @@ def get_gp_vs_expenses_ebitda(client_id, current_date):
 
     accounts_related_to_direct_income = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding = 'Direct Income'
+        account_for_coding = 'direct_income'
     ).values_list('account_id')
 
     accounts_related_to_cogs = ZohoAccount.objects.filter(
@@ -368,7 +368,7 @@ def get_gp_vs_expenses_ebitda(client_id, current_date):
     ).values_list('account_id')
 
     filter1 = Q(account_type__in = ('expense', 'other_expense'))
-    filter2 = ~Q(account_for_coding__in = ('Depreciation expenses', 'Interest Expenses'))
+    filter2 = ~Q(account_for_coding__in = ('depreciation_expenses', 'interest_expenses'))
     filter3 = Q(client_id=client_id)
     accounts_related_to_expenses = ZohoAccount.objects.filter(
         filter1, filter2, filter3
@@ -438,21 +438,21 @@ def get_monthly_cashflow_statement(client_id, current_date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
     cashflow_accounts = (
-        'Bank Balance',
-        'Cash Balance',
-        'Accounts Receivable',
-        'Other Current Assets',
-        'Other Non Current Assets',
-        'Trade Payables',
-        'Other long term Liabilities & Provisions',
-        'Other Liabilities',
-        'Other Current Liabilities & Provisions',
-        'Tangible Assets',
-        'Short Term Loans & Advances',
-        'Long Term Loans & Advances',
-        'Short-term borrowings',
-        'Long Term Borrowing',
-        'Share Capital'
+        'bank_balance',
+        'cash_balance',
+        'accounts_receivable',
+        'other_current_assets',
+        'other_non_current_assets',
+        'trade_payables',
+        'other_long_term_liabilities_&_provisions',
+        'other_liabilities',
+        'other_current_liabilities_&_provisions',
+        'tangible_assets',
+        'short_term_loans_&_advances',
+        'long_term_loans_&_advances',
+        'short_term_borrowings',
+        'long_term_borrowings',
+        'share_capital'
     )
 
     # Fetching data related to cashflow accounts
@@ -552,29 +552,29 @@ def get_monthly_cashflow_statement(client_id, current_date):
 
 
     cashflow_data['cashflow_from_operating_activities'].append(pbt_lst)
-    temp = cashflow_data_uncategorized['Accounts Receivable']
+    temp = cashflow_data_uncategorized['accounts_receivable']
     lst = [0]*6
     for i in range(5, -1, -1):
         lst[i] = temp[i]- temp[i+1]
     cashflow_data['cashflow_from_operating_activities'].append(lst)
    
 
-    temp = cashflow_data_uncategorized['Other Current Assets'] if cashflow_data_uncategorized['Other Current Assets'] else [0]*7
-    temp2 = cashflow_data_uncategorized['Other Non Current Assets'] if cashflow_data_uncategorized['Other Non Current Assets'] else [0]*7
+    temp = cashflow_data_uncategorized['other_current_assets'] if cashflow_data_uncategorized['other_current_assets'] else [0]*7
+    temp2 = cashflow_data_uncategorized['other_non_current_assets'] if cashflow_data_uncategorized['other_non_current_assets'] else [0]*7
     lst = [0]*6
     for i in range(5, -1, -1):
         lst[i] = temp[i] + temp2[i] - (temp[i+1] + temp2[i+1])
     cashflow_data['cashflow_from_operating_activities'].append(lst)
 
-    temp = cashflow_data_uncategorized['Trade Payables'] if cashflow_data_uncategorized['Trade Payables'] else [0]*7
+    temp = cashflow_data_uncategorized['trade_payables'] if cashflow_data_uncategorized['trade_payables'] else [0]*7
     lst = [0]*6
     for i in range(5, -1, -1):
         lst[i] = temp[i+1] - temp[i]
     cashflow_data['cashflow_from_operating_activities'].append(lst)
 
-    temp = cashflow_data_uncategorized['Other long term Liabilities & Provisions'] if cashflow_data_uncategorized['Other long term Liabilities & Provisions'] else [0]*7
-    temp2 = cashflow_data_uncategorized['Other Liabilities'] if cashflow_data_uncategorized['Other Liabilities'] else [0]*7
-    temp3 = cashflow_data_uncategorized['Other Current Liabilities & Provisions'] if cashflow_data_uncategorized['Other Current Liabilities & Provisions'] else [0]*7
+    temp = cashflow_data_uncategorized['other_long_term_liabilities_&_provisions'] if cashflow_data_uncategorized['other_long_term_liabilities_&_provisions'] else [0]*7
+    temp2 = cashflow_data_uncategorized['other_liabilities'] if cashflow_data_uncategorized['other_liabilities'] else [0]*7
+    temp3 = cashflow_data_uncategorized['other_current_liabilities_&_provisions'] if cashflow_data_uncategorized['other_current_liabilities_&_provisions'] else [0]*7
     lst = [0]*6
     for i in range(5, -1, -1):
         lst[i] = (temp[i+1] + temp2[i+1] + temp3[i+1]) - (temp[i] + temp2[i] + temp3[i]) 
@@ -586,7 +586,7 @@ def get_monthly_cashflow_statement(client_id, current_date):
             cashflow_data['net_cash_a'][i] += lst[i]
     
 
-    temp = cashflow_data_uncategorized['Tangible Assets'] if cashflow_data_uncategorized['Tangible Assets'] else [0]*7
+    temp = cashflow_data_uncategorized['tangible_assets'] if cashflow_data_uncategorized['tangible_assets'] else [0]*7
     lst = [0]*6
     for i in range(5,-1,-1):
         lst[i] = temp[i] - temp[i+1]
@@ -600,16 +600,16 @@ def get_monthly_cashflow_statement(client_id, current_date):
             cashflow_data['net_cash_b'][i] += lst[i]
 
 
-    temp = cashflow_data_uncategorized['Short-term borrowings'] if cashflow_data_uncategorized['Short-term borrowings'] else [0]*7
-    temp2 = cashflow_data_uncategorized['Long Term Borrowing'] if cashflow_data_uncategorized['Long Term Borrowing'] else [0]*7
-    temp3 = cashflow_data_uncategorized['Short Term Loans & Advances'] if cashflow_data_uncategorized['Short Term Loans & Advances'] else [0]*7
-    temp4 = cashflow_data_uncategorized['Long Term Loans & Advances'] if cashflow_data_uncategorized['Long Term Loans & Advances'] else [0]*7
+    temp = cashflow_data_uncategorized['short_term_borrowings'] if cashflow_data_uncategorized['short_term_borrowings'] else [0]*7
+    temp2 = cashflow_data_uncategorized['long_term_borrowings'] if cashflow_data_uncategorized['long_term_borrowings'] else [0]*7
+    temp3 = cashflow_data_uncategorized['short_term_loans_&_advances'] if cashflow_data_uncategorized['short_term_loans_&_advances'] else [0]*7
+    temp4 = cashflow_data_uncategorized['long_term_loans_&_advances'] if cashflow_data_uncategorized['long_term_loans_&_advances'] else [0]*7
     lst = [0]*6
     for i in range(5,-1,-1):
         lst[i] = (temp[i+1]+temp2[i+1]) - (temp[i]+temp2[i]) + (temp3[i]+temp4[i]) - (temp3[i+1]+temp4[i+1])
     cashflow_data['cashflow_from_financing_activities'].append(lst)
 
-    temp = cashflow_data_uncategorized['Share Capital']
+    temp = cashflow_data_uncategorized['share_capital']
     lst = [0]*6
     for i in range(5,-1,-1):
         lst[i] = temp[i+1] - temp[i]

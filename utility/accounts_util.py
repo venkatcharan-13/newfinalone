@@ -7,6 +7,7 @@ locale.setlocale(locale.LC_ALL, 'en_IN.utf8')
 current_str, previous_str, pre_prev_str = "current", "previous", "pre_prev"
 curr_per_str, prev_per_str = "curr_per", "prev_per"
 per_change_str, prev_per_change_str, three_month_avg_str = "per_change", "prev_per_change", "three_month_avg"
+change_str = "change"
 
 
 def fetch_data_from_db(table, client_id, period, account_filter):
@@ -29,13 +30,13 @@ def fetch_data_from_db(table, client_id, period, account_filter):
         ).all()
     return accounts_data, transactions_data
 
-def change_percentage(percent):
-    if percent > 100:
-        return '>100'
-    elif percent < -100:
-        return '<-100'
-    else:
-        return str(round(percent))
+def change_percentage(percent, trans_flag=False):
+    if trans_flag:
+        if percent > 100:
+            return '>100'
+        elif percent < -100:
+            return '<-100'
+    return str(round(percent))
 
 def convert_to_indian_comma_notation(table, response_data):
     if table == 'pnl':
@@ -125,9 +126,9 @@ def fetch_pnl_transactions(period, client_id, account):
     accounts_for_pnl_account = ZohoAccount.objects.filter(
         client_id=client_id,
         account_for_coding=account
-    ).values_list('account_id', 'account_for_coding')
+    )
 
-    account_ids = dict(accounts_for_pnl_account)
+    account_ids = dict((acc.account_id, acc.get_account_for_coding_display()) for acc in accounts_for_pnl_account)
 
     prev_three_months = [period]
     current_date = period
@@ -149,7 +150,7 @@ def fetch_pnl_transactions(period, client_id, account):
         payee = transaction['payee']
         trans_date = transaction['transaction_date']
 
-        if account in ('Direct Income', 'Indirect Income'):
+        if account in ('direct_income', 'indirect_income'):
             amount = transaction['credit_amount'] - transaction['debit_amount']
         else:
             amount = transaction['debit_amount'] - transaction['credit_amount']
@@ -187,9 +188,9 @@ def fetch_pnl_transactions(period, client_id, account):
     for k in response_data:
         obj = response_data[k]
         obj[per_change_str] = 0 if obj[previous_str] == 0 \
-            else change_percentage((obj[current_str]/obj[previous_str]-1)*100)
+            else change_percentage((obj[current_str]/obj[previous_str]-1)*100, trans_flag=True)
         obj[prev_per_change_str] = 0 if obj[pre_prev_str] == 0 \
-            else change_percentage((obj[previous_str]/obj[pre_prev_str]-1)*100)
+            else change_percentage((obj[previous_str]/obj[pre_prev_str]-1)*100, trans_flag=True)
 
         obj[three_month_avg_str] = round(obj[three_month_avg_str]/3)
         obj[current_str] = round(obj[current_str])
@@ -200,14 +201,30 @@ def fetch_pnl_transactions(period, client_id, account):
         total[pre_prev_str] += obj[pre_prev_str]
     
     total[per_change_str] = 0 if total[previous_str] == 0 \
-        else change_percentage((total[current_str]/total[previous_str]-1)*100)
+        else change_percentage((total[current_str]/total[previous_str]-1)*100, trans_flag=True)
     total[prev_per_change_str] = 0 if total[pre_prev_str] == 0 \
-        else change_percentage((total[previous_str]/total[pre_prev_str]-1)*100)
+        else change_percentage((total[previous_str]/total[pre_prev_str]-1)*100, trans_flag=True)
+    
+    # defining distinct payees for current financial year to check category or status of payee
+    if period.month >= 4:
+        curr_fy_start = f'{period.year}-04-01'
+    else:
+        curr_fy_start = f'{period.year-1}-04-01'
+
+    curr_fy_prev = period.replace(day=1) + relativedelta(days=-1)
+    distict_payees_in_cfy = ZohoTransaction.objects.filter(transaction_date__gte=curr_fy_start, transaction_date__lte=curr_fy_prev).values('payee').distinct()
+    payees_for_cfy = dict((dic['payee'], 0) for dic in distict_payees_in_cfy)
     
     response_data_filtered = {}
     for k in response_data:
         obj = response_data[k]
-        if not account in ('Direct Income', 'Indirect Income'):
+        # defining status of payee
+        if k in payees_for_cfy:
+            obj['payee_category'] = 'Regular'
+        else:
+            obj['payee_category'] = 'New'
+
+        if not account in ('direct_income', 'indirect_income'):
             if (abs(round(obj[current_str])), abs(round(obj[previous_str]))) == (0,0):
                 continue
         total[three_month_avg_str] += obj[three_month_avg_str]
@@ -220,3 +237,94 @@ def fetch_pnl_transactions(period, client_id, account):
         ))
 
     return (response_data_filtered, total, prev_three_months)
+
+
+def get_accounts_from_account_for_coding(acc_for_codings):
+    
+    related_accounts = ZohoAccount.objects.filter(
+        account_for_coding__in = acc_for_codings
+    ).values_list('account_id')
+
+    related_account_ids_lst = [acc_id[0] for acc_id in related_accounts]
+    return related_account_ids_lst
+
+
+def fetch_cashflow_balances(period, client_id, codings_list):
+    accounts_according_to_coding = ZohoAccount.objects.filter(
+        client_id=client_id,
+        account_for_coding__in=codings_list
+    )
+
+    assets_related_types = (
+        'accounts_receivable', 
+        'fixed_asset', 
+        'other_asset', 
+        'other_current_asset', 
+        'stock', 
+        'cash', 
+        'bank'
+    )
+
+    account_ids = dict((acc.account_id, (acc.account_name, acc.account_type)) for acc in accounts_according_to_coding)
+
+    prev_two_months = [period]
+    current_date = period
+    last_date_of_previous_month = current_date.replace(
+        day=1) + relativedelta(days=-1)
+    prev_two_months.append(last_date_of_previous_month)
+
+    related_transactions = ZohoTransaction.objects.filter(
+        account_id__in=account_ids,
+        transaction_date__lte=period
+    )
+
+    response_data = {}
+
+    for account in account_ids:
+        account_name = account_ids[account][0]
+        account_type = account_ids[account][1]
+        current_period_total, previous_period_total = 0, 0
+        response_data[account_name] = {
+            current_str: 0,
+            previous_str: 0,
+            change_str: 0
+        }
+        for transaction in related_transactions:
+            if account_type in assets_related_types:
+                amount = transaction.debit_amount - transaction.credit_amount
+            else:
+                amount = transaction.credit_amount - transaction.debit_amount
+
+            if transaction.account_id == account:
+                if transaction.transaction_date <= prev_two_months[1]:
+                    previous_period_total += amount
+                current_period_total += amount
+        response_data[account_name][change_str] = previous_period_total - current_period_total
+        response_data[account_name][current_str] = current_period_total
+        response_data[account_name][previous_str] = previous_period_total
+
+
+    total = {
+        current_str: 0,
+        previous_str: 0,
+        change_str: 0,
+    }
+
+    for k in response_data:
+        obj = response_data[k]
+        
+        obj[current_str] = round(obj[current_str])
+        obj[previous_str] = round(obj[previous_str])
+        obj[change_str] = round(obj[change_str])
+        total[current_str] += obj[current_str]
+        total[previous_str] += obj[previous_str]
+        total[change_str] += obj[change_str]
+ 
+    response_data_filtered = dict(sorted(
+        response_data.items(), 
+        key=lambda x: (x[1][current_str], x[1][previous_str]),
+        reverse=True
+    ))
+    
+
+    return (response_data_filtered, total, prev_two_months)

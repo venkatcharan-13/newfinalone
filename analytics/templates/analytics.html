@@ -3,104 +3,89 @@
 {% block title %}MIS Report{% endblock title %}
 {% block active %}active{% endblock active %}
 {% block body %}
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"></script>
-  <div class="month-dropdown float-end">
-    <select class="form-select" id="periodSelector" onchange="changePeriod(this.value)" style="width:auto;">
-      <option value="Choose Month">Choose Month</option>
-      <option value="2022-01-31">January</option>
-      <option value="2022-02-28">February</option>
-      <option value="2022-03-31">March</option>
-      <option value="2022-04-30">April</option>
-      <option value="2022-05-31">May</option>
-      <option value="2022-06-30">June</option>
-    </select>
-    <!-- <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
-      aria-expanded="false">
-      Select Month
-    </button>
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-      <li><a class="dropdown-item" href="#" onclick="changePeriod('2022-01-31')">January</a></li>
-      <li><a class="dropdown-item" href="#" onclick="changePeriod('2022-02-28')">February</a></li>
-      <li><a class="dropdown-item" href="#" onclick="changePeriod('2022-03-31')">March</a></li>
-      <li><a class="dropdown-item" href="#" onclick="changePeriod('2022-04-30')">April</a></li>
-      <li><a class="dropdown-item" href="#" onclick="changePeriod('2022-05-31')">May</a></li>
-      <li><a class="dropdown-item" href="#" onclick="changePeriod('2022-06-30')">June</a></li>
-    </ul> -->
-  </div>
-  <h1>Graphs</h1><br>
-  <div class="container">
-    <h3 style="text-align: center;">Sales Performance</h3>
-    <div class="row mb-5">
-      <div class="col-12">
-        <canvas id="sales_performance1"></canvas>
-      </div>
-    </div>
-    <div class="row mb-5">
-      <div class="col-6">
-        <canvas id="sales_performance2"></canvas>
-      </div>
-      <div class="col-6">
-        <canvas id="sales_performance3"></canvas>
-      </div>
-    </div>
-    <div class="row mb-5">
-      <div class="col-6">
-        <canvas id="income_vs_expenses"></canvas>
-      </div>
-      <div class="col-6">
-        <canvas id="inflow_vs_outflow"></canvas>
-      </div>
-    </div>
-    <div class="row mb-5">
-      <div class="col-6">
-        <canvas id="closing_bank_balance"></canvas>
-      </div>
-      <div class="col-6">
-        <canvas id="gross_and_net_profit"></canvas>
-      </div>
-    </div>
-    <div class="row mb-5">
-      <div class="col-6">
-        <canvas id="monthly_runaway"></canvas>
-      </div>
-      <div class="col-6">
-        <canvas id="gp_expenses_ebitda"></canvas>
-      </div>
-    </div>
-    <div class="row mb-5">
-      <div class="col-12">
-        <canvas id="monthly_cashflow"></canvas>
-      </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"></script>
+<br>
+<div>
+  <form action="" class="form">
+    <input type="month" name="date" id="periodSelector" onchange="changePeriod(this.value)">
+  </form>
+</div>
+<h1>Graphs</h1><br>
+<div class="container">
+  <h3 style="text-align: center;">Sales Performance</h3>
+  <div class="row mb-5">
+    <div class="col-12">
+      <canvas id="sales_performance1"></canvas>
     </div>
   </div>
-  <h1>Tabular Summaries</h1><br>
-  <h2>P&L Summary</h2>
-  <table class="table table-bordered">
-    <thead class="table-dark" id="pnl_head">
-    </thead>
-    <tbody id="pnl_summary">
-      
-    </tbody>
-  </table>
-  <br><h2>Balance Sheet Summary</h2>
-  <table class="table table-bordered">
-    <thead class="table-dark" id="bal_sheet_head">
-    </thead>
-    <tbody id="bal_sheet_summary">
-      
-    </tbody>
-  </table>
-  <br><h2>Cashflow Statement Summary</h2>
-  <table class="table table-bordered">
-    <thead class="table-dark" id="cashflow_head">
-    </thead>
-    <tbody id="cashflow_summary">
-      
-    </tbody>
-  </table>
+  <div class="row mb-5">
+    <div class="col-6">
+      <canvas id="sales_performance2"></canvas>
+    </div>
+    <div class="col-6">
+      <canvas id="sales_performance3"></canvas>
+    </div>
+  </div>
+  <div class="row mb-5">
+    <div class="col-6">
+      <canvas id="income_vs_expenses"></canvas>
+    </div>
+    <div class="col-6">
+      <canvas id="inflow_vs_outflow"></canvas>
+    </div>
+  </div>
+  <div class="row mb-5">
+    <div class="col-6">
+      <canvas id="closing_bank_balance"></canvas>
+    </div>
+    <div class="col-6">
+      <canvas id="gross_and_net_profit"></canvas>
+    </div>
+  </div>
+  <div class="row mb-5">
+    <div class="col-6">
+      <canvas id="monthly_runaway"></canvas>
+    </div>
+    <div class="col-6">
+      <canvas id="gp_expenses_ebitda"></canvas>
+    </div>
+  </div>
+  <div class="row mb-5">
+    <div class="col-12">
+      <canvas id="monthly_cashflow"></canvas>
+    </div>
+  </div>
+</div>
+<h1>Tabular Summaries</h1><br>
+<h2>P&L Summary</h2>
+<table class="table table-bordered">
+  <thead class="table-dark" id="pnl_head">
+  </thead>
+  <tbody id="pnl_summary">
+
+  </tbody>
+</table>
+<br>
+<h2>Balance Sheet Summary</h2>
+<table class="table table-bordered">
+  <thead class="table-dark" id="bal_sheet_head">
+  </thead>
+  <tbody id="bal_sheet_summary">
+
+  </tbody>
+</table>
+<br>
+<h2>Cashflow Statement Summary</h2>
+<table class="table table-bordered">
+  <thead class="table-dark" id="cashflow_head">
+  </thead>
+  <tbody id="cashflow_summary">
+
+  </tbody>
+</table>
 
 {% endblock body %}
 
 {% block script %}
-  <script src="{% static 'js/report.js' %}"></script>
+<script src="{% static 'js/report.js' %}"></script>
 {% endblock script %}

@@ -171,4 +171,5 @@ JAZZMIN_SETTINGS = {
         # # App with dropdown menu to all its models pages (Permissions checked against models)
         # {"app": "accounts"},
     ],
+    "changeform_format": "vertical_tabs",
 }

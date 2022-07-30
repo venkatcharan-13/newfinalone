@@ -15,7 +15,7 @@
     crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-  <title>Transaction Details</title>
+  <title>Balances Details</title>
 </head>
 
 <body>
@@ -28,80 +28,34 @@
     <a href="/profile">Profile</a>
   </div>
   <div class="main">
-    <h1>Transactions for {{ account }}</h1>
+    <h1>Balances for {{ activity }}</h1>
     <table class="table table-bordered">
-      {% if account == "Direct Income" or account == "Indirect Income" %}
       <thead>
         <tr>
-          <th scope="col">Status</th>
-          <th scope="col">Name of Payee</th>
+          <th scope="col">#</th>
+          <th scope="col">Account name</th>
           <th scope="col" style="text-align:right;">{{ current_period }}</th>
           <th scope="col" style="text-align:right;">{{ previous_period }}</th>
-          <th scope="col" style="text-align:center;">% Change</th>
-          <th scope="col" style="text-align:right;">{{ pre_previous_period }}</th>
-          <th scope="col" style="text-align:center;">% Change</th>
+          <th scope="col" style="text-align:center;">Change</th>
         </tr>
       </thead>
       <tbody>
         {% for transaction, trans_detail in response_data.items %}
         <tr>
-          <th scope="row">{{ trans_detail.payee_category }}</th>
-          {% if transaction == '' %}
-          <th>Others</th>
-          {% else %}
+          <th scope="row">{{ forloop.counter }}</th>
           <th>{{ transaction }}</th>
-          {% endif %}
           <td style="text-align:right;">{{ trans_detail.current }}</td>
           <td style="text-align:right;">{{ trans_detail.previous }}</td>
-          <td style="text-align:center;">{{ trans_detail.per_change }}%</td>
-          <td style="text-align:right;">{{ trans_detail.pre_prev }}</td>
-          <td style="text-align:center;">{{ trans_detail.prev_per_change }}%</td>
+          <td style="text-align:center;">{{ trans_detail.change }}</td>
         </tr>
         {% endfor %}
         <tr>
           <th colspan="2">Total</th>
           <th style="text-align:right;">{{ totals.current }}</th>
           <th style="text-align:right;">{{ totals.previous }}</th>
-          <th style="text-align:center;">{{ totals.per_change }}%</th>
-          <th style="text-align:right;">{{ totals.pre_prev }}</th>
-          <th style="text-align:center;">{{ totals.prev_per_change }}%</th>
+          <th style="text-align:center;">{{ totals.change }}</th>
         </tr>
       </tbody>
-      {% else %}
-      <thead>
-        <tr>
-          <th scope="col">Status</th>
-          <th scope="col">Name of Payee</th>
-          <th scope="col" style="text-align:right;">{{ current_period }}</th>
-          <th scope="col" style="text-align:right;">{{ previous_period }}</th>
-          <th scope="col" style="text-align:center;">% Change</th>
-          <th scope="col" style="text-align:right;">Avg of last 3 months</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for transaction, trans_detail in response_data.items %}
-        <tr>
-          <th scope="row">{{ trans_detail.payee_category }}</th>
-          {% if transaction == '' %}
-          <th>Others</th>
-          {% else %}
-          <th>{{ transaction }}</th>
-          {% endif %}
-          <td style="text-align:right;">{{ trans_detail.current }}</td>
-          <td style="text-align:right;">{{ trans_detail.previous }}</td>
-          <td style="text-align:center;">{{ trans_detail.per_change }}%</td>
-          <td style="text-align:right;">{{ trans_detail.three_month_avg }}</td>
-        </tr>
-        {% endfor %}
-        <tr>
-          <th colspan="2">Total</th>
-          <th style="text-align:right;">{{ totals.current }}</th>
-          <th style="text-align:right;">{{ totals.previous }}</th>
-          <th style="text-align:center;">{{ totals.per_change }}%</th>
-          <th style="text-align:right;">{{ totals.three_month_avg }}</th>
-        </tr>
-      </tbody>
-      {% endif %}
     </table>
   </div>
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>

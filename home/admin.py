@@ -25,24 +25,37 @@ admin.site.register(StatutoryCompliance, StatutoryComplianceAdmin)
 # Defining inlines for User
 class CompanyInline(admin.TabularInline):
     model = Company
+    extra = 0
 
 class PendingActionableInline(admin.TabularInline):
     model = PendingActionable
+    extra = 0
 class WatchOutPointInline(admin.TabularInline):
     model = WatchOutPoint
+    extra = 0
 class StatutoryComplianceInline(admin.TabularInline):
     model = StatutoryCompliance
+    extra = 0
 
 class TaxAlertInline(admin.TabularInline):
     model = TaxAlert
+    extra = 0
 class ITMonthlyStatusInline(admin.TabularInline):
     model = ITMonthlyStatus
+    extra = 0
 class ITQuarterlyStatusInline(admin.TabularInline):
     model = ITQuarterlyStatus
+    extra = 0
 class GSTMonthlyStatusInline(admin.TabularInline):
     model = GSTMonthlyStatus
+    extra = 0
 class GSTQuarterlyStatusInline(admin.TabularInline):
     model = GSTQuarterlyStatus
+    extra = 0
+
+@admin.action(description='Mark selected object to delete')
+def delete_object(modeladmin, request, queryset):
+    queryset.delete()
 
 class UserAdmin(admin.ModelAdmin):
     inlines = [
@@ -56,6 +69,7 @@ class UserAdmin(admin.ModelAdmin):
         GSTMonthlyStatusInline,
         GSTQuarterlyStatusInline
     ]
+    actions = [delete_object]
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
