@@ -1,8 +1,13 @@
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 from accounts.models import ZohoAccount, ZohoTransaction
+from utility import accounts_util
 import locale
 
+current_str, previous_str, pre_prev_str = "current", "previous", "pre_prev"
+curr_per_str, prev_per_str = "curr_per", "prev_per"
+per_change_str, prev_per_change_str, three_month_avg_str = "per_change", "prev_per_change", "three_month_avg"
+change_str = "change"
 
 def get_insights(client_id, current_period):
     if current_period is None:
@@ -132,6 +137,106 @@ def get_insights(client_id, current_period):
     return insights_data
 
 
+def fetch_insights_transaction(period, client_id, exp_head):
+
+    accounts_for_expense = ZohoAccount.objects.filter(
+        client_id=client_id,
+        parent_account_name=exp_head
+    )
+
+    account_ids = dict((acc.account_id, acc.parent_account_name) for acc in accounts_for_expense)
+    
+    prev_three_months = [period]
+    current_date = period
+    for i in range(2):
+        last_date_of_previous_month = current_date.replace(
+            day=1) + relativedelta(days=-1)
+        prev_three_months.append(last_date_of_previous_month)
+        current_date = last_date_of_previous_month
+
+    related_transactions = ZohoTransaction.objects.filter(
+        account_id__in=account_ids,
+        transaction_date__gte=prev_three_months[2].replace(day=1),
+        transaction_date__lte=period
+    ).values('transaction_date', 'payee', 'debit_amount', 'credit_amount')
+
+    response_data = {}
+
+    for transaction in related_transactions:
+        payee = transaction['payee']
+        trans_date = transaction['transaction_date']
+
+        amount = transaction['debit_amount'] - transaction['credit_amount']
+
+        if payee not in response_data:
+            response_data[payee] = {
+                current_str: 0,
+                previous_str: 0,
+                per_change_str: 0,
+                three_month_avg_str: 0
+            }
+
+        if prev_three_months[1] < trans_date <= prev_three_months[0]:
+            response_data[payee][current_str] += amount
+
+        elif prev_three_months[2] < trans_date <= prev_three_months[1]:
+            response_data[payee][previous_str] += amount
+
+        response_data[payee][three_month_avg_str] += amount
+
+    total = {
+        current_str: 0,
+        previous_str: 0,
+        per_change_str: 0,
+        three_month_avg_str: 0
+    }
+    for k in response_data:
+        obj = response_data[k]
+
+        obj[per_change_str] = 0 if obj[previous_str] == 0 \
+            else accounts_util.change_percentage((obj[current_str]/obj[previous_str]-1)*100, trans_flag=True)
+        obj[three_month_avg_str] = round(obj[three_month_avg_str]/3)
+        obj[current_str] = round(obj[current_str])
+        obj[previous_str] = round(obj[previous_str])
+        total[current_str] += obj[current_str]
+        total[previous_str] += obj[previous_str]
+    
+    total[per_change_str] = 0 if total[previous_str] == 0 \
+        else accounts_util.change_percentage((total[current_str]/total[previous_str]-1)*100, trans_flag=True)
+    
+    # defining distinct payees for current financial year to check category or status of payee
+    if period.month >= 4:
+        curr_fy_start = f'{period.year}-04-01'
+    else:
+        curr_fy_start = f'{period.year-1}-04-01'
+
+    curr_fy_prev = period.replace(day=1) + relativedelta(days=-1)
+    distict_payees_in_cfy = ZohoTransaction.objects.filter(transaction_date__gte=curr_fy_start, transaction_date__lte=curr_fy_prev).values('payee').distinct()
+    payees_for_cfy = dict((dic['payee'], 0) for dic in distict_payees_in_cfy)
+    
+    response_data_filtered = {}
+    for k in response_data:
+        obj = response_data[k]
+        # defining status of payee
+        if k in payees_for_cfy:
+            obj['payee_category'] = 'Regular'
+        else:
+            obj['payee_category'] = 'New'
+
+        if (abs(round(obj[current_str])), abs(round(obj[previous_str]))) == (0,0):
+            continue
+        total[three_month_avg_str] += obj[three_month_avg_str]
+        response_data_filtered[k.title()] = obj
+
+    response_data_filtered = dict(sorted(
+        response_data_filtered.items(), 
+        key=lambda x: (x[1][current_str], x[1][previous_str]),
+        reverse=True
+    ))
+
+    return (response_data_filtered, total, prev_three_months)
+
+
 def get_deep_insight_one(client_id, current_period):
     if current_period is None:
         current_period = date(2022, 6, 30)
@@ -230,7 +335,9 @@ def get_deep_insight_three(client_id, current_period):
     ).values_list('account_id')
 
     transactions_related_to_revenue = ZohoTransaction.objects.filter(
-        account_id__in = (tup[0] for tup in accounts_related_to_revenue), transaction_date__gte = start_of_current_fy
+        account_id__in = (tup[0] for tup in accounts_related_to_revenue), 
+        transaction_date__gte = start_of_current_fy,
+        transaction_date__lte = current_period
     )
 
     total_revenue = 0
@@ -259,7 +366,9 @@ def get_deep_insight_four(client_id, current_period):
     accounts_map = dict(accounts_related_to_expenses)
     
     transactions_related_to_expense = ZohoTransaction.objects.filter(
-        account_id__in = accounts_map, transaction_date__gte = previous_month_start
+        account_id__in = accounts_map, 
+        transaction_date__gte = previous_month_start,
+        transaction_date__lte = current_period
     )
 
     transactions_map = {}
@@ -445,7 +554,9 @@ def get_deep_insight_seven(client_id, current_period):
     ).values_list('account_id')
 
     transactions_related_to_rent_expenses = ZohoTransaction.objects.filter(
-        account_id__in = (tup[0] for tup in accounts_related_to_rent_expenses), transaction_date__gte = start_of_current_fy
+        account_id__in = (tup[0] for tup in accounts_related_to_rent_expenses), 
+        transaction_date__gte = start_of_current_fy,
+        transaction_date__lte = current_period
     )
 
     temporary_storage = {}
@@ -480,7 +591,9 @@ def get_deep_insight_eight(client_id, current_period):
     ).values_list('account_id')
 
     transactions_related_to_commission = ZohoTransaction.objects.filter(
-        account_id__in = (tup[0] for tup in accounts_related_to_commission), transaction_date__gte = start_of_current_fy
+        account_id__in = (tup[0] for tup in accounts_related_to_commission), 
+        transaction_date__gte = start_of_current_fy,
+        transaction_date__lte = current_period
     )
 
     temporary_storage = {}
@@ -515,7 +628,9 @@ def get_deep_insight_nine(client_id, current_period):
     ).values_list('account_id')
 
     transactions_related_to_professional_fees = ZohoTransaction.objects.filter(
-        account_id__in = (tup[0] for tup in accounts_related_to_professional_fees), transaction_date__gte = start_of_current_fy
+        account_id__in = (tup[0] for tup in accounts_related_to_professional_fees), 
+        transaction_date__gte = start_of_current_fy,
+        transaction_date__lte = current_period
     )
 
     temporary_storage = {}
@@ -558,7 +673,9 @@ def get_deep_insight_ten(client_id, current_period):
     prev_four_months.sort()
     
     transactions_related_to_expense = ZohoTransaction.objects.filter(
-        account_id__in = accounts_map, transaction_date__gte = prev_four_months[0]
+        account_id__in = accounts_map, 
+        transaction_date__gte = prev_four_months[0],
+        transaction_date__lte = current_period
     )
 
     month_wise_payee = {
@@ -585,6 +702,7 @@ def get_deep_insight_ten(client_id, current_period):
 
     deep_insight_ten_data = []
     for payee in absent_payees:
+        payee = payee if payee != '' else 'Unknown'
         deep_insight_ten_data.append(
             f'{payee} has no transactions for current month'
         )

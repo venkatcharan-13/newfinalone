@@ -1,4 +1,5 @@
-from datetime import date
+from datetime import date, datetime
+import calendar
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from rest_framework.views import APIView
@@ -8,6 +9,8 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework.permissions import IsAuthenticated
 
 SELECTED_DATE = date(2022, 6, 30)
+current_period_str, previous_period_str  = "current_period", "previous_period"
+response_data_str, totals_str = "response_data", "totals"
 
 # Create your views here.
 @login_required()
@@ -17,6 +20,32 @@ def analytics(request):
 @login_required()
 def insights(request):
     return render(request, 'insights.html')
+
+@login_required()
+def insight_transactions(request, expense):
+    selected_month = request.GET.get('selected_date')
+    logged_client_id = request.user.id
+
+    if selected_month is None:
+        selected_month = date(2022, 6, 30)
+    else:
+        selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
+    
+    # Fetching PNL transactions for each payee related to an account
+    response_data, totals, prev_three_months = insights_util.fetch_insights_transaction(
+        selected_month, logged_client_id, expense
+    )
+    current_month = prev_three_months[0]
+    previous_month = prev_three_months[1]
+    context = {
+        'expense_head': expense,
+        current_period_str: calendar.month_name[current_month.month] + '-' + str(current_month.year)[2:],
+        previous_period_str: calendar.month_name[previous_month.month] + '-' + str(previous_month.year)[2:],
+        response_data_str: response_data,
+        totals_str: totals
+    }
+
+    return render(request, 'insights_trans.html', context)
 
 @login_required()
 def deep_insights(request):

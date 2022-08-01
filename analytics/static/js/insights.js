@@ -45,7 +45,7 @@ function changePeriod(params) {
 }
 
 function fillExpenseHeader(object, tid, head) {
-  document.getElementById(tid).innerHTML = '<th style="width:40%">' + head + '<br><em>Change: ' + object.change + '</em></th>' +
+  document.getElementById(tid).innerHTML = `<th style="width:40%"><a href="${head}/?selected_date=${choosen_month}" style="text-decoration: none">${head}</a><br><em>Change: ${object.change}</em></th>` +
     '<td style="width: 15%; text-align:right;">' + object.current + '</td>' +
     '<td style="width: 15%; text-align:right;">' + object.previous + '</td>' +
     '<td style="width: 15%; text-align:center;">' + object.per_change + '%</td>' +

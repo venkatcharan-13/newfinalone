@@ -897,9 +897,9 @@ def get_ratios(period, logged_client_id):
         ratio_info: ratio_config_data['days_payable_outstanding']['info'],
         ideal_ratio: ratio_config_data['days_payable_outstanding']['ideal'],
         ratio_format: " days",
-        current: 0 if cogs[current] == 0 else (accpay[current] + accpay[previous])/(2*cogs[current])*365,
-        previous: 0 if cogs[previous] == 0 else (accpay[previous] + accpay['pre_prev'])/(2*cogs[previous])*365,
-        three_month_avg: 0 if cogs[three_month_avg] == 0 else (accpay[three_month_avg])/(cogs[three_month_avg])*365,
+        current: 0 if cogs[current] == 0 else round((accpay[current] + accpay[previous])/(2*cogs[current])*365),
+        previous: 0 if cogs[previous] == 0 else round((accpay[previous] + accpay['pre_prev'])/(2*cogs[previous])*365),
+        three_month_avg: 0 if cogs[three_month_avg] == 0 else round((accpay[three_month_avg])/(cogs[three_month_avg])*365),
     }
     ratios_data['op_eff_ratios'].append(temporary_storage)
     
@@ -934,9 +934,9 @@ def get_ratios(period, logged_client_id):
         ratio_info: ratio_config_data['runway']['info'],
         ideal_ratio: ratio_config_data['runway']['ideal'],
         ratio_format: " months",
-        current: 0 if mbr[current] == 0 else (cash[current] + bank[current])/mbr[current],
-        previous: 0 if mbr[previous] == 0 else (cash[previous] + bank[previous])/mbr[previous],
-        three_month_avg: 0 if mbr[three_month_avg] == 0 else (cash[three_month_avg] + bank[three_month_avg])/mbr[three_month_avg],
+        current: 0 if mbr[current] == 0 else round((cash[current] + bank[current])/mbr[current]),
+        previous: 0 if mbr[previous] == 0 else round((cash[previous] + bank[previous])/mbr[previous]),
+        three_month_avg: 0 if mbr[three_month_avg] == 0 else round((cash[three_month_avg] + bank[three_month_avg])/mbr[three_month_avg]),
     }
     ratios_data['solvency_ratios'].append(temporary_storage)
 

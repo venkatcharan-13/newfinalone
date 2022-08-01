@@ -55,7 +55,12 @@ function fillCashflowRows(data, tid) {
     }
     console.log(codings);
     var tr = document.createElement('tr');
-    tr.innerHTML = `<th style="width:40%"><a href="${object.activity}/?${codings}selected_date=${choosen_month}" 
+    if (object.activity == "Net Income" || object.activity == "Plus: Depreciation & Amortization"){
+      var href = '#';
+    }else{
+      var href = `${object.activity}/?${codings}selected_date=${choosen_month}`;
+    }
+    tr.innerHTML = `<th style="width:40%"><a href="${href}" 
     style="text-decoration: none">${object.activity}</a></th>` +
       '<td style="width: 20%; text-align:right;">' + object.current + '</td>' +
       '<td style="width: 20%; text-align:right;">' + object.previous + '</td>' +
