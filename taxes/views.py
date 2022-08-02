@@ -56,10 +56,10 @@ class TaxesData(APIView):
             })
 
         for monthly_stat in monthly_status:
-            income_tax_data_response['status']['monthly'][monthly_stat.monthName] = monthly_stat.paymentStatus
+            income_tax_data_response['status']['monthly'][monthly_stat.get_monthName_display()] = monthly_stat.paymentStatus
         
         for quarterly_stat in quarterly_status:
-            income_tax_data_response['status']['quarterly'][quarterly_stat.quarter] = quarterly_stat.paymentStatus
+            income_tax_data_response['status']['quarterly'][quarterly_stat.get_quarter_display()] = quarterly_stat.paymentStatus
 
         return Response(income_tax_data_response)
 
@@ -98,9 +98,9 @@ class GSTData(APIView):
             })
 
         for monthly_stat in monthly_status:
-            gst_data_response['status']['monthly'][monthly_stat.monthName] = monthly_stat.paymentStatus
+            gst_data_response['status']['monthly'][monthly_stat.get_monthName_display()] = monthly_stat.paymentStatus
         
         for quarterly_stat in quarterly_status:
-            gst_data_response['status']['quarterly'][quarterly_stat.quarter] = quarterly_stat.paymentStatus
+            gst_data_response['status']['quarterly'][quarterly_stat.get_quarter_display()] = quarterly_stat.paymentStatus
 
         return Response(gst_data_response)

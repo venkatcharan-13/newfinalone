@@ -13,7 +13,6 @@
     integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
     crossorigin="anonymous"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-  <script src="../static/js/remark.js"></script>
   <title>Dashboard</title>
 </head>
 
@@ -32,16 +31,11 @@
     <a href="/profile">Profile</a>
   </div>
   <div class="main">
-    <div class="month-dropdown float-end">
-      <select class="form-select" id="periodSelector" onchange="changePeriod(this.value)" style="width:auto;">
-        <option value="Choose Month">Choose Month</option>
-        <option value="2022-01-31">January</option>
-        <option value="2022-02-28">February</option>
-        <option value="2022-03-31">March</option>
-        <option value="2022-04-30">April</option>
-        <option value="2022-05-31">May</option>
-        <option value="2022-06-30">June</option>
-      </select>
+    <br>
+    <div>
+      <form action="" class="form">
+        <input type="month" name="date" id="periodSelector" onchange="changePeriod(this.value)">
+      </form>
     </div>
     {% if user.is_authenticated %}
     <br><h2>Welcome {{ user.first_name }} {{ user.last_name }}</h2><br>
@@ -88,30 +82,8 @@
                   <th scope="col"></th>
                 </tr>
               </thead>
-              <tbody>
-                {% for point in pending_points %}
-                <tr>
-                  <th scope="row">{{ forloop.counter }}</th>
-                  <td>{{point.point}}</td>
-                  <td>
-                    <div class="input-group">
-                      <input type="text" class="form-control" value="{{point.clientRemarks}}"
-                        id="actionRemark{{point.pk}}"></input>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" 
-                      {% if point.status %} checked {% endif %} disabled>
-                    </div>
-                  </td>
-                  <td>
-                    <button type="submit" class="btn btn-primary" onClick="add_actionable_remark({{point.pk}})">
-                      Add
-                    </button>
-                  </td>
-                </tr>
-                {% endfor %}
+              <tbody id="pending_actionables">
+              
               </tbody>
             </table>
           </div>
@@ -127,10 +99,7 @@
         <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
           data-bs-parent="#accordionExample">
           <div class="accordion-body">
-            <ul class="list-group list-group-numbered list-group-flush">
-              {% for point in watch_out_points %}
-              <li class="list-group-item">{{point.point}}</li>
-              {% endfor %}
+            <ul class="list-group list-group-numbered list-group-flush" id="watchout_points">
             </ul>
           </div>
         </div>
@@ -155,7 +124,7 @@
                   <th style="width: 15%;">Last month Completion date</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="stat_comp">
                 {% for tax_head, compliances in statutory_compliances.items %}
                 <tr>
                   <th scope="row" colspan="5">{{ tax_head }}</th>
@@ -177,6 +146,7 @@
       </div>
     </div>
   </div>
+  <script src="../static/js/dashboard.js"></script>
 </body>
 
 </html>

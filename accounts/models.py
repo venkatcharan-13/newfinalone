@@ -97,3 +97,28 @@ class ZohoTransaction(models.Model):
     fcy_debit_amount = models.CharField(max_length=20, null=True)
     fcy_credit_amount = models.CharField(max_length=20, null=True)
     reconcile_status = models.CharField(max_length=20, null=True)
+
+class Ratio(models.Model):
+    ratio_type_choices=[
+        ('gross_profit_margin', 'Gross Profit Margin'),
+        ('net_profit_margin', 'Net Profit Margin'),
+        ('return_on_equity', 'Return on Equity'),
+        ('cashflow_to_sales_ratio', 'Cashflow to Sales Ratio'),
+        ('working_capital_current_ratio', 'Working Capital Ratio / Current Ratio'),
+        ('cashflow_to_debt_ratio', 'Cashflow to Debt Ratio'),
+        ('inventory_turnover', 'Inventory turnover'),
+        ('accounts_receivable_turnover', 'Accounts receivable turnover'),
+        ('days_payable_outstanding', 'Days payable outstanding (DPO)'),
+        ('debt_to_equity_ratio', 'Debt to equity ratio'),
+        ('monthly_burn_rate', 'Monthly Burn Rate'),
+        ('runway', 'Runway'),
+    ]
+
+    client = models.ForeignKey(User, on_delete=models.CASCADE)
+    ratio_type = models.CharField(max_length=50, choices=ratio_type_choices)
+    action_need_to_be_taken = models.CharField(max_length=100, blank=True, null=True)
+    period = models.DateField(auto_now=False)
+
+    def __str__(self):
+        return self.get_ratio_type_display()
+

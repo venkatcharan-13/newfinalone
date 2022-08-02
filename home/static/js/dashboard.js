@@ -1,0 +1,110 @@
+const endpoint = 'api/dashboardData/';
+var choosen_month = sessionStorage.getItem("choosen_month") ? sessionStorage.getItem("choosen_month"): "2022-06-30";
+
+$(document).ready(function() {
+  if(sessionStorage.getItem("choosen_month")){
+    $('#periodSelector').val(sessionStorage.getItem("choosen_month").substring(0, 7));
+  }
+  else{
+    $('#periodSelector').val("Choose Month");
+  }
+});
+
+$.ajax({
+  method: "GET",
+  url: endpoint,
+  data: {
+    selected_date: choosen_month
+  },
+  success: function (response) {
+    console.log("Success Dashbosard");
+    fillPendingActionables(response.pending_points, "pending_actionables");
+    fillWatchoutPoints(response.watchout_points, "watchout_points");
+    fillStatutoryCompliances(response.statutory_compliances, "stat_comp");
+  },
+  error: function (error_data) {
+    console.log("Error1");
+    console.log(error_data);
+  }
+})
+
+function changePeriod(params) {
+  console.log(params);
+  var year = params.substring(0, 4);
+  var month = params.substring(5, 7);
+  var choosen_period = params + '-' + new Date(year, month, 0).getDate(); 
+  sessionStorage.setItem("choosen_month", choosen_period);
+  location.reload();
+}
+
+
+function fillPendingActionables(data, tid) {
+  var table = document.getElementById(tid);
+  data.forEach(function (object) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = `<th> ${object.sno} </th>` +
+    `<td> ${object.point} </td>` +
+    `<td>
+        <div class="input-group">
+        <input type="text" class="form-control" value="${object.client_remarks}"
+            id="actionRemark${object.id}"></input>
+        </div>
+    </td>` + 
+    `<td>
+        <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" 
+        ${object.status ? 'checked':''} disabled>
+        </div>
+    </td>` + 
+    `<td>
+        <button type="submit" class="btn btn-primary" onClick="add_actionable_remark(${object.id})">
+        Add
+        </button>
+    </td>`;
+    table.appendChild(tr);
+  })
+}
+
+function add_actionable_remark(pk) {
+    var remark_val = $('#actionRemark' + pk).val();
+    $.ajax({
+        url: "add_actionable_remark/" + pk + "/",
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify({actionRemark: remark_val}),
+        dataType: 'json',
+    }).done(function (data) {
+        console.log("Success");
+        document.location.reload();
+    }).fail(function (error) {
+        console.log("error");
+    });
+}
+
+function fillWatchoutPoints(data, tid) {
+  var list = document.getElementById(tid);
+  data.forEach(function (object) {
+    var li = document.createElement('li');
+    li.className = "list-group-item";
+    li.innerHTML = object.point;
+    list.appendChild(li);
+  })
+}
+
+function fillStatutoryCompliances(data, tid) {
+  var table = document.getElementById(tid);
+  Object.keys(data).forEach(function (tax){
+    var tax_head = document.createElement('tr');
+    tax_head.innerHTML = `<th scope="row" colspan="5">${tax}</th>`;
+    table.appendChild(tax_head);
+    data[tax].forEach(function(comp){
+      var compliance = document.createElement('tr');
+      compliance.innerHTML = `<td scope="row" style="width: 40%;">${comp.compliance}</td>` + 
+      `<td style="width: 15%;">${comp.current_month}</td>` + 
+      `<td style="width: 15%;">${comp.current_status}</td>` +
+      `<td style="width: 15%;">${comp.last_status}</td>` + 
+      `<td style="width: 15%;">${comp.last_month}</td>`;
+      table.appendChild(compliance);
+    })
+  })
+}

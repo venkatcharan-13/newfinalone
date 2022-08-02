@@ -1,5 +1,5 @@
 import copy
-from accounts.models import ZohoAccount, ZohoTransaction
+from accounts.models import ZohoAccount, ZohoTransaction, Ratio
 from utility import accounts_util, jsonobj
 from dateutil.relativedelta import relativedelta
 from datetime import date, datetime
@@ -663,6 +663,17 @@ def get_cashflow(period, logged_client_id):
     return cashflow_data
 
 
+def get_ratio_actions(period, client_id):
+    ratio_actions = Ratio.objects.filter(
+        client_id=client_id,
+        period=period
+    ).values_list('ratio_type', 'action_need_to_be_taken')
+
+    ratios_dic = dict(ratio_actions)
+    
+    return ratios_dic
+
+
 def get_ratios(period, logged_client_id):
 
     ratio_config_data = config_data['ratios_info']
@@ -674,6 +685,7 @@ def get_ratios(period, logged_client_id):
     ratios_data = {}
     ratio_head, ratio_info, ideal_ratio, ratio_format = "ratio_head", "ratio_info", "ideal_ratio", "ratio_format"
     current, previous, three_month_avg = "current", "previous", "three_month_avg"
+    action_str = "action_to_be_taken"
 
     gross_profit = pnl_data['gross_profit']
     ratios_data['gross_profit'] = {
@@ -692,10 +704,13 @@ def get_ratios(period, logged_client_id):
     ratios_data['profit_ratios'] = []
     income = pnl_data['total_income']
 
+    action = get_ratio_actions(period, logged_client_id)
+
     temporary_storage = {
         ratio_head: ratio_config_data['gross_profit_margin']['head'],
         ratio_info: ratio_config_data['gross_profit_margin']['info'],
         ideal_ratio: ratio_config_data['gross_profit_margin']['ideal'],
+        action_str: action['gross_profit_margin'] if 'gross_profit_margin' in action else '',
         ratio_format: "%",
         current: 0 if income[current] == 0 else round(gross_profit[current]/income[current]*100),
         previous: 0 if income[previous] == 0 else round(gross_profit[previous]/income[previous]*100),
@@ -707,6 +722,7 @@ def get_ratios(period, logged_client_id):
         ratio_head: ratio_config_data['net_profit_margin']['head'],
         ratio_info: ratio_config_data['net_profit_margin']['info'],
         ideal_ratio: ratio_config_data['net_profit_margin']['ideal'],
+        action_str: action['net_profit_margin'] if 'net_profit_margin' in action else '',
         ratio_format: "%",
         current: 0 if income[current] == 0 else round(pbt[current]/income[current]*100),
         previous: 0 if income[previous] == 0 else round(pbt[previous]/income[previous]*100),
@@ -730,6 +746,7 @@ def get_ratios(period, logged_client_id):
         ratio_head: ratio_config_data['return_on_equity']['head'],
         ratio_info: ratio_config_data['return_on_equity']['info'],
         ideal_ratio: ratio_config_data['return_on_equity']['ideal'],
+        action_str: action['return_on_equity'] if 'return_on_equity' in action else '',
         ratio_format: "%",
         current: 0 if equity[current] == 0 else round(pbt[current]/equity[current]*100),
         previous: 0 if equity[previous] == 0 else round(pbt[previous]/equity[previous]*100),
@@ -742,6 +759,7 @@ def get_ratios(period, logged_client_id):
         ratio_head: ratio_config_data['cashflow_to_sales_ratio']['head'],
         ratio_info: ratio_config_data['cashflow_to_sales_ratio']['info'],
         ideal_ratio: ratio_config_data['cashflow_to_sales_ratio']['ideal'],
+        action_str: action['cashflow_to_sales_ratio'] if 'cashflow_to_sales_ratio' in action else '',
         ratio_format: "%",
         current: 0 if income[current] == 0 else round(cf_operations[current]/income[current]*100),
         previous: 0 if income[previous] == 0 else round(cf_operations[previous]/income[previous]*100),
@@ -822,6 +840,7 @@ def get_ratios(period, logged_client_id):
         ratio_head: ratio_config_data['working_capital_current_ratio']['head'],
         ratio_info: ratio_config_data['working_capital_current_ratio']['info'],
         ideal_ratio: ratio_config_data['working_capital_current_ratio']['ideal'],
+        action_str: action['working_capital_current_ratio'] if 'working_capital_current_ratio' in action else '',
         ratio_format: "x",
         current: 0 if (accpay[current]+ocurrl[current]) == 0 else (accrec[current]+cash[current]+bank[current]+ocurra[current])/(accpay[current]+ocurrl[current]),
         previous: 0 if (accpay[previous]+ocurrl[previous]) == 0 else (accrec[previous]+cash[previous]+bank[previous]+ocurra[previous])/(accpay[previous]+ocurrl[previous]),
@@ -846,6 +865,7 @@ def get_ratios(period, logged_client_id):
         ratio_head: ratio_config_data['cashflow_to_debt_ratio']['head'],
         ratio_info: ratio_config_data['cashflow_to_debt_ratio']['info'],
         ideal_ratio: ratio_config_data['cashflow_to_debt_ratio']['ideal'],
+        action_str: action['cashflow_to_debt_ratio'] if 'cashflow_to_debt_ratio' in action else '',
         ratio_format: "x",
         current: 0 if (st_borrow[current] + lt_borrow[current]) == 0 else cf_operations[current]/(st_borrow[current] + lt_borrow[current]),
         previous: 0 if (st_borrow[current] + lt_borrow[current]) == 0 else cf_operations[previous]/(st_borrow[previous] + lt_borrow[previous]),
@@ -874,6 +894,7 @@ def get_ratios(period, logged_client_id):
         ratio_head: ratio_config_data['inventory_turnover']['head'],
         ratio_info: ratio_config_data['inventory_turnover']['info'],
         ideal_ratio: ratio_config_data['inventory_turnover']['ideal'],
+        action_str: action['inventory_turnover'] if 'inventory_turnover' in action else '',
         ratio_format: "x",
         current: 0 if (inventory[current] + inventory[previous]) == 0 else cogs[current]/(inventory[current] + inventory[previous]) * 2,
         previous: 0 if (inventory[previous] + inventory['pre_prev']) == 0 else cogs[previous]/(inventory[previous] + inventory['pre_prev']) * 2,
@@ -885,6 +906,7 @@ def get_ratios(period, logged_client_id):
         ratio_head: ratio_config_data['accounts_receivable_turnover']['head'],
         ratio_info: ratio_config_data['accounts_receivable_turnover']['info'],
         ideal_ratio: ratio_config_data['accounts_receivable_turnover']['ideal'],
+        action_str: action['accounts_receivable_turnover'] if 'accounts_receivable_turnover' in action else '',
         ratio_format: "x",
         current: 0 if (accrec[current] + accrec[previous]) == 0 else income[current]/((accrec[current] + accrec[previous])/2),
         previous: 0 if (accrec[previous] + accrec['pre_prev']) == 0 else income[previous]/((accrec[previous] + accrec['pre_prev'])/2),
@@ -896,6 +918,7 @@ def get_ratios(period, logged_client_id):
         ratio_head: ratio_config_data['days_payable_outstanding']['head'],
         ratio_info: ratio_config_data['days_payable_outstanding']['info'],
         ideal_ratio: ratio_config_data['days_payable_outstanding']['ideal'],
+        action_str: action['days_payable_outstanding'] if 'days_payable_outstanding' in action else '',
         ratio_format: " days",
         current: 0 if cogs[current] == 0 else round((accpay[current] + accpay[previous])/(2*cogs[current])*365),
         previous: 0 if cogs[previous] == 0 else round((accpay[previous] + accpay['pre_prev'])/(2*cogs[previous])*365),
@@ -911,6 +934,7 @@ def get_ratios(period, logged_client_id):
         ratio_head: ratio_config_data['debt_to_equity_ratio']['head'],
         ratio_info: ratio_config_data['debt_to_equity_ratio']['info'],
         ideal_ratio: ratio_config_data['debt_to_equity_ratio']['ideal'],
+        action_str: action['debt_to_equity_ratio'] if 'debt_to_equity_ratio' in action else '',
         ratio_format: "x",
         current: 0 if share_cap[current] == 0 else (st_borrow[current] + lt_borrow[current])/share_cap[current],
         previous: 0 if share_cap[previous] == 0 else (st_borrow[previous] + lt_borrow[previous])/share_cap[previous],
@@ -922,6 +946,7 @@ def get_ratios(period, logged_client_id):
         ratio_head: ratio_config_data['monthly_burn_rate']['head'],
         ratio_info: ratio_config_data['monthly_burn_rate']['info'],
         ideal_ratio: ratio_config_data['monthly_burn_rate']['ideal'],
+        action_str: action['monthly_burn_rate'] if 'monthly_burn_rate' in action else '',
         ratio_format: "",
         current: cash[current] + bank[current] - cash[previous] - bank[previous],
         previous: cash[previous] + bank[previous] - cash['pre_prev'] - bank['pre_prev'],
@@ -933,6 +958,7 @@ def get_ratios(period, logged_client_id):
         ratio_head: ratio_config_data['runway']['head'],
         ratio_info: ratio_config_data['runway']['info'],
         ideal_ratio: ratio_config_data['runway']['ideal'],
+        action_str: action['runway'] if 'runway' in action else '',
         ratio_format: " months",
         current: 0 if mbr[current] == 0 else round((cash[current] + bank[current])/mbr[current]),
         previous: 0 if mbr[previous] == 0 else round((cash[previous] + bank[previous])/mbr[previous]),

@@ -4,11 +4,12 @@ from django.contrib.auth.models import User
 from cprofile.models import Company
 from taxes.models import TaxAlert, ITMonthlyStatus, ITQuarterlyStatus, GSTMonthlyStatus, GSTQuarterlyStatus
 # from accounts.admin import ZohoAccountInline
+from accounts.models import Ratio
 
 # Register your models here.
 class PendingActionableAdmin(admin.ModelAdmin):
     list_filter = ['client']
-    list_display = ['point', 'clientRemarks', 'status']
+    list_display = ['point', 'client_remarks', 'status']
 
 admin.site.register(PendingActionable, PendingActionableAdmin)
 
@@ -37,6 +38,10 @@ class StatutoryComplianceInline(admin.TabularInline):
     model = StatutoryCompliance
     extra = 0
 
+class RatioInline(admin.TabularInline):
+    model = Ratio
+    extra = 0
+
 class TaxAlertInline(admin.TabularInline):
     model = TaxAlert
     extra = 0
@@ -63,6 +68,7 @@ class UserAdmin(admin.ModelAdmin):
         PendingActionableInline,
         WatchOutPointInline,
         StatutoryComplianceInline,
+        RatioInline,
         TaxAlertInline,
         ITMonthlyStatusInline,
         ITQuarterlyStatusInline,

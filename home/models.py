@@ -20,16 +20,18 @@ class PendingActionable(models.Model):
         return self.point
 
     client = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_on = models.DateField(auto_now_add=True)
     point = models.CharField(max_length=100)
-    clientRemarks = models.CharField(max_length=500, blank=True)
+    client_remarks = models.CharField(max_length=500, blank=True)
     status = models.BooleanField(default=False, blank=True)
-    # attachedDoc = models.FileField()
+    # attached_doc = models.FileField()
 
 class WatchOutPoint(models.Model):
     def __str__(self):
         return self.point
         
     client = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_on = models.DateField(auto_now_add=True)
     point = models.CharField(max_length=100)
 
 class StatutoryCompliance(models.Model):

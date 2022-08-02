@@ -42,10 +42,11 @@ function changePeriod(params) {
   }
 
 function fillRatiosHead(object, tid, head) {
-    document.getElementById(tid).innerHTML = '<th style="width:40%">' + head + '</th>' +
+    document.getElementById(tid).innerHTML = '<th style="width:20%">' + head + '</th>' +
         '<td style="width: 15%; text-align:right;">' + object.current + '</td>' +
         '<td style="width: 15%; text-align:right;">' + object.previous + '</td>' +
-        '<td style="width: 10%; text-align:center;">' + object.three_month_avg + '</td>' +
+        '<td style="width: 15%; text-align:center;">' + object.three_month_avg + '</td>' +
+        '<td style="width: 15%; text-align:center;"></td>' + 
         '<td style="width: 20%; text-align:center;"></td>';
 }
 
@@ -63,11 +64,12 @@ function fillRatiosTableRows(data, tid) {
         `<td style="width: 15%; text-align:center;">
             ${object.ideal_ratio}
         </td>`;
-        tr.innerHTML = `<th style="width:40%"> ${object.ratio_head}<span class="fa fa-info-circle" title="${object.ratio_info}"></span></th>` +
+        tr.innerHTML = `<th style="width:20%"> ${object.ratio_head}<span class="fa fa-info-circle" title="${object.ratio_info}"></span></th>` +
             `<td style="width: 15%; text-align:right;"> ${object.current + object.ratio_format} </td>` +
             `<td style="width: 15%; text-align:right;"> ${object.previous + object.ratio_format} </td>` +
             `<td style="width: 15%; text-align:center;"> ${object.three_month_avg + object.ratio_format} </td>` +
-            idealRatio;
+            idealRatio + 
+            `<td style="width: 20%; text-align:center;"> ${object.action_to_be_taken} </td>`;
         table.appendChild(tr);
     })
 }

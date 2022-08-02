@@ -1,6 +1,5 @@
 from django.contrib import admin
-from accounts.models import ZohoAccount, ZohoTransaction
-from django.contrib.auth.models import User
+from accounts.models import ZohoAccount, ZohoTransaction, Ratio
 
 # Register your models here.
 class ZohoAccountAdmin(admin.ModelAdmin):
@@ -11,8 +10,16 @@ class ZohoAccountAdmin(admin.ModelAdmin):
         qs = qs.order_by('account_name')
         return qs
 
-# class ZohoAccountInline(admin.TabularInline):
-#     model = ZohoAccount
+class ZohoTransactionAdmin(admin.ModelAdmin):
+    list_filter = ['account']
+    list_display = ['categorized_transaction_id', 'account', 'payee', 
+    'transaction_date', 'debit_amount', 'credit_amount']
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.order_by('transaction_date')
+        return qs
+
 
 admin.site.register(ZohoAccount, ZohoAccountAdmin)
-admin.site.register(ZohoTransaction)
+admin.site.register(ZohoTransaction, ZohoTransactionAdmin)
+admin.site.register(Ratio)
