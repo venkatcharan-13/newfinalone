@@ -2,7 +2,7 @@ import json
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from datetime import date, datetime
-from home.models import PendingActionable, WatchOutPoint,  StatutoryCompliance
+from home.models import DashboardAccountStatus, PendingActionable, WatchOutPoint,  StatutoryCompliance
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from rest_framework.views import APIView
@@ -39,6 +39,18 @@ class DashboardData(APIView):
             selected_month = date(2022, 6, 30)
         else:
             selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
+        
+        accounts_status_data = DashboardAccountStatus.objects.filter(
+            client_id=logged_client_id,
+            created_on__lte=selected_month,
+            created_on__gte=selected_month.replace(day=1)
+        )
+        accounts_status= []
+        for level in accounts_status_data:
+            accounts_status.append({
+                'level_desc': level.status_desc,
+                'status': level.status
+            })
 
         pending_actionables_data = PendingActionable.objects.filter(
             client_id=logged_client_id,
@@ -68,7 +80,9 @@ class DashboardData(APIView):
             })
 
         statutory_compliances_data = StatutoryCompliance.objects.filter(
-            client_id=logged_client_id
+            client_id=logged_client_id,
+            current_month_due_date__lte=selected_month,
+            current_month_due_date__gte=selected_month.replace(day=1)
         )
 
         statutory_compliances = {}
@@ -85,6 +99,7 @@ class DashboardData(APIView):
             })
         
         response = {
+            'accounts_status': accounts_status,
             'pending_points': pending_actionables,
             'watchout_points': watchout_points,
             'statutory_compliances': statutory_compliances

@@ -18,6 +18,7 @@ $.ajax({
   },
   success: function (response) {
     console.log("Success Dashbosard");
+    fillDashboardStatus(response.accounts_status, "status_list");
     fillPendingActionables(response.pending_points, "pending_actionables");
     fillWatchoutPoints(response.watchout_points, "watchout_points");
     fillStatutoryCompliances(response.statutory_compliances, "stat_comp");
@@ -79,6 +80,20 @@ function add_actionable_remark(pk) {
     }).fail(function (error) {
         console.log("error");
     });
+}
+
+function fillDashboardStatus(data, tid) {
+  var ul = document.getElementById(tid);
+  data.forEach(function (object) {
+    var li = document.createElement('li');
+    if(object.status == "completed"){
+      li.className = "list-group-item active";
+    } else {
+      li.className = "list-group-item"
+    }
+    li.innerHTML = object.level_desc;
+    ul.appendChild(li);
+  })
 }
 
 function fillWatchoutPoints(data, tid) {

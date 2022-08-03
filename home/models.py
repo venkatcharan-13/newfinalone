@@ -1,6 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+dashboard_acc_status_choices = [
+    ('completed', 'Completed'),
+    ('pending', 'Pending')
+]
 
 statutory_compliance_choices = [
     ('tds', 'TDS'),
@@ -15,6 +19,12 @@ statutory_comp_status_choices = [
 ]
 
 # Create your models here.
+class DashboardAccountStatus(models.Model):
+    client = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_on = models.DateField(auto_now_add=True)
+    status_desc = models.CharField(max_length=100)
+    status = models.CharField(max_length=10, choices=dashboard_acc_status_choices, default='pending')
+
 class PendingActionable(models.Model):
     def __str__(self):
         return self.point

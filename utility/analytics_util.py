@@ -716,10 +716,21 @@ def get_balance_sheet_summary(client_id, current_date):
         )
     ).values_list('account_id', 'account_type')
 
-    accounts_map = dict(accounts_related_to_balancesheet)
+    accounts_map_one = dict(accounts_related_to_balancesheet)
 
     transactions_related_to_balancesheet = ZohoTransaction.objects.filter(
-        account_id__in = accounts_map
+        account_id__in = accounts_map_one
+    )
+
+    earnings_accounts_data = ZohoAccount.objects.filter(
+    client_id=client_id,
+    account_type__in=('income', 'expense',
+                        'other_expense', 'cost_of_goods_sold')
+    ).values_list('account_id', 'account_type')
+    accounts_map_two = dict(earnings_accounts_data)
+
+    transactions_related_to_earnings = ZohoTransaction.objects.filter(
+        account_id__in=accounts_map_two
     )
     
     prev_six_months = [current_date]
@@ -736,27 +747,65 @@ def get_balance_sheet_summary(client_id, current_date):
         'Liabilities': [0]*6,
         'Equity': [0]*6
     }
+
+    cy_income, cy_cogs, cy_expenses = [0]*6, [0]*6, [0]*6
+    ret_income, ret_cogs, ret_expenses = [0]*6, [0]*6, [0]*6
+    current_year_earnings, retained_earnings = [0]*6, [0]*6
+
     for i in range(5, -1, -1):
         month = prev_six_months[i].month
         year = prev_six_months[i].year
         balance_sheet_summary['months'][i] = calendar.month_name[month][:3] + '-' + str(year)[2:]
+
+        if month < 4:
+            current_year_period = date(year-1, 4, 1)
+        else:
+            current_year_period = date(year, 4, 1)
+
         assets, liabilities, equity = 0, 0, 0,
         for transaction in transactions_related_to_balancesheet:
             debit_minus_credit = transaction.debit_amount - transaction.credit_amount
             credit_minus_debit = transaction.credit_amount - transaction.debit_amount
             if transaction.transaction_date <= prev_six_months[i]:
-                if accounts_map[transaction.account_id] in ('fixed_asset', 'accounts_receivable', 'other_asset', 'bank', 'cash', 'other_current_asset', 'stock'):
+                if accounts_map_one[transaction.account_id] in ('fixed_asset', 'accounts_receivable', 'other_asset', 'bank', 'cash', 'other_current_asset', 'stock'):
                     assets += debit_minus_credit
-                if accounts_map[transaction.account_id] in ('accounts_payable', 'long_term_liability', 'other_liability', 'other_current_liability'):
+                if accounts_map_one[transaction.account_id] in ('accounts_payable', 'long_term_liability', 'other_liability', 'other_current_liability'):
                     liabilities += credit_minus_debit
-                if accounts_map[transaction.account_id] in ('equity'):
+                if accounts_map_one[transaction.account_id] in ('equity'):
                     equity += credit_minus_debit
+        
+        for transaction in transactions_related_to_earnings:
+            credit_minus_debit = transaction.credit_amount - transaction.debit_amount
+            debit_minus_credit = transaction.debit_amount - transaction.credit_amount
+            trans_date = transaction.transaction_date
+
+            if trans_date >= current_year_period and trans_date <= prev_six_months[i]:
+                if accounts_map_two[transaction.account_id] == 'income':
+                    cy_income[i] += credit_minus_debit
+                if accounts_map_two[transaction.account_id] == 'cost_of_goods_sold':
+                    cy_cogs[i] += debit_minus_credit
+                if accounts_map_two[transaction.account_id] in ('expense', 'other_expense'):
+                    cy_expenses[i] += debit_minus_credit
+
+            if trans_date < current_year_period:
+                if accounts_map_two[transaction.account_id] == 'income':
+                    ret_income[i] += credit_minus_debit
+                if accounts_map_two[transaction.account_id] == 'cost_of_goods_sold':
+                    ret_cogs[i] += debit_minus_credit
+                if accounts_map_two[transaction.account_id] in ('expense', 'other_expense'):
+                    ret_expenses[i] += debit_minus_credit
+        
+        current_year_earnings[i] = cy_income[i] - cy_cogs[i] - cy_expenses[i]
+        retained_earnings[i] = ret_income[i] - ret_cogs[i] - ret_expenses[i]
+        equity = equity + current_year_earnings[i] + retained_earnings[i]
 
         balance_sheet_summary['Assets'][i] = locale.format("%d", assets, grouping=True)
         balance_sheet_summary['Liabilities'][i] = locale.format("%d", liabilities, grouping=True)
         balance_sheet_summary['Equity'][i] = locale.format("%d", equity, grouping=True)
+
     
     return balance_sheet_summary
+
 
 def get_cashflow_summary(client_id, current_date):
     if current_date is None:

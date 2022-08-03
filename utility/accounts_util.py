@@ -299,6 +299,7 @@ def fetch_cashflow_balances(period, client_id, codings_list):
                 if transaction.transaction_date <= prev_two_months[1]:
                     previous_period_total += amount
                 current_period_total += amount
+        
         response_data[account_name][change_str] = previous_period_total - current_period_total
         response_data[account_name][current_str] = current_period_total
         response_data[account_name][previous_str] = previous_period_total
@@ -310,6 +311,8 @@ def fetch_cashflow_balances(period, client_id, codings_list):
         change_str: 0,
     }
 
+    response_data_filtered = {}
+
     for k in response_data:
         obj = response_data[k]
         
@@ -319,9 +322,13 @@ def fetch_cashflow_balances(period, client_id, codings_list):
         total[current_str] += obj[current_str]
         total[previous_str] += obj[previous_str]
         total[change_str] += obj[change_str]
- 
+
+        if obj[current_str] == 0 and obj[previous_str] == 0:
+            continue
+        response_data_filtered[k] = obj
+    
     response_data_filtered = dict(sorted(
-        response_data.items(), 
+        response_data_filtered.items(), 
         key=lambda x: (x[1][current_str], x[1][previous_str]),
         reverse=True
     ))

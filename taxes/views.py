@@ -30,7 +30,7 @@ class TaxesData(APIView):
         
         tax_alerts = TaxAlert.objects.filter(
             client_id = logged_client_id,
-            taxType = 'income_tax'
+            tax_type = 'income_tax'
         )
 
         monthly_status = ITMonthlyStatus.objects.filter(
@@ -51,15 +51,15 @@ class TaxesData(APIView):
         for alert in tax_alerts:
             income_tax_data_response['alerts'].append({
                 'desc': alert.alert,
-                'dueDate': datetime.strftime(alert.dueDate, "%d %b, %Y"),
-                'raisedOn': datetime.strftime(alert.raisedOn, "%d %b, %Y at %H:%M")
+                'dueDate': datetime.strftime(alert.due_date, "%d %b, %Y"),
+                'raisedOn': datetime.strftime(alert.raised_on, "%d %b, %Y at %H:%M")
             })
 
         for monthly_stat in monthly_status:
-            income_tax_data_response['status']['monthly'][monthly_stat.get_monthName_display()] = monthly_stat.paymentStatus
+            income_tax_data_response['status']['monthly'][f'{monthly_stat.get_month_name_display()}-{monthly_stat.year[2:]}'] = monthly_stat.payment_status
         
         for quarterly_stat in quarterly_status:
-            income_tax_data_response['status']['quarterly'][quarterly_stat.get_quarter_display()] = quarterly_stat.paymentStatus
+            income_tax_data_response['status']['quarterly'][quarterly_stat.get_quarter_display()] = quarterly_stat.payment_status
 
         return Response(income_tax_data_response)
 
@@ -72,7 +72,7 @@ class GSTData(APIView):
         
         tax_alerts = TaxAlert.objects.filter(
             client_id = logged_client_id,
-            taxType = 'gst'
+            tax_type = 'gst'
         )
 
         monthly_status = GSTMonthlyStatus.objects.filter(
@@ -93,14 +93,14 @@ class GSTData(APIView):
         for alert in tax_alerts:
             gst_data_response['alerts'].append({
                 'desc': alert.alert,
-                'dueDate': datetime.strftime(alert.dueDate, "%d %b, %Y"),
-                'raisedOn': datetime.strftime(alert.raisedOn, "%d %b, %Y at %H:%M")
+                'dueDate': datetime.strftime(alert.due_date, "%d %b, %Y"),
+                'raisedOn': datetime.strftime(alert.raised_on, "%d %b, %Y at %H:%M")
             })
 
         for monthly_stat in monthly_status:
-            gst_data_response['status']['monthly'][monthly_stat.get_monthName_display()] = monthly_stat.paymentStatus
+            gst_data_response['status']['monthly'][f'{monthly_stat.get_month_name_display()}-{monthly_stat.year[2:]}'] = monthly_stat.payment_status
         
         for quarterly_stat in quarterly_status:
-            gst_data_response['status']['quarterly'][quarterly_stat.get_quarter_display()] = quarterly_stat.paymentStatus
+            gst_data_response['status']['quarterly'][quarterly_stat.get_quarter_display()] = quarterly_stat.payment_status
 
         return Response(gst_data_response)

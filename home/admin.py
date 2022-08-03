@@ -1,5 +1,5 @@
 from django.contrib import admin
-from home.models import PendingActionable, WatchOutPoint, StatutoryCompliance
+from home.models import DashboardAccountStatus, PendingActionable, WatchOutPoint, StatutoryCompliance
 from django.contrib.auth.models import User
 from cprofile.models import Company
 from taxes.models import TaxAlert, ITMonthlyStatus, ITQuarterlyStatus, GSTMonthlyStatus, GSTQuarterlyStatus
@@ -7,6 +7,12 @@ from taxes.models import TaxAlert, ITMonthlyStatus, ITQuarterlyStatus, GSTMonthl
 from accounts.models import Ratio
 
 # Register your models here.
+class DashboardAccountStatusAdmin(admin.ModelAdmin):
+    list_filter = ['client']
+    list_display = ['status_desc', 'status']
+
+admin.site.register(DashboardAccountStatus, DashboardAccountStatusAdmin)
+
 class PendingActionableAdmin(admin.ModelAdmin):
     list_filter = ['client']
     list_display = ['point', 'client_remarks', 'status']
@@ -28,6 +34,9 @@ class CompanyInline(admin.TabularInline):
     model = Company
     extra = 0
 
+class DashboardAccountStatusInline(admin.TabularInline):
+    model = DashboardAccountStatus
+    extra = 0
 class PendingActionableInline(admin.TabularInline):
     model = PendingActionable
     extra = 0
@@ -65,6 +74,7 @@ def delete_object(modeladmin, request, queryset):
 class UserAdmin(admin.ModelAdmin):
     inlines = [
         CompanyInline,
+        DashboardAccountStatusInline,
         PendingActionableInline,
         WatchOutPointInline,
         StatutoryComplianceInline,
