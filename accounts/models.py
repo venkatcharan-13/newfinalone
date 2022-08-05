@@ -82,7 +82,6 @@ class ZohoTransaction(models.Model):
     transaction_date = models.DateField(auto_now=False, auto_now_add=False)
     transaction_type_formatted = models.CharField(max_length=100)
     account = models.ForeignKey(ZohoAccount, on_delete=models.CASCADE)
-    parent_account_id = models.CharField(max_length=30)
     customer_id = models.CharField(max_length=30)
     payee = models.CharField(max_length=100)
     description = models.TextField()

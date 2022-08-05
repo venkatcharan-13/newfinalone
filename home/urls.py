@@ -6,5 +6,4 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('api/dashboardData/', views.DashboardData.as_view()),
     path('add_actionable_remark/<int:pk>/', views.add_actionable_remark, name='add_actionable_remark'),
-    path('help/', views.help, name='help'),
 ]

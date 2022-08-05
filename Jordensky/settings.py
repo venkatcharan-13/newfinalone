@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'taxes.apps.TaxesConfig',
     'cprofile.apps.CprofileConfig',
+    'help.apps.HelpConfig',
     'rest_framework',
     'phonenumber_field',
 ]

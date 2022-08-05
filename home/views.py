@@ -1,6 +1,6 @@
 import json
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from datetime import date, datetime
 from home.models import DashboardAccountStatus, PendingActionable, WatchOutPoint,  StatutoryCompliance
 from django.views.decorators.csrf import csrf_exempt
@@ -23,9 +23,6 @@ def add_actionable_remark(request, pk):
     pending_actionable.client_remarks = json.loads(request.body)["actionRemark"]
     pending_actionable.save()
     return JsonResponse({'Message': 'Success'})
-
-def help(request):
-    return HttpResponse("This will be Help Page")
 
 
 class DashboardData(APIView):
