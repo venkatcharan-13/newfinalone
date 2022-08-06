@@ -1,6 +1,6 @@
 {% extends 'accounts_base.html' %}
 {% load static %}
-{% block title %}Profit and Loss{% endblock title %}
+{% block title %}Accounts | Profit and Loss{% endblock title %}
 {% block active %}active{% endblock active %}
 {% block body %}
 <!-- <div class="month-dropdown float-end">
@@ -14,13 +14,6 @@
     <option value="2022-06-30">June</option>
   </select>
 </div> -->
-<br>
-<div>
-  <form action="" class="form">
-    <input type="month" name="date" id="periodSelector" onchange="changePeriod(this.value)">
-  </form>
-</div>
-
 <div class="box" style="margin-top: 20px;">
   <table class="table" style="border-style: dotted;">
     <h2>Profit & Loss Statement</h2>
@@ -97,8 +90,8 @@
     <tr id="pbt"></tr>
   </tbody>
 </table>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
-  integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script> -->
 
 {% endblock body %}
 

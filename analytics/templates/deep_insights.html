@@ -1,225 +1,233 @@
 {% extends 'analytics_base.html' %}
 {% load static %}
-{% block title %}Deep Insights{% endblock title %}
+{% block title %}Analytics | Deep Insights{% endblock title %}
 {% block active3 %}active{% endblock active3 %}
 {% block body %}
-<br>
-<div>
-  <form action="" class="form">
-    <input type="month" name="date" id="periodSelector" onchange="changePeriod(this.value)">
-  </form>
-</div>
-  <h1>Deep Insights</h1><br>
-  <div class="accordion" id="accordionExample">
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-          Cash expenses more than INR 10k per day to the same party
-        </button>
-      </h2>
-      <div id="collapseOne" class="accordion-collapse collapse show">
-        <div class="accordion-body">
-          <table class="table table-bordered">
-            <thead class="table-dark">
-              <th>Account Name</th>
-              <th>Payee</th>
-              <th>Date</th>
-              <th>Amount</th>
-            </thead>
-            <tbody id="deep_insight_one"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-          Loan taken by the company (not from directors or Banks)
-        </button>
-      </h2>
-      <div id="collapseTwo" class="accordion-collapse collapse">
-        <div class="accordion-body">
-          <table class="table table-bordered">
-            <thead class="table-dark">
-              <th>Account Name</th>
-              <th>Amount</th>
-            </thead>
-            <tbody id="deep_insight_two"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-          If the company is not GST Registered and Total Revenue in the FY exceeed INR 40 lacs for Goods and 20 lacs for Service then alert the system for the GST registration ( From 1st April {year} to till date sum)
-        </button>
-      </h2>
-      <div id="collapseThree" class="accordion-collapse collapse">
-        <div class="accordion-body" id="deep_insight_three">
-         
-        </div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-          Expenses above INR 10k and increase by more than 25% from previous month
-        </button>
-      </h2>
-      <div id="collapseFour" class="accordion-collapse collapse">
-        <div class="accordion-body">
-          <table class="table table-bordered">
-            <thead class="table-dark">
-              <th>Expense</th>
-              <th>Current month</th>
-              <th>Previous Month</th>
-              <th>Increase</th>
-            </thead>
-            <tbody id="deep_insight_four"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-          Account Balances should reflect the correct position
-        </button>
-      </h2>
-      <div id="collapseFive" class="accordion-collapse collapse">
-        <div class="accordion-body">
-          <table class="table table-bordered">
-            <thead class="table-dark">
-              <th>Account Name</th>
-              <th>Negative Amount</th>
-            </thead>
-            <tbody id="deep_insight_five"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
-          Account Payables and Receivables
-        </button>
-      </h2>
-      <div id="collapseSix" class="accordion-collapse collapse">
-        <div class="accordion-body">
-          <table class="table table-bordered">
-            <thead class="table-dark">
-              <th>Account Name</th>
-              <th>Payee</th>
-              <th>Negative Amount</th>
-            </thead>
-            <tbody id="deep_insight_six"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
-          TDS on Rent Expenses
-        </button>
-      </h2>
-      <div id="collapseSeven" class="accordion-collapse collapse">
-        <div class="accordion-body">
-          <table class="table table-bordered">
-            <thead class="table-dark">
-              <th>Payee</th>
-              <th>Amount</th>
-            </thead>
-            <tbody id="deep_insight_seven"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
-          TDS on Commission
-        </button>
-      </h2>
-      <div id="collapseEight" class="accordion-collapse collapse">
-        <div class="accordion-body">
-          <table class="table table-bordered">
-            <thead class="table-dark">
-              <th>Payee</th>
-              <th>Amount</th>
-            </thead>
-            <tbody id="deep_insight_eight"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNine" aria-expanded="false" aria-controls="collapseNine">
-          TDS on Professional Fees
-        </button>
-      </h2>
-      <div id="collapseNine" class="accordion-collapse collapse">
-        <div class="accordion-body">
-          <table class="table table-bordered">
-            <thead class="table-dark">
-              <th>Payee</th>
-              <th>Amount</th>
-            </thead>
-            <tbody id="deep_insight_nine"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTen" aria-expanded="false" aria-controls="collapseTen">
-          To check Invoices of each party in last 3 months, if every month invoice is there and current month not there
-        </button>
-      </h2>
-      <div id="collapseTen" class="accordion-collapse collapse">
-        <div class="accordion-body" id="deep_insight_ten">
-        
-        </div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEleven" aria-expanded="false" aria-controls="collapseEleven">
-          Number of Uncategorized Transactions
-        </button>
-      </h2>
-      <div id="collapseEleven" class="accordion-collapse collapse">
-        <div class="accordion-body" id="deep_insight_eleven">
-          
-        </div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwelve" aria-expanded="true" aria-controls="collapseTwelve">
-          Same amount paid to same vendor in same month
-        </button>
-      </h2>
-      <div id="collapseTwelve" class="accordion-collapse collapse">
-        <div class="accordion-body">
-          <table class="table table-bordered">
-            <thead class="table-dark">
-              <th>Account Name</th>
-              <th>Payee</th>
-              <th>Date</th>
-              <th>Amount</th>
-            </thead>
-            <tbody id="deep_insight_twelve"></tbody>
-          </table>
-        </div>
+
+<h1>Deep Insights</h1><br>
+<div class="accordion" id="accordionExample">
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+        aria-expanded="true" aria-controls="collapseOne">
+        Cash expenses more than INR 10k per day to the same party
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse show">
+      <div class="accordion-body">
+        <table class="table table-bordered">
+          <thead class="table-dark">
+            <th>Account Name</th>
+            <th>Payee</th>
+            <th>Date</th>
+            <th>Amount</th>
+          </thead>
+          <tbody id="deep_insight_one"></tbody>
+        </table>
       </div>
     </div>
   </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo"
+        aria-expanded="false" aria-controls="collapseTwo">
+        Loan taken by the company (not from directors or Banks)
+      </button>
+    </h2>
+    <div id="collapseTwo" class="accordion-collapse collapse">
+      <div class="accordion-body">
+        <table class="table table-bordered">
+          <thead class="table-dark">
+            <th>Account Name</th>
+            <th>Amount</th>
+          </thead>
+          <tbody id="deep_insight_two"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree"
+        aria-expanded="false" aria-controls="collapseThree">
+        If the company is not GST Registered and Total Revenue in the FY exceeed INR 40 lacs for Goods and 20 lacs for
+        Service then alert the system for the GST registration ( From 1st April {year} to till date sum)
+      </button>
+    </h2>
+    <div id="collapseThree" class="accordion-collapse collapse">
+      <div class="accordion-body" id="deep_insight_three">
+
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour"
+        aria-expanded="false" aria-controls="collapseFour">
+        Expenses above INR 10k and increase by more than 25% from previous month
+      </button>
+    </h2>
+    <div id="collapseFour" class="accordion-collapse collapse">
+      <div class="accordion-body">
+        <table class="table table-bordered">
+          <thead class="table-dark">
+            <th>Expense</th>
+            <th>Current month</th>
+            <th>Previous Month</th>
+            <th>Increase</th>
+          </thead>
+          <tbody id="deep_insight_four"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive"
+        aria-expanded="false" aria-controls="collapseFive">
+        Account Balances should reflect the correct position
+      </button>
+    </h2>
+    <div id="collapseFive" class="accordion-collapse collapse">
+      <div class="accordion-body">
+        <table class="table table-bordered">
+          <thead class="table-dark">
+            <th>Account Name</th>
+            <th>Negative Amount</th>
+          </thead>
+          <tbody id="deep_insight_five"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix"
+        aria-expanded="false" aria-controls="collapseSix">
+        Account Payables and Receivables
+      </button>
+    </h2>
+    <div id="collapseSix" class="accordion-collapse collapse">
+      <div class="accordion-body">
+        <table class="table table-bordered">
+          <thead class="table-dark">
+            <th>Account Name</th>
+            <th>Payee</th>
+            <th>Negative Amount</th>
+          </thead>
+          <tbody id="deep_insight_six"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven"
+        aria-expanded="false" aria-controls="collapseSeven">
+        TDS on Rent Expenses
+      </button>
+    </h2>
+    <div id="collapseSeven" class="accordion-collapse collapse">
+      <div class="accordion-body">
+        <table class="table table-bordered">
+          <thead class="table-dark">
+            <th>Payee</th>
+            <th>Amount</th>
+          </thead>
+          <tbody id="deep_insight_seven"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight"
+        aria-expanded="false" aria-controls="collapseEight">
+        TDS on Commission
+      </button>
+    </h2>
+    <div id="collapseEight" class="accordion-collapse collapse">
+      <div class="accordion-body">
+        <table class="table table-bordered">
+          <thead class="table-dark">
+            <th>Payee</th>
+            <th>Amount</th>
+          </thead>
+          <tbody id="deep_insight_eight"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNine"
+        aria-expanded="false" aria-controls="collapseNine">
+        TDS on Professional Fees
+      </button>
+    </h2>
+    <div id="collapseNine" class="accordion-collapse collapse">
+      <div class="accordion-body">
+        <table class="table table-bordered">
+          <thead class="table-dark">
+            <th>Payee</th>
+            <th>Amount</th>
+          </thead>
+          <tbody id="deep_insight_nine"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTen"
+        aria-expanded="false" aria-controls="collapseTen">
+        To check Invoices of each party in last 3 months, if every month invoice is there and current month not there
+      </button>
+    </h2>
+    <div id="collapseTen" class="accordion-collapse collapse">
+      <div class="accordion-body" id="deep_insight_ten">
+
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+        data-bs-target="#collapseEleven" aria-expanded="false" aria-controls="collapseEleven">
+        Number of Uncategorized Transactions
+      </button>
+    </h2>
+    <div id="collapseEleven" class="accordion-collapse collapse">
+      <div class="accordion-body" id="deep_insight_eleven">
+
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+        data-bs-target="#collapseTwelve" aria-expanded="true" aria-controls="collapseTwelve">
+        Same amount paid to same vendor in same month
+      </button>
+    </h2>
+    <div id="collapseTwelve" class="accordion-collapse collapse">
+      <div class="accordion-body">
+        <table class="table table-bordered">
+          <thead class="table-dark">
+            <th>Account Name</th>
+            <th>Payee</th>
+            <th>Date</th>
+            <th>Amount</th>
+          </thead>
+          <tbody id="deep_insight_twelve"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock body %}
 
 {% block script %}
-  <script src="{% static 'js/deepins.js' %}"></script>
+<script src="{% static 'js/deepins.js' %}"></script>
 {% endblock script %}

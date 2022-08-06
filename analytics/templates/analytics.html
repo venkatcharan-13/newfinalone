@@ -1,15 +1,9 @@
 {% extends 'analytics_base.html' %}
 {% load static %}
-{% block title %}MIS Report{% endblock title %}
+{% block title %}Analytics | MIS Report{% endblock title %}
 {% block active %}active{% endblock active %}
 {% block body %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"></script>
-<br>
-<div>
-  <form action="" class="form">
-    <input type="month" name="date" id="periodSelector" onchange="changePeriod(this.value)">
-  </form>
-</div>
 <h1>Graphs</h1><br>
 <div class="container">
   <h3 style="text-align: center;">Sales Performance</h3>

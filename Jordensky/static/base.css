@@ -1,12 +1,14 @@
-
+.navbar {
+    z-index: 2;
+}
 .sidenav {
 	height: 100%;
 	width: 200px;
 	position: fixed;
 	z-index: 1;
-	top: 0;
+	top: 50;
 	left: 0;
-	background-color: #111;
+	background-color: #212529;
 	overflow-x: hidden;
 	padding-top: 40px;
 }
@@ -28,9 +30,10 @@
 }
 
 .main {
+	margin-top: 50px;
 	margin-left: 250px;
-	margin-right: 50px;
-	width: 60%;
+	margin-right: 20px;
+	width: 70%;
 	/* Same as the width of the sidenav */
 }
 
@@ -43,7 +46,7 @@
 	border: 1px solid rgb(0, 0, 0);
 }
 
-li.list-group-item {
+#status_list li.list-group-item {
 	margin-bottom: 15px;
 	border: 1px black solid !important;
 }

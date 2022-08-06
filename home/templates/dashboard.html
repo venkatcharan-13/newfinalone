@@ -1,147 +1,115 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../static/css/dashboard.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <!-- JavaScript Bundle with Popper -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
-    crossorigin="anonymous"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-  <title>Dashboard</title>
-</head>
+{% block title %} Dashboard {% endblock title %}
+{% block current1 %} current {% endblock current1 %}
 
-<body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid d-flex flex-row-reverse">
-      <a class="navbar-brand" href="/auth/logout/">Logout</a>
-    </div>
-  </nav>
-  <div class="sidenav">
-    <a href="/" class="current">Home</a>
-    <a href="/accounts">Accounts</a>
-    <a href="/analytics">Analytics</a>
-    <a href="/taxes">Taxes</a>
-    <a href="/help">Help</a>
-    <a href="/profile">Profile</a>
-  </div>
-  <div class="main">
-    <br>
-    <div>
-      <form action="" class="form">
-        <input type="month" name="date" id="periodSelector" onchange="changePeriod(this.value)">
-      </form>
-    </div>
-    {% if user.is_authenticated %}
-    <br><h2>Welcome {{ user.first_name }} {{ user.last_name }}</h2><br>
-    {% endif %}
-    <div class="accordion" id="accordionExample">
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingOne">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-            data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-            Your books for the month of July is cooked and ready to be served.
-          </button>
-        </h2>
-        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
-          data-bs-parent="#accordionExample">
-          <div class="accordion-body">
-            <ul class="list-group" id="status_list">
-              
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingTwo">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-            data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-            Pending Actionables from your end for this month
-          </button>
-        </h2>
-        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
-          data-bs-parent="#accordionExample">
-          <div class="accordion-body">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Pending Points</th>
-                  <th scope="col">Client Remarks</th>
-                  <th scope="col">Status</th>
-                  <th scope="col"></th>
-                </tr>
-              </thead>
-              <tbody id="pending_actionables">
-              
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingThree">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-            data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-            Things to watch out this month
-          </button>
-        </h2>
-        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
-          data-bs-parent="#accordionExample">
-          <div class="accordion-body">
-            <ul class="list-group list-group-numbered list-group-flush" id="watchout_points">
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingFour">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-            data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-            Statutory Compliances Due Dates for this Month
-          </button>
-        </h2>
-        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
-          data-bs-parent="#accordionExample">
-          <div class="accordion-body">
-            <table class="table table-warning">
-              <thead>
-                <tr>
-                  <th style="width: 40%;"></th>
-                  <th style="width: 15%;">Current month due date</th>
-                  <th style="width: 15%;">Status</th>
-                  <th style="width: 15%;">Last month Status</th>
-                  <th style="width: 15%;">Last month Completion date</th>
-                </tr>
-              </thead>
-              <tbody id="stat_comp">
-                {% for tax_head, compliances in statutory_compliances.items %}
-                <tr>
-                  <th scope="row" colspan="5">{{ tax_head }}</th>
-                </tr>
-                  {% for compliance in compliances %}
-                  <tr>
-                    <td scope="row" style="width: 40%;">{{ compliance.compliance }}</td>
-                    <td style="width: 15%;">{{ compliance.current_month }}</td>
-                    <td style="width: 15%;">{{ compliance.current_status }}</td>
-                    <td style="width: 15%;">{{ compliance.last_status }}</td>
-                    <td style="width: 15%;">{{ compliance.last_month }}</td>
-                  </tr>
-                  {% endfor %}
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
+{% block content %}
+<br>
+<div>
+  <form action="" class="form">
+    <input type="month" name="date" id="periodSelector" onchange="changePeriod(this.value)">
+  </form>
+</div>
+<br>
+<div class="accordion" id="accordionExample">
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingOne">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
+        aria-expanded="true" aria-controls="collapseOne">
+        Your books for the month of July is cooked and ready to be served.
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
+      data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <ul class="list-group" id="status_list">
+
+        </ul>
       </div>
     </div>
   </div>
-  <script src="../static/js/dashboard.js"></script>
-</body>
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingTwo">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo"
+        aria-expanded="false" aria-controls="collapseTwo">
+        Pending Actionables from your end for this month
+      </button>
+    </h2>
+    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+      data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Pending Points</th>
+              <th scope="col">Client Remarks</th>
+              <th scope="col">Status</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody id="pending_actionables">
 
-</html>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingThree">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree"
+        aria-expanded="false" aria-controls="collapseThree">
+        Things to watch out this month
+      </button>
+    </h2>
+    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+      data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <ul class="list-group list-group-numbered list-group-flush" id="watchout_points">
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingFour">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour"
+        aria-expanded="false" aria-controls="collapseFour">
+        Statutory Compliances Due Dates for this Month
+      </button>
+    </h2>
+    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
+      data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <table class="table table-warning">
+          <thead>
+            <tr>
+              <th style="width: 40%;"></th>
+              <th style="width: 15%;">Current month due date</th>
+              <th style="width: 15%;">Status</th>
+              <th style="width: 15%;">Last month Status</th>
+              <th style="width: 15%;">Last month Completion date</th>
+            </tr>
+          </thead>
+          <tbody id="stat_comp">
+            {% for tax_head, compliances in statutory_compliances.items %}
+            <tr>
+              <th scope="row" colspan="5">{{ tax_head }}</th>
+            </tr>
+            {% for compliance in compliances %}
+            <tr>
+              <td scope="row" style="width: 40%;">{{ compliance.compliance }}</td>
+              <td style="width: 15%;">{{ compliance.current_month }}</td>
+              <td style="width: 15%;">{{ compliance.current_status }}</td>
+              <td style="width: 15%;">{{ compliance.last_status }}</td>
+              <td style="width: 15%;">{{ compliance.last_month }}</td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../static/js/dashboard.js"></script>
+{% endblock content %}

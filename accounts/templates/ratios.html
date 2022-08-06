@@ -1,14 +1,8 @@
 {% extends 'accounts_base.html' %}
 {% load static %}
-{% block title %}Ratios{% endblock title %}
+{% block title %}Accounts | Ratios{% endblock title %}
 {% block active4 %} active {% endblock active4 %}
 {% block body %}
-<br>
-<div>
-  <form action="" class="form">
-    <input type="month" name="date" id="periodSelector" onchange="changePeriod(this.value)">
-  </form>
-</div>
 <div class="box" style="margin-top: 20px;">
   <h2>Ratios</h2>
 </div>
@@ -82,8 +76,7 @@
   </tbody>
 </table>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
-  integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+
 {% endblock body %}
 
 {% block script %}
