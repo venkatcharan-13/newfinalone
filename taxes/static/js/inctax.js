@@ -1,8 +1,21 @@
 var endpoint = 'api/incometaxData/';
+var choosen_month = sessionStorage.getItem("choosen_month") ? sessionStorage.getItem("choosen_month"): "2022-06-30";
+
+$(document).ready(function() {
+  if(sessionStorage.getItem("choosen_month")){
+    $('#periodSelector').val(sessionStorage.getItem("choosen_month").substring(0, 7));
+  }
+  else{
+    $('#periodSelector').val("Choose Month");
+  }
+});
 
 $.ajax({
   method: "GET",
   url: endpoint,
+  data: {
+    selected_date: choosen_month
+  },
   success: function (response) {
     console.log("Income Tax data loaded");
     createAlertBoxes(response.alerts, "alertsBox");
@@ -14,6 +27,16 @@ $.ajax({
     console.log(error_data);
   }
 })
+
+function changePeriod(params) {
+  console.log(params);
+  var year = params.substring(0, 4);
+  var month = params.substring(5, 7);
+  var choosen_period = params + '-' + new Date(year, month, 0).getDate(); 
+  sessionStorage.setItem("choosen_month", choosen_period);
+  location.reload();
+}
+
 
 function createAlertBoxes(data, id) {
   var box = document.getElementById(id);

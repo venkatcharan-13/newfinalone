@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from rest_framework.views import APIView
@@ -27,14 +27,29 @@ class TaxesData(APIView):
 
     def get(self, request, format=None):
         logged_client_id = self.request.user.id
-        
+        selected_month = self.request.query_params.get('selected_date')
+        if selected_month is None:
+            selected_month = date(2022, 6, 30)
+        else:
+            selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
+            
+        current_month, current_year = selected_month.month, selected_month.year
+        if current_month < 4:
+            current_fy_start = date(current_year-1, 4, 1)
+            current_fy_end = date(current_year, 3, 31)
+        else:
+            current_fy_start = date(current_year, 4, 1)
+            current_fy_end = date(current_year+1, 3, 31)
+
         tax_alerts = TaxAlert.objects.filter(
             client_id = logged_client_id,
-            tax_type = 'income_tax'
+            tax_type = 'income_tax',
+            raised_on__lte = selected_month,
+            raised_on__gte = selected_month.replace(day=1)
         )
 
         monthly_status = ITMonthlyStatus.objects.filter(
-            client_id = logged_client_id
+            client_id = logged_client_id,
         )
         quarterly_status = ITQuarterlyStatus.objects.filter(
             client_id = logged_client_id
@@ -69,14 +84,22 @@ class GSTData(APIView):
 
     def get(self, request, format=None):
         logged_client_id = self.request.user.id
+        selected_month = self.request.query_params.get('selected_date')
+        if selected_month is None:
+            selected_month = date(2022, 6, 30)
+        else:
+            selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
+            
         
         tax_alerts = TaxAlert.objects.filter(
             client_id = logged_client_id,
-            tax_type = 'gst'
+            tax_type = 'gst',
+            raised_on__lte = selected_month,
+            raised_on__gte = selected_month.replace(day=1)
         )
 
         monthly_status = GSTMonthlyStatus.objects.filter(
-            client_id = logged_client_id
+            client_id = logged_client_id,
         )
         quarterly_status = GSTQuarterlyStatus.objects.filter(
             client_id = logged_client_id

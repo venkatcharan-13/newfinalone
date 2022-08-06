@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls.static import static
+from django.conf import settings
 
 admin.site.site_header = "JordenSky Admin"
 admin.site.site_title = "JordenSky Admin Portal"
@@ -28,5 +30,9 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('taxes/', include('taxes.urls')),
     path('profile/', include('cprofile.urls')),
-    path('help/', include('help.urls'))
+    path('help/', include('help.urls')),
+    path('upload/', include('upload.urls'))
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

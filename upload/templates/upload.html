@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block current7 %} current {% endblock current7 %}
+{% block title %}Uploads{% endblock title %}
+{% block content %}
+<br>
+<h1>Upload</h1>
+<br>
+<form action="" method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label for="formFileMultiple" class="form-label">Upload your files here</label>
+    <input class="form-control" type="file" id="formFileMultiple" name="uploaded_files" multiple>
+  </div>
+  <br>
+  <input class="btn btn-primary" type="submit" value="Submit">
+</form>
+
+{% endblock content %}
