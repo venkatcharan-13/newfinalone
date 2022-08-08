@@ -30,9 +30,5 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('taxes/', include('taxes.urls')),
     path('profile/', include('cprofile.urls')),
-    path('help/', include('help.urls')),
-    path('upload/', include('upload.urls'))
+    path('help/', include('help.urls'))
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

@@ -1,11 +1,11 @@
 const endpoint = 'api/balsheetData';
-var choosen_month = sessionStorage.getItem("choosen_month") ? sessionStorage.getItem("choosen_month"): "2022-06-30";
+var choosen_month = sessionStorage.getItem("choosen_month") ? sessionStorage.getItem("choosen_month") : "2022-06-30";
 
-$(document).ready(function() {
-  if(sessionStorage.getItem("choosen_month")){
+$(document).ready(function () {
+  if (sessionStorage.getItem("choosen_month")) {
     $('#periodSelector').val(sessionStorage.getItem("choosen_month").substring(0, 7));
   }
-  else{
+  else {
     $('#periodSelector').val("Choose Month");
   }
 });
@@ -36,9 +36,12 @@ $.ajax({
     fillBalsheetRows(response.response_data.other_current_liability, 'ocliab');
     fillBalsheetRows(response.response_data.other_liability, 'othliab');
     fillBalsheetRows(response.response_data.equity, 'equity');
-    document.getElementById('head_equity').innerHTML = response.response_data.total_equity;
-    document.getElementById('head_liabilities').innerHTML = response.response_data.total_liabilities;
-    document.getElementById('head_assets').innerHTML = response.response_data.total_assets;
+    document.getElementById('head_equity').innerHTML = response.response_data.total_equity.current;
+    document.getElementById('head_liabilities').innerHTML = response.response_data.total_liabilities.current;
+    document.getElementById('head_assets').innerHTML = response.response_data.total_assets.current;
+    fillTotalHead(response.response_data.total_assets, 'total_of_assets', 'Total Assets');
+    fillTotalHead(response.response_data.total_liabilities, 'total_of_liabilities', 'Total Liabilities');
+    fillTotalHead(response.response_data.total_equity, 'total_of_equity', 'Total Equity');
   },
   error: function (error_data) {
     console.log("Error2");
@@ -49,7 +52,7 @@ $.ajax({
 function changePeriod(params) {
   var year = params.substring(0, 4);
   var month = params.substring(5, 7);
-  var choosen_period = params + '-' + new Date(year, month, 0).getDate(); 
+  var choosen_period = params + '-' + new Date(year, month, 0).getDate();
   sessionStorage.setItem("choosen_month", choosen_period);
   location.reload();
 }
@@ -65,4 +68,12 @@ function fillBalsheetRows(data, tid) {
       '<td style="width: 20%; text-align:center;">' + object.per_change + '%</td>';
     table.appendChild(tr);
   })
+}
+
+function fillTotalHead(data, tid, head) {
+  var tr = document.getElementById(tid);
+  tr.innerHTML = '<th style="width:40%">' + head + '</th>' +
+    '<th style="width: 20%; text-align:right;">' + data.current + '</th>' +
+    '<th style="width: 20%; text-align:right;">' + data.previous + '</th>' +
+    '<th style="width: 20%; text-align:center;">' + data.per_change + '%</th>';
 }

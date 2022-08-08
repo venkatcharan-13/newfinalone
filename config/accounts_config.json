@@ -1,4 +1,83 @@
 {
+    "cashflow": {
+        "cashflow_from_operating_activities":{
+            "net_income":{
+                "head": "Net Income",
+                "accounts_for_coding": [],
+                "logic": -1
+            },
+            "depreciation_and_amortization":{
+                "head": "Plus: Depreciation and Amortization",
+                "accounts_for_coding": [],
+                "logic": -1
+            },
+            "increase_decrease_sundry_debtors":{
+                "head": "Increase or Decrease in Sundry debtors",
+                "accounts_for_coding": [
+                    "accounts_receivable"
+                ],
+                "logic": 0
+            },
+            "increase_decrease_other_assets":{
+                "head": "Increase or Decrease in Other Assets",
+                "accounts_for_coding": [
+                    "other_current_assets"
+                ],
+                "logic": 0
+            },
+            "increase_decrease_sundry_creditors":{
+                "head": "Increase or Decrease in Sundry creditors",
+                "accounts_for_coding": [
+                    "trade_payables"
+                ],
+                "logic": 1
+            },
+            "increase_decrease_other_liability":{
+                "head": "Increase or Decrease in Other Liability",
+                "accounts_for_coding": [
+                    "other_long_term_liabilities_and_provisions",
+                    "other_liabilities",
+                    "other_current_liabilities_and_provisions"
+                ],
+                "logic": 1
+            }
+        },
+        "cashflow_from_investing_activities":{
+            "investments_property_equipment":{
+                "head": "Investments in Property and Equipment",
+                "accounts_for_coding": [
+                    "tangible_assets"
+                ],
+                "logic": 0
+            },
+            "purchase_sale_investments":{
+                "head": "Purchase or Sale of Investments",
+                "accounts_for_coding": [
+                    "other_non_current_assets"
+                ],
+                "logic": 0
+            }
+        },
+        "cashflow_from_financing_activities":{
+            "issuance_of_debt":{
+                "head": "Issuance (repayment) of debt",
+                "accounts_for_coding": [
+                    "long_term_borrowings",
+                    "short_term_borrowings",
+                    "short_term_loans_and_advances",
+                    "long_term_loans"
+                ],
+                "logic": 1
+            },
+            "issuance_of_equity":{
+                "head": "Issuance (repayment) of equity",
+                "accounts_for_coding": [
+                    "share_capital"
+                ],
+                "logic": 1
+            }
+        }
+    },
     "ratios_info": {
         "gross_profit_margin": {
             "head": "Gross Profit Margin",

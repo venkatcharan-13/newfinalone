@@ -17,7 +17,8 @@ current_period_str, previous_period_str, pre_previous_period_str  = "current_per
 response_data_str, totals_str = "response_data", "totals"
 
 config_file = open("config/accounts_config.json")
-config_data = json.load(config_file)
+cashflow_config_data = json.load(config_file)['cashflow']
+
 # Create your views here.
 
 @login_required()
@@ -46,6 +47,8 @@ def pnl_transaction(request, account):
     response_data, totals, prev_three_months = accounts_util.fetch_pnl_transactions(
         selected_month, logged_client_id, account
     )
+    response_data_modified = accounts_util.convert_to_indian_comma_notation('pnl_trans', response_data)
+    totals_modified = accounts_util.convert_to_indian_comma_notation('totals', totals)
     current_month = prev_three_months[0]
     previous_month = prev_three_months[1]
     pre_previous_month = prev_three_months[2]
@@ -54,8 +57,8 @@ def pnl_transaction(request, account):
         current_period_str: calendar.month_name[current_month.month] + '-' + str(current_month.year)[2:],
         previous_period_str: calendar.month_name[previous_month.month] + '-' + str(previous_month.year)[2:],
         pre_previous_period_str: calendar.month_name[pre_previous_month.month] + '-' + str(pre_previous_month.year)[2:],
-        response_data_str: response_data,
-        totals_str: totals
+        response_data_str: response_data_modified,
+        totals_str: totals_modified
     }
     return render(request, 'pnl_trans.html', context)
 
@@ -63,9 +66,15 @@ def pnl_transaction(request, account):
 @login_required()
 def cashflow_balances(request, activity):
     selected_month = request.GET.get('selected_date')
-    codings_lst = request.GET.getlist('codings')
     logged_client_id = request.user.id
 
+    for dic in cashflow_config_data.values():
+        for val in dic.values():
+            if val['head'] == activity:
+                codings_lst = val['accounts_for_coding']
+                subtraction_logic = val['logic']
+                break
+    
     if selected_month is None:
         selected_month = date(2022, 6, 30)
     else:
@@ -73,8 +82,11 @@ def cashflow_balances(request, activity):
 
     # Fetching balance for each account related to an account for coding
     response_data, totals, two_periods = accounts_util.fetch_cashflow_balances(
-        selected_month, logged_client_id, codings_lst
+        selected_month, logged_client_id, codings_lst, subtraction_logic
     )
+    response_data_modified = accounts_util.convert_to_indian_comma_notation('cashflow_bal', response_data)
+    totals_modified = accounts_util.convert_to_indian_comma_notation('cashflow_totals', totals)
+
     current_month = two_periods[0]
     previous_month = two_periods[1]
 
@@ -82,8 +94,8 @@ def cashflow_balances(request, activity):
         'activity': activity,
         current_period_str: calendar.month_name[current_month.month] + '-' + str(current_month.year)[2:],
         previous_period_str: calendar.month_name[previous_month.month] + '-' + str(previous_month.year)[2:],
-        response_data_str: response_data,
-        totals_str: totals
+        response_data_str: response_data_modified,
+        totals_str: totals_modified
     }
 
     return render(request, 'cashflow_bal.html', context)
@@ -163,18 +175,20 @@ class BalanceSheetData(APIView):
                 "current": current_year_earnings["current"],
                 "previous": current_year_earnings["previous"],
                 "per_change": 0 if current_year_earnings["previous"] == 0 else 
-                    (current_year_earnings["current"]/current_year_earnings["previous"] - 1)*100
+                    round((current_year_earnings["current"]/current_year_earnings["previous"] - 1)*100)
             },
             {
                 "account_header": "Retained Earnings",
                 "current": retained_earnings["current"],
                 "previous": retained_earnings["previous"],
                 "per_change": 0 if retained_earnings["previous"] == 0 else 
-                    (retained_earnings["current"]/retained_earnings["previous"] - 1)*100
+                    round((retained_earnings["current"]/retained_earnings["previous"] - 1)*100)
             }
         ])
         
-        bal_sheet_data['total_equity'] += (current_year_earnings["current"] + retained_earnings["current"])
+        bal_sheet_data['total_equity']['current'] += (current_year_earnings["current"] + retained_earnings["current"])
+        bal_sheet_data['total_equity']['previous'] += (current_year_earnings["previous"] + retained_earnings["previous"])
+        bal_sheet_data['total_equity']['per_change'] = round((bal_sheet_data['total_equity']['current']/bal_sheet_data['total_equity']['previous']-1)*100)
 
         bal_sheet_data_response = {}
         bal_sheet_data_response[current_period_str] = calendar.month_name[current_month] + '-' + str(current_month_year)[2:]

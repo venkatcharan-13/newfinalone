@@ -45,15 +45,14 @@ def convert_to_indian_comma_notation(table, response_data):
             if key == 'data':
                 for acc in income_obj['data']:
                     acc[current_str] = locale.format(
-                    "%d", acc[current_str], grouping=True)
+                    "%.2f", acc[current_str], grouping=True)
                     acc[previous_str] = locale.format(
-                        "%d", acc[previous_str], grouping=True)
-                    acc[per_change_str] = change_percentage(acc[per_change_str])
+                        "%.2f", acc[previous_str], grouping=True)
                     acc[three_month_avg_str] = locale.format(
-                        "%d", acc[three_month_avg_str], grouping=True)
-            else:
+                        "%.2f", acc[three_month_avg_str], grouping=True)
+            elif key in (current_str, previous_str, three_month_avg_str):
                 income_obj[key] = locale.format(
-                    "%d", income_obj[key], grouping=True)
+                    "%.2f", income_obj[key], grouping=True)
         
         expense_obj = response_data['expense']
         for category in expense_obj:
@@ -62,32 +61,24 @@ def convert_to_indian_comma_notation(table, response_data):
                 if key == 'data':
                     for acc in dic['data']:
                         acc[current_str] = locale.format(
-                        "%d", acc[current_str], grouping=True)
+                        "%.2f", acc[current_str], grouping=True)
                         acc[previous_str] = locale.format(
-                            "%d", acc[previous_str], grouping=True)
-                        acc[per_change_str] = change_percentage(acc[per_change_str])
+                            "%.2f", acc[previous_str], grouping=True)
                         acc[three_month_avg_str] = locale.format(
-                            "%d", acc[three_month_avg_str], grouping=True)
-                else:
-                    if key in (curr_per_str, prev_per_str):
-                        dic[key] = change_percentage(dic[key])
-                    else:
-                        dic[key] = locale.format(
-                            "%d", dic[key], grouping=True)
+                            "%.2f", acc[three_month_avg_str], grouping=True)
+                elif key in (current_str, previous_str, three_month_avg_str):
+                    dic[key] = locale.format(
+                    "%.2f", dic[key], grouping=True)
         
         for object in response_data:
             content = response_data[object]
             if object not in ('income', 'expense'):
                 content[current_str] = locale.format(
-                    "%d", content[current_str], grouping=True)
+                    "%.2f", content[current_str], grouping=True)
                 content[previous_str] = locale.format(
-                    "%d", content[previous_str], grouping=True)
-                content[per_change_str] = change_percentage(content[per_change_str])
-                if curr_per_str in content:
-                    content[curr_per_str] = change_percentage(content[curr_per_str])
-                    content[prev_per_str] = change_percentage(content[prev_per_str])
+                    "%.2f", content[previous_str], grouping=True)
                 content[three_month_avg_str] = locale.format(
-                    "%d", content[three_month_avg_str], grouping=True)
+                    "%.2f", content[three_month_avg_str], grouping=True)
 
     elif table == 'balsheet':
         for acc_type in response_data:
@@ -95,29 +86,52 @@ def convert_to_indian_comma_notation(table, response_data):
             if type(obj) == list:
                 for acc in obj:
                     acc[current_str] = locale.format(
-                        "%d", acc[current_str], grouping=True)
+                        "%.2f", acc[current_str], grouping=True)
                     acc[previous_str] = locale.format(
-                        "%d", acc[previous_str], grouping=True)
-                    acc[per_change_str] = change_percentage(acc[per_change_str])
-                    if three_month_avg_str in acc:
-                        acc[three_month_avg_str] = locale.format(
-                            "%d", acc[three_month_avg_str], grouping=True)
+                        "%.2f", acc[previous_str], grouping=True)
             else:
-                response_data[acc_type] = locale.format("%d", response_data[acc_type], grouping=True)
+                response_data[acc_type][current_str] = locale.format("%.2f", response_data[acc_type][current_str], grouping=True)
+                response_data[acc_type][previous_str] = locale.format("%.2f", response_data[acc_type][previous_str], grouping=True)
 
     elif table == 'cashflow':
         for head in response_data:
             obj = response_data[head]
             if type(obj) == dict:
-                obj[current_str] = locale.format("%d", obj[current_str], grouping=True)
-                obj[previous_str] = locale.format("%d", obj[previous_str], grouping=True)
+                obj[current_str] = locale.format("%.2f", obj[current_str], grouping=True)
+                obj[previous_str] = locale.format("%.2f", obj[previous_str], grouping=True)
                 obj[per_change_str] = change_percentage(obj[per_change_str])
             else:
                 for activity in obj:
-                    activity[current_str] = locale.format("%d", activity[current_str], grouping=True)
-                    activity[previous_str] = locale.format("%d", activity[previous_str], grouping=True)
+                    activity[current_str] = locale.format("%.2f", activity[current_str], grouping=True)
+                    activity[previous_str] = locale.format("%.2f", activity[previous_str], grouping=True)
                     activity[per_change_str] = change_percentage(activity[per_change_str])
+    
+    elif table == 'pnl_trans':
+        for key in response_data:
+            trans_obj = response_data[key]
+            trans_obj[current_str] = locale.format("%.2f", trans_obj[current_str], grouping=True)
+            trans_obj[previous_str] = locale.format("%.2f", trans_obj[previous_str], grouping=True)
+            trans_obj[pre_prev_str] = locale.format("%.2f", trans_obj[pre_prev_str], grouping=True)
+            trans_obj[three_month_avg_str] = locale.format("%.2f", trans_obj[three_month_avg_str], grouping=True)
+    
+    elif table == 'pnl_totals':
+        response_data[current_str] = locale.format("%.2f", response_data[current_str], grouping=True)
+        response_data[previous_str] = locale.format("%.2f", response_data[previous_str], grouping=True)
+        response_data[pre_prev_str] = locale.format("%.2f", response_data[pre_prev_str], grouping=True)
+        response_data[three_month_avg_str] = locale.format("%.2f", response_data[three_month_avg_str], grouping=True)
 
+    elif table == 'cashflow_bal':
+        for key in response_data:
+            trans_obj = response_data[key]
+            trans_obj[current_str] = locale.format("%.2f", trans_obj[current_str], grouping=True)
+            trans_obj[previous_str] = locale.format("%.2f", trans_obj[previous_str], grouping=True)
+            trans_obj[change_str] = locale.format("%.2f", trans_obj[change_str], grouping=True)
+
+    elif table == 'cashflow_totals':
+        response_data[current_str] = locale.format("%.2f", response_data[current_str], grouping=True)
+        response_data[previous_str] = locale.format("%.2f", response_data[previous_str], grouping=True)
+        response_data[change_str] = locale.format("%.2f", response_data[change_str], grouping=True)
+    
     return response_data
 
 
@@ -192,10 +206,7 @@ def fetch_pnl_transactions(period, client_id, account):
         obj[prev_per_change_str] = 0 if obj[pre_prev_str] == 0 \
             else change_percentage((obj[previous_str]/obj[pre_prev_str]-1)*100, trans_flag=True)
 
-        obj[three_month_avg_str] = round(obj[three_month_avg_str]/3)
-        obj[current_str] = round(obj[current_str])
-        obj[previous_str] = round(obj[previous_str])
-        obj[pre_prev_str] = round(obj[pre_prev_str])
+        obj[three_month_avg_str] = obj[three_month_avg_str]/3
         total[current_str] += obj[current_str]
         total[previous_str] += obj[previous_str]
         total[pre_prev_str] += obj[pre_prev_str]
@@ -249,7 +260,7 @@ def get_accounts_from_account_for_coding(acc_for_codings):
     return related_account_ids_lst
 
 
-def fetch_cashflow_balances(period, client_id, codings_list):
+def fetch_cashflow_balances(period, client_id, codings_list, sub_logic):
     accounts_according_to_coding = ZohoAccount.objects.filter(
         client_id=client_id,
         account_for_coding__in=codings_list
@@ -300,7 +311,10 @@ def fetch_cashflow_balances(period, client_id, codings_list):
                     previous_period_total += amount
                 current_period_total += amount
         
-        response_data[account_name][change_str] = previous_period_total - current_period_total
+        if sub_logic == 0:
+            response_data[account_name][change_str] = previous_period_total - current_period_total
+        else:
+            response_data[account_name][change_str] = current_period_total - previous_period_total
         response_data[account_name][current_str] = current_period_total
         response_data[account_name][previous_str] = previous_period_total
 
@@ -316,9 +330,6 @@ def fetch_cashflow_balances(period, client_id, codings_list):
     for k in response_data:
         obj = response_data[k]
         
-        obj[current_str] = round(obj[current_str])
-        obj[previous_str] = round(obj[previous_str])
-        obj[change_str] = round(obj[change_str])
         total[current_str] += obj[current_str]
         total[previous_str] += obj[previous_str]
         total[change_str] += obj[change_str]

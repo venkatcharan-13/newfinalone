@@ -33,7 +33,6 @@ INSTALLED_APPS = [
     'taxes.apps.TaxesConfig',
     'cprofile.apps.CprofileConfig',
     'help.apps.HelpConfig',
-    'upload.apps.UploadConfig',
     'rest_framework',
     'phonenumber_field',
 ]
@@ -134,8 +133,9 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_ROOT = BASE_DIR  / "uploaded"
-MEDIA_URL = '/uploaded/'
+# Add Media root URL
+# MEDIA_ROOT = BASE_DIR  / "uploaded"
+# MEDIA_URL = '/uploaded/'
 
 
 # Login redirect URL
