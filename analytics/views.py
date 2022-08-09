@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from utility import analytics_util, insights_util
+from utility import analytics_util, insights_util, accounts_util
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 
@@ -35,13 +35,16 @@ def insight_transactions(request, expense):
     response_data, totals, prev_three_months = insights_util.fetch_insights_transaction(
         selected_month, logged_client_id, expense
     )
+    response_data_modified = accounts_util.convert_to_indian_comma_notation('insights_trans', response_data)
+    totals_modified = accounts_util.convert_to_indian_comma_notation('insights_totals', totals)
+
     current_month = prev_three_months[0]
     previous_month = prev_three_months[1]
     context = {
         'expense_head': expense,
         current_period_str: calendar.month_name[current_month.month] + '-' + str(current_month.year)[2:],
         previous_period_str: calendar.month_name[previous_month.month] + '-' + str(previous_month.year)[2:],
-        response_data_str: response_data,
+        response_data_str: response_data_modified,
         totals_str: totals
     }
 

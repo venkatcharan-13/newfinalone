@@ -683,11 +683,11 @@ def get_pnl_summary(client_id, current_date):
                     cogs += debit_minus_credit
                 if accounts_map[transaction.account_id] in ('expense', 'other_expense'):
                     expenses += debit_minus_credit
-        pnl_summary['Income'][i] = locale.format("%d", income, grouping=True)
-        pnl_summary['Cost of Goods Sold'][i] = locale.format("%d", cogs, grouping=True)
-        pnl_summary['Expenses'][i] = locale.format("%d", expenses, grouping=True)
-        pnl_summary['Gross profit'][i] = locale.format("%d", income-cogs, grouping=True)
-        pnl_summary['Net Profit'][i]  = locale.format("%d", income-cogs-expenses, grouping=True)
+        pnl_summary['Income'][i] = locale.format("%.2f", income, grouping=True)
+        pnl_summary['Cost of Goods Sold'][i] = locale.format("%.2f", cogs, grouping=True)
+        pnl_summary['Expenses'][i] = locale.format("%.2f", expenses, grouping=True)
+        pnl_summary['Gross profit'][i] = locale.format("%.2f", income-cogs, grouping=True)
+        pnl_summary['Net Profit'][i]  = locale.format("%.2f", income-cogs-expenses, grouping=True)
     
     return pnl_summary
 
@@ -799,9 +799,9 @@ def get_balance_sheet_summary(client_id, current_date):
         retained_earnings[i] = ret_income[i] - ret_cogs[i] - ret_expenses[i]
         equity = equity + current_year_earnings[i] + retained_earnings[i]
 
-        balance_sheet_summary['Assets'][i] = locale.format("%d", assets, grouping=True)
-        balance_sheet_summary['Liabilities'][i] = locale.format("%d", liabilities, grouping=True)
-        balance_sheet_summary['Equity'][i] = locale.format("%d", equity, grouping=True)
+        balance_sheet_summary['Assets'][i] = locale.format("%.2f", assets, grouping=True)
+        balance_sheet_summary['Liabilities'][i] = locale.format("%.2f", liabilities, grouping=True)
+        balance_sheet_summary['Equity'][i] = locale.format("%.2f", equity, grouping=True)
 
     
     return balance_sheet_summary
@@ -834,8 +834,8 @@ def get_cashflow_summary(client_id, current_date):
         cashflow_summary['months'][i] = calendar.month_name[month][:3] + '-' + str(year % 100)
 
     for key in monthly_cashflow_data:
-        cashflow_summary['Cashflow from Operations'].append(locale.format("%d", monthly_cashflow_data[key]['cf_from_operations'], grouping=True))
-        cashflow_summary['Cashflow from Investing'].append(locale.format("%d", monthly_cashflow_data[key]['cf_from_investing'], grouping=True))
-        cashflow_summary['Cashflow from Financing'].append(locale.format("%d", monthly_cashflow_data[key]['cf_from_financing'], grouping=True))
+        cashflow_summary['Cashflow from Operations'].append(locale.format("%.2f", monthly_cashflow_data[key]['cf_from_operations'], grouping=True))
+        cashflow_summary['Cashflow from Investing'].append(locale.format("%.2f", monthly_cashflow_data[key]['cf_from_investing'], grouping=True))
+        cashflow_summary['Cashflow from Financing'].append(locale.format("%.2f", monthly_cashflow_data[key]['cf_from_financing'], grouping=True))
 
     return cashflow_summary

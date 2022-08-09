@@ -69,10 +69,10 @@ def get_insights(client_id, current_period):
                 temporary_storage['three_month_avg'] += debit_minus_credit
 
         temporary_storage['per_change'] = 0 if temporary_storage['previous'] == 0 else round((temporary_storage['current']/temporary_storage['previous']-1)*100)
-        temporary_storage['three_month_avg'] = locale.format("%d", temporary_storage['three_month_avg'] / 3, grouping=True)
-        temporary_storage['change'] = locale.format("%d", temporary_storage['current'] -  temporary_storage['previous'], grouping=True)
-        temporary_storage['current'] = locale.format("%d", temporary_storage['current'], grouping=True)
-        temporary_storage['previous'] = locale.format("%d", temporary_storage['previous'], grouping=True)
+        temporary_storage['three_month_avg'] = locale.format("%.2f", temporary_storage['three_month_avg'] / 3, grouping=True)
+        temporary_storage['change'] = locale.format("%.2f", temporary_storage['current'] -  temporary_storage['previous'], grouping=True)
+        temporary_storage['current'] = locale.format("%.2f", temporary_storage['current'], grouping=True)
+        temporary_storage['previous'] = locale.format("%.2f", temporary_storage['previous'], grouping=True)
         parent_summary[expense_head] = temporary_storage
 
     current_month_payees = {}
@@ -108,7 +108,7 @@ def get_insights(client_id, current_period):
                     insights_data[key].append(
                         {
                             'payee': k,
-                            'additional': locale.format("%d", new_amount, grouping=True)
+                            'additional': locale.format("%.2f", new_amount, grouping=True)
                         }
                     )
             else:
@@ -117,7 +117,7 @@ def get_insights(client_id, current_period):
                     insights_data[key].append(
                         {
                             'payee': k,
-                            'additional': locale.format("%d", curr_dic[k] - prev_dic[k], grouping=True)
+                            'additional': locale.format("%.2f", curr_dic[k] - prev_dic[k], grouping=True)
                         }
                     )
 
@@ -195,9 +195,9 @@ def fetch_insights_transaction(period, client_id, exp_head):
 
         obj[per_change_str] = 0 if obj[previous_str] == 0 \
             else accounts_util.change_percentage((obj[current_str]/obj[previous_str]-1)*100, trans_flag=True)
-        obj[three_month_avg_str] = round(obj[three_month_avg_str]/3)
-        obj[current_str] = round(obj[current_str])
-        obj[previous_str] = round(obj[previous_str])
+        obj[three_month_avg_str] = obj[three_month_avg_str]/3
+        obj[current_str] = obj[current_str]
+        obj[previous_str] = obj[previous_str]
         total[current_str] += obj[current_str]
         total[previous_str] += obj[previous_str]
     
@@ -281,7 +281,7 @@ def get_deep_insight_one(client_id, current_period):
                 'account_name': key[1],
                 'payee': key[0],
                 'date': dt,
-                'amount': locale.format("%d",  datewise_transactions[dt][key], grouping=True)
+                'amount': locale.format("%.2f",  datewise_transactions[dt][key], grouping=True)
             }
         deep_insight_one_data.append(cash_expense)
     
@@ -315,7 +315,7 @@ def get_deep_insight_two(client_id, current_period):
     for key in loan_map:
         deep_insight_two_data.append({
             'account_name': accounts_map[key],
-            'amount': locale.format("%d", loan_map[key], grouping=True)
+            'amount': locale.format("%.2f", loan_map[key], grouping=True)
         })
     return deep_insight_two_data
 
@@ -404,8 +404,8 @@ def get_deep_insight_four(client_id, current_period):
                 temporary_storage['current']/temporary_storage['previous'] - 1) * 100)
 
         if temporary_storage['current'] > 10000 and temporary_storage['per_change'] >= 25:
-            temporary_storage['current'] = locale.format("%d", temporary_storage['current'], grouping=True)
-            temporary_storage['previous'] = locale.format("%d", temporary_storage['previous'], grouping=True)
+            temporary_storage['current'] = locale.format("%.2f", temporary_storage['current'], grouping=True)
+            temporary_storage['previous'] = locale.format("%.2f", temporary_storage['previous'], grouping=True)
             deep_insight_four_data.append(temporary_storage)
 
 
@@ -473,7 +473,7 @@ def get_deep_insight_five(client_id, current_period):
         if amount < 0:
             deep_insight_five_data.append({
                 'account_name': key,
-                'amount': locale.format("%d", amount, grouping=True)
+                'amount': locale.format("%.2f", amount, grouping=True)
             })
     
     for key in liability_wise_transactions:
@@ -481,7 +481,7 @@ def get_deep_insight_five(client_id, current_period):
         if amount < 0:
             deep_insight_five_data.append({
                 'account_name': key,
-                'amount': locale.format("%d", amount, grouping=True)
+                'amount': locale.format("%.2f", amount, grouping=True)
             })
 
     return deep_insight_five_data
@@ -525,7 +525,7 @@ def get_deep_insight_six(client_id, current_period):
             deep_insight_six_data.append({
                 'account_name': 'Acounts Receivable',
                 'payee': key,
-                'amount': locale.format("%d", temporary_storage_acc_rec[key], grouping=True)
+                'amount': locale.format("%.2f", temporary_storage_acc_rec[key], grouping=True)
             })
     
     for key in temporary_storage_acc_pay:
@@ -533,7 +533,7 @@ def get_deep_insight_six(client_id, current_period):
             deep_insight_six_data.append({
                 'account_name': 'Acounts Payable',
                 'payee': key,
-                'amount': locale.format("%d", temporary_storage_acc_pay[key], grouping=True)
+                'amount': locale.format("%.2f", temporary_storage_acc_pay[key], grouping=True)
             })
     
     return deep_insight_six_data

@@ -24,13 +24,48 @@ json_structure = {
         'cash': [],
         'bank': [],
         'equity': [],
-        'fixed_asset': [],
-        'long_term_liability': [],
-        'other_asset': [],
-        'other_current_asset': [],
-        'other_current_liability': [],
-        'other_liability': [],
-        'stock': [],
+        'fixed_asset': {
+            'current_total': 0,
+            'previous_total': 0,
+            'overall_change': 0,
+            'data': []
+        },
+        'long_term_liability': {
+            'current_total': 0,
+            'previous_total': 0,
+            'overall_change': 0,
+            'data': []
+        },
+        'other_asset': {
+            'current_total': 0,
+            'previous_total': 0,
+            'overall_change': 0,
+            'data': []
+        },
+        'other_current_asset': {
+            'current_total': 0,
+            'previous_total': 0,
+            'overall_change': 0,
+            'data': []
+        },
+        'other_current_liability': {
+            'current_total': 0,
+            'previous_total': 0,
+            'overall_change': 0,
+            'data': []
+        },
+        'other_liability': {
+            'current_total': 0,
+            'previous_total': 0,
+            'overall_change': 0,
+            'data': []
+        },
+        'stock': {
+            'current_total': 0,
+            'previous_total': 0,
+            'overall_change': 0,
+            'data': []
+        },
         'total_assets': 0,
         'total_liabilities': 0,
         'total_equity': 0

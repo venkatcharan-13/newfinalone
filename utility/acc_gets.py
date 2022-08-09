@@ -356,10 +356,27 @@ def get_balsheet(period, logged_client_id):
             temporary_storage[per_change_str] = round((
                 temporary_storage[current_str]/temporary_storage[previous_str] - 1) * 100)
 
-        bal_sheet_data[account_header[0]].append(temporary_storage)
+        if account_header[0] in ( 'accounts_payable', 'accounts_receivable', 'cash', 'bank', 'equity'):
+            bal_sheet_data[account_header[0]].append(temporary_storage)
+        else:
+            bal_sheet_data[account_header[0]]['data'].append(temporary_storage)
 
     bal_sheet_data['total_assets'] = {current_str: 0, previous_str: 0}
-    for k in ('accounts_receivable', 'fixed_asset', 'other_asset', 'other_current_asset', 'stock', 'cash', 'bank'):
+    for k in ('fixed_asset', 'other_asset', 'other_current_asset', 'stock'):
+        for acc in bal_sheet_data[k]['data']:
+            acc[current_str] = -acc[current_str]
+            acc[previous_str] = -acc[previous_str]
+            bal_sheet_data[k]['current_total'] += acc[current_str]
+            bal_sheet_data[k]['previous_total'] += acc[previous_str]
+            bal_sheet_data['total_assets'][current_str] += acc[current_str]
+            bal_sheet_data['total_assets'][previous_str] += acc[previous_str]
+        bal_sheet_data[k]['overall_change'] = 0 if bal_sheet_data[k]['previous_total'] == 0 else round(
+            (bal_sheet_data[k]['current_total']/bal_sheet_data[k]['previous_total']-1)*100
+        )
+    bal_sheet_data['total_assets'][per_change_str] = round(
+        (bal_sheet_data['total_assets'][current_str]/bal_sheet_data['total_assets'][previous_str]-1)*100)
+
+    for k in ('accounts_receivable', 'cash', 'bank'):
         for acc in bal_sheet_data[k]:
             acc[current_str] = -acc[current_str]
             acc[previous_str] = -acc[previous_str]
@@ -369,8 +386,19 @@ def get_balsheet(period, logged_client_id):
         (bal_sheet_data['total_assets'][current_str]/bal_sheet_data['total_assets'][previous_str]-1)*100)
 
     bal_sheet_data['total_liabilities'] = {current_str: 0, previous_str: 0}
-    for k in ('accounts_payable', 'long_term_liability', 'other_current_liability', 'other_liability'):
-        for acc in bal_sheet_data[k]:
+    for k in ('long_term_liability', 'other_current_liability', 'other_liability'):
+        for acc in bal_sheet_data[k]['data']:
+            bal_sheet_data[k]['current_total'] += acc[current_str]
+            bal_sheet_data[k]['previous_total'] += acc[previous_str]
+            bal_sheet_data['total_liabilities'][current_str] += acc[current_str]
+            bal_sheet_data['total_liabilities'][previous_str] += acc[previous_str]
+        bal_sheet_data[k]['overall_change'] = 0 if bal_sheet_data[k]['previous_total'] == 0 else round(
+            (bal_sheet_data[k]['current_total']/bal_sheet_data[k]['previous_total']-1)*100
+        )
+    bal_sheet_data['total_liabilities'][per_change_str] = round(
+        (bal_sheet_data['total_liabilities'][current_str]/bal_sheet_data['total_liabilities'][previous_str]-1)*100)
+    
+    for acc in bal_sheet_data['accounts_payable']:
             bal_sheet_data['total_liabilities'][current_str] += acc[current_str]
             bal_sheet_data['total_liabilities'][previous_str] += acc[previous_str]
     bal_sheet_data['total_liabilities'][per_change_str] = round(
@@ -695,23 +723,22 @@ def get_ratios(period, logged_client_id):
 
     ratios_data = {}
     ratio_head, ratio_info, ideal_ratio, ratio_format = "ratio_head", "ratio_info", "ideal_ratio", "ratio_format"
-    current, previous, three_month_avg = "current", "previous", "three_month_avg"
     action_str = "action_to_be_taken"
 
     gross_profit = pnl_data['gross_profit']
     ratios_data['gross_profit'] = {
-        current: locale.format("%.2f", gross_profit[current], grouping=True),
-        previous: locale.format("%.2f", gross_profit[previous], grouping=True),
-        three_month_avg: locale.format(
-            "%.2f", gross_profit[three_month_avg], grouping=True)
+        current_str: locale.format("%.2f", gross_profit[current_str], grouping=True),
+        previous_str: locale.format("%.2f", gross_profit[previous_str], grouping=True),
+        three_month_avg_str: locale.format(
+            "%.2f", gross_profit[three_month_avg_str], grouping=True)
     }
 
     pbt = pnl_data['pbt']
     ratios_data['pbt'] = {
-        current: locale.format("%.2f", pbt[current], grouping=True),
-        previous: locale.format("%.2f", pbt[previous], grouping=True),
-        three_month_avg:  locale.format(
-            "%.2f", pbt[three_month_avg], grouping=True)
+        current_str: locale.format("%.2f", pbt[current_str], grouping=True),
+        previous_str: locale.format("%.2f", pbt[previous_str], grouping=True),
+        three_month_avg_str: locale.format(
+            "%.2f", pbt[three_month_avg_str], grouping=True)
     }
 
     ratios_data['profit_ratios'] = []
@@ -725,10 +752,10 @@ def get_ratios(period, logged_client_id):
         ideal_ratio: ratio_config_data['gross_profit_margin']['ideal'],
         action_str: action['gross_profit_margin'] if 'gross_profit_margin' in action else '',
         ratio_format: "%",
-        current: 0 if income[current] == 0 else round(gross_profit[current]/income[current]*100),
-        previous: 0 if income[previous] == 0 else round(gross_profit[previous]/income[previous]*100),
-        three_month_avg: 0 if income[three_month_avg] == 0 else round(
-            gross_profit[three_month_avg]/income[three_month_avg]*100)
+        current_str: 0 if income[current_str] == 0 else round(gross_profit[current_str]/income[current_str]*100),
+        previous_str: 0 if income[previous_str] == 0 else round(gross_profit[previous_str]/income[previous_str]*100),
+        three_month_avg_str: 0 if income[three_month_avg_str] == 0 else round(
+            gross_profit[three_month_avg_str]/income[three_month_avg_str]*100)
     }
     ratios_data['profit_ratios'].append(temporary_storage)
 
@@ -738,10 +765,10 @@ def get_ratios(period, logged_client_id):
         ideal_ratio: ratio_config_data['net_profit_margin']['ideal'],
         action_str: action['net_profit_margin'] if 'net_profit_margin' in action else '',
         ratio_format: "%",
-        current: 0 if income[current] == 0 else round(pbt[current]/income[current]*100),
-        previous: 0 if income[previous] == 0 else round(pbt[previous]/income[previous]*100),
-        three_month_avg: 0 if income[three_month_avg] == 0 else round(
-            pbt[three_month_avg]/income[three_month_avg]*100)
+        current_str: 0 if income[current_str] == 0 else round(pbt[current_str]/income[current_str]*100),
+        previous_str: 0 if income[previous_str] == 0 else round(pbt[previous_str]/income[previous_str]*100),
+        three_month_avg_str: 0 if income[three_month_avg_str] == 0 else round(
+            pbt[three_month_avg_str]/income[three_month_avg_str]*100)
     }
     ratios_data['profit_ratios'].append(temporary_storage)
 
@@ -763,10 +790,10 @@ def get_ratios(period, logged_client_id):
         ideal_ratio: ratio_config_data['return_on_equity']['ideal'],
         action_str: action['return_on_equity'] if 'return_on_equity' in action else '',
         ratio_format: "%",
-        current: 0 if equity[current] == 0 else round(pbt[current]/equity[current]*100),
-        previous: 0 if equity[previous] == 0 else round(pbt[previous]/equity[previous]*100),
-        three_month_avg: 0 if equity[three_month_avg] == 0 else round(
-            pbt[three_month_avg]/equity[three_month_avg]*100)
+        current_str: 0 if equity[current_str] == 0 else round(pbt[current_str]/equity[current_str]*100),
+        previous_str: 0 if equity[previous_str] == 0 else round(pbt[previous_str]/equity[previous_str]*100),
+        three_month_avg_str: 0 if equity[three_month_avg_str] == 0 else round(
+            pbt[three_month_avg_str]/equity[three_month_avg_str]*100)
     }
     ratios_data['profit_ratios'].append(temporary_storage)
 
@@ -777,9 +804,9 @@ def get_ratios(period, logged_client_id):
         ideal_ratio: ratio_config_data['cashflow_to_sales_ratio']['ideal'],
         action_str: action['cashflow_to_sales_ratio'] if 'cashflow_to_sales_ratio' in action else '',
         ratio_format: "%",
-        current: 0 if income[current] == 0 else round(cf_operations[current]/income[current]*100),
-        previous: 0 if income[previous] == 0 else round(cf_operations[previous]/income[previous]*100),
-        three_month_avg: 0
+        current_str: 0 if income[current_str] == 0 else round(cf_operations[current_str]/income[current_str]*100),
+        previous_str: 0 if income[previous_str] == 0 else round(cf_operations[previous_str]/income[previous_str]*100),
+        three_month_avg_str: 0
     }
     ratios_data['profit_ratios'].append(temporary_storage)
 
@@ -821,17 +848,12 @@ def get_ratios(period, logged_client_id):
             "three_month_avg": 0
         }
 
+    ocurra = {current_str: 0, previous_str: 0, three_month_avg_str: 0}
     if balsheet_data['other_current_asset']:
-        ocurra = balsheet_data['other_current_asset'][0]
-    else:
-        ocurra = {
-            "account_header": "Other Current Assets",
-            "current": 0,
-            "previous": 0,
-            "pre_prev": 0,
-            "per_change": 0,
-            "three_month_avg": 0
-        }
+        for account in balsheet_data['other_current_liability']['data']:
+            ocurra[current_str] += account[current_str]
+            ocurra[previous_str] += account[previous_str]
+            ocurra[three_month_avg_str] += account[three_month_avg_str]
 
     if balsheet_data['accounts_payable']:
         accpay = balsheet_data['accounts_payable'][0]
@@ -845,11 +867,11 @@ def get_ratios(period, logged_client_id):
             "three_month_avg": 0
         }
 
-    ocurrl = {current: 0, previous: 0, three_month_avg: 0}
-    for account in balsheet_data['other_current_liability']:
-        ocurrl[current] += account[current]
-        ocurrl[previous] += account[previous]
-        ocurrl[three_month_avg] += account[three_month_avg]
+    ocurrl = {current_str: 0, previous_str: 0, three_month_avg_str: 0}
+    for account in balsheet_data['other_current_liability']['data']:
+        ocurrl[current_str] += account[current_str]
+        ocurrl[previous_str] += account[previous_str]
+        ocurrl[three_month_avg_str] += account[three_month_avg_str]
 
     temporary_storage = {
         ratio_head: ratio_config_data['working_capital_current_ratio']['head'],
@@ -857,25 +879,25 @@ def get_ratios(period, logged_client_id):
         ideal_ratio: ratio_config_data['working_capital_current_ratio']['ideal'],
         action_str: action['working_capital_current_ratio'] if 'working_capital_current_ratio' in action else '',
         ratio_format: "x",
-        current: 0 if (accpay[current]+ocurrl[current]) == 0 else (accrec[current]+cash[current]+bank[current]+ocurra[current])/(accpay[current]+ocurrl[current]),
-        previous: 0 if (accpay[previous]+ocurrl[previous]) == 0 else (accrec[previous]+cash[previous]+bank[previous]+ocurra[previous])/(accpay[previous]+ocurrl[previous]),
-        three_month_avg: 0 if (accpay[three_month_avg]+ocurrl[three_month_avg]) == 0 else (accrec[three_month_avg] +
-                                                                                           cash[three_month_avg]+bank[three_month_avg]+ocurra[three_month_avg])/(accpay[three_month_avg]+ocurrl[three_month_avg])
+        current_str: 0 if (accpay[current_str]+ocurrl[current_str]) == 0 else (accrec[current_str]+cash[current_str]+bank[current_str]+ocurra[current_str])/(accpay[current_str]+ocurrl[current_str]),
+        previous_str: 0 if (accpay[previous_str]+ocurrl[previous_str]) == 0 else (accrec[previous_str]+cash[previous_str]+bank[previous_str]+ocurra[previous_str])/(accpay[previous_str]+ocurrl[previous_str]),
+        three_month_avg_str: 0 if (accpay[three_month_avg_str]+ocurrl[three_month_avg_str]) == 0 else (accrec[three_month_avg_str] +
+                                                                                           cash[three_month_avg_str]+bank[three_month_avg_str]+ocurra[three_month_avg_str])/(accpay[three_month_avg_str]+ocurrl[three_month_avg_str])
     }
     ratios_data['liquidity_ratio'].append(temporary_storage)
 
-    for account in balsheet_data['other_current_liability']:
+    for account in balsheet_data['other_current_liability']['data']:
         if account['account_header'] == 'Short-term borrowings':
             st_borrow = copy.deepcopy(account)
             break
     else:
-        st_borrow = {current: 0, previous: 0, three_month_avg: 0}
-    for account in balsheet_data['long_term_liability']:
+        st_borrow = {current_str: 0, previous_str: 0, three_month_avg_str: 0}
+    for account in balsheet_data['long_term_liability']['data']:
         if account['account_header'] == 'Long Term Borrowing':
             lt_borrow = copy.deepcopy(account)
             break
     else:
-        lt_borrow = {current: 0, previous: 0, three_month_avg: 0}
+        lt_borrow = {current_str: 0, previous_str: 0, three_month_avg_str: 0}
 
     temporary_storage = {
         ratio_head: ratio_config_data['cashflow_to_debt_ratio']['head'],
@@ -883,9 +905,9 @@ def get_ratios(period, logged_client_id):
         ideal_ratio: ratio_config_data['cashflow_to_debt_ratio']['ideal'],
         action_str: action['cashflow_to_debt_ratio'] if 'cashflow_to_debt_ratio' in action else '',
         ratio_format: "x",
-        current: 0 if (st_borrow[current] + lt_borrow[current]) == 0 else cf_operations[current]/(st_borrow[current] + lt_borrow[current]),
-        previous: 0 if (st_borrow[current] + lt_borrow[current]) == 0 else cf_operations[previous]/(st_borrow[previous] + lt_borrow[previous]),
-        three_month_avg: 0
+        current_str: 0 if (st_borrow[current_str] + lt_borrow[current_str]) == 0 else cf_operations[current_str]/(st_borrow[current_str] + lt_borrow[current_str]),
+        previous_str: 0 if (st_borrow[current_str] + lt_borrow[current_str]) == 0 else cf_operations[previous_str]/(st_borrow[previous_str] + lt_borrow[previous_str]),
+        three_month_avg_str: 0
     }
 
     ratios_data['liquidity_ratio'].append(temporary_storage)
@@ -896,14 +918,18 @@ def get_ratios(period, logged_client_id):
         cogs = pnl_data['cost_of_goods_sold']
     else:
         cogs = {
-            current: 0, previous: 0, 'pre_prev': 0, three_month_avg: 0
+            current_str: 0, previous_str: 0, pre_prev_str: 0, three_month_avg_str: 0
         }
 
-    if balsheet_data['stock']:
-        inventory = balsheet_data['stock']
+    inventory = {current_str: 0, previous_str: 0, pre_prev_str: 0, three_month_avg_str: 0}
+    if balsheet_data['stock']['data']:
+        for acc in balsheet_data['stock']['data']:
+            inventory[current_str] += acc[current_str]
+
+        inventory = balsheet_data['stock']['data']
     else:
         inventory = {
-            current: 0, previous: 0, 'pre_prev': 0, three_month_avg: 0
+            current_str: 0, previous_str: 0, pre_prev_str: 0, three_month_avg_str: 0
         }
 
     temporary_storage = {
@@ -912,10 +938,10 @@ def get_ratios(period, logged_client_id):
         ideal_ratio: ratio_config_data['inventory_turnover']['ideal'],
         action_str: action['inventory_turnover'] if 'inventory_turnover' in action else '',
         ratio_format: "x",
-        current: 0 if (inventory[current] + inventory[previous]) == 0 else cogs[current]/(inventory[current] + inventory[previous]) * 2,
-        previous: 0 if (inventory[previous] + inventory['pre_prev']) == 0 else cogs[previous]/(inventory[previous] + inventory['pre_prev']) * 2,
-        three_month_avg: 0 if (
-            inventory[three_month_avg]) == 0 else cogs[three_month_avg]/(inventory[three_month_avg])
+        current_str: 0 if (inventory[current_str] + inventory[previous_str]) == 0 else cogs[current_str]/(inventory[current_str] + inventory[previous_str]) * 2,
+        previous_str: 0 if (inventory[previous_str] + inventory[pre_prev_str]) == 0 else cogs[previous_str]/(inventory[previous_str] + inventory[pre_prev_str]) * 2,
+        three_month_avg_str: 0 if (
+            inventory[three_month_avg_str]) == 0 else cogs[three_month_avg_str]/(inventory[three_month_avg_str])
     }
     ratios_data['op_eff_ratios'].append(temporary_storage)
 
@@ -925,9 +951,9 @@ def get_ratios(period, logged_client_id):
         ideal_ratio: ratio_config_data['accounts_receivable_turnover']['ideal'],
         action_str: action['accounts_receivable_turnover'] if 'accounts_receivable_turnover' in action else '',
         ratio_format: "x",
-        current: 0 if (accrec[current] + accrec[previous]) == 0 else income[current]/((accrec[current] + accrec[previous])/2),
-        previous: 0 if (accrec[previous] + accrec['pre_prev']) == 0 else income[previous]/((accrec[previous] + accrec['pre_prev'])/2),
-        three_month_avg: 0 if (accrec[three_month_avg]) == 0 else income[three_month_avg]/(accrec[three_month_avg]),
+        current_str: 0 if (accrec[current_str] + accrec[previous_str]) == 0 else income[current_str]/((accrec[current_str] + accrec[previous_str])/2),
+        previous_str: 0 if (accrec[previous_str] + accrec[pre_prev_str]) == 0 else income[previous_str]/((accrec[previous_str] + accrec[pre_prev_str])/2),
+        three_month_avg_str: 0 if (accrec[three_month_avg_str]) == 0 else income[three_month_avg_str]/(accrec[three_month_avg_str]),
     }
     ratios_data['op_eff_ratios'].append(temporary_storage)
 
@@ -937,9 +963,9 @@ def get_ratios(period, logged_client_id):
         ideal_ratio: ratio_config_data['days_payable_outstanding']['ideal'],
         action_str: action['days_payable_outstanding'] if 'days_payable_outstanding' in action else '',
         ratio_format: " days",
-        current: 0 if cogs[current] == 0 else round((accpay[current] + accpay[previous])/(2*cogs[current])*365),
-        previous: 0 if cogs[previous] == 0 else round((accpay[previous] + accpay['pre_prev'])/(2*cogs[previous])*365),
-        three_month_avg: 0 if cogs[three_month_avg] == 0 else round((accpay[three_month_avg])/(cogs[three_month_avg])*365),
+        current_str: 0 if cogs[current_str] == 0 else round((accpay[current_str] + accpay[previous_str])/(2*cogs[current_str])*365),
+        previous_str: 0 if cogs[previous_str] == 0 else round((accpay[previous_str] + accpay[pre_prev_str])/(2*cogs[previous_str])*365),
+        three_month_avg_str: 0 if cogs[three_month_avg_str] == 0 else round((accpay[three_month_avg_str])/(cogs[three_month_avg_str])*365),
     }
     ratios_data['op_eff_ratios'].append(temporary_storage)
 
@@ -952,10 +978,10 @@ def get_ratios(period, logged_client_id):
         ideal_ratio: ratio_config_data['debt_to_equity_ratio']['ideal'],
         action_str: action['debt_to_equity_ratio'] if 'debt_to_equity_ratio' in action else '',
         ratio_format: "x",
-        current: 0 if share_cap[current] == 0 else (st_borrow[current] + lt_borrow[current])/share_cap[current],
-        previous: 0 if share_cap[previous] == 0 else (st_borrow[previous] + lt_borrow[previous])/share_cap[previous],
-        three_month_avg: 0 if share_cap[three_month_avg] == 0 else (
-            st_borrow[three_month_avg] + lt_borrow[three_month_avg])/share_cap[three_month_avg]
+        current_str: 0 if share_cap[current_str] == 0 else (st_borrow[current_str] + lt_borrow[current_str])/share_cap[current_str],
+        previous_str: 0 if share_cap[previous_str] == 0 else (st_borrow[previous_str] + lt_borrow[previous_str])/share_cap[previous_str],
+        three_month_avg_str: 0 if share_cap[three_month_avg_str] == 0 else (
+            st_borrow[three_month_avg_str] + lt_borrow[three_month_avg_str])/share_cap[three_month_avg_str]
     }
     ratios_data['solvency_ratios'].append(temporary_storage)
 
@@ -965,9 +991,9 @@ def get_ratios(period, logged_client_id):
         ideal_ratio: ratio_config_data['monthly_burn_rate']['ideal'],
         action_str: action['monthly_burn_rate'] if 'monthly_burn_rate' in action else '',
         ratio_format: "",
-        current: cash[current] + bank[current] - cash[previous] - bank[previous],
-        previous: cash[previous] + bank[previous] - cash['pre_prev'] - bank['pre_prev'],
-        three_month_avg: cash[three_month_avg] + bank[three_month_avg]
+        current_str: cash[current_str] + bank[current_str] - cash[previous_str] - bank[previous_str],
+        previous_str: cash[previous_str] + bank[previous_str] - cash[pre_prev_str] - bank[pre_prev_str],
+        three_month_avg_str: cash[three_month_avg_str] + bank[three_month_avg_str]
     }
     ratios_data['solvency_ratios'].append(mbr)
 
@@ -977,22 +1003,22 @@ def get_ratios(period, logged_client_id):
         ideal_ratio: ratio_config_data['runway']['ideal'],
         action_str: action['runway'] if 'runway' in action else '',
         ratio_format: " months",
-        current: 0 if mbr[current] == 0 else round((cash[current] + bank[current])/mbr[current]),
-        previous: 0 if mbr[previous] == 0 else round((cash[previous] + bank[previous])/mbr[previous]),
-        three_month_avg: 0 if mbr[three_month_avg] == 0 else round((cash[three_month_avg] + bank[three_month_avg])/mbr[three_month_avg]),
+        current_str: 0 if mbr[current_str] == 0 else round((cash[current_str] + bank[current_str])/mbr[current_str]),
+        previous_str: 0 if mbr[previous_str] == 0 else round((cash[previous_str] + bank[previous_str])/mbr[previous_str]),
+        three_month_avg_str: 0 if mbr[three_month_avg_str] == 0 else round((cash[three_month_avg_str] + bank[three_month_avg_str])/mbr[three_month_avg_str]),
     }
     ratios_data['solvency_ratios'].append(temporary_storage)
 
     for obj in ratios_data:
         if type(ratios_data[obj]) == list:
             for ratio in ratios_data[obj]:
-                ratio[current] = round(ratio[current], 2)
-                ratio[previous] = round(ratio[previous], 2)
-                ratio[three_month_avg] = round(ratio[three_month_avg], 2)
+                ratio[current_str] = round(ratio[current_str], 2)
+                ratio[previous_str] = round(ratio[previous_str], 2)
+                ratio[three_month_avg_str] = round(ratio[three_month_avg_str], 2)
 
-    mbr[current] = locale.format("%d", mbr[current], grouping=True)
-    mbr[previous] = locale.format("%d", mbr[previous], grouping=True)
-    mbr[three_month_avg] = locale.format(
-        "%d", mbr[three_month_avg], grouping=True)
+    mbr[current_str] = locale.format("%d", mbr[current_str], grouping=True)
+    mbr[previous_str] = locale.format("%d", mbr[previous_str], grouping=True)
+    mbr[three_month_avg_str] = locale.format(
+        "%d", mbr[three_month_avg_str], grouping=True)
 
     return ratios_data

@@ -11,6 +11,14 @@ change_str = "change"
 
 
 def fetch_data_from_db(table, client_id, period, account_filter):
+    three_month_before_date = period
+    for i in range(2):
+        last_date_of_previous_month = three_month_before_date.replace(
+            day=1) + relativedelta(days=-1)   
+        three_month_before_date = last_date_of_previous_month
+    three_month_before_date = three_month_before_date.replace(day=1)
+
+
     if table == 'cashflow':
         accounts_data = ZohoAccount.objects.filter(
             account_for_coding__in=account_filter, client_id=client_id
@@ -22,7 +30,7 @@ def fetch_data_from_db(table, client_id, period, account_filter):
 
     if table == 'pnl':
         transactions_data = ZohoTransaction.objects.filter(
-            transaction_date__gte=period + relativedelta(months=-3), transaction_date__lte=period
+            transaction_date__gte=three_month_before_date, transaction_date__lte=period
         ).all()
     else:
         transactions_data = ZohoTransaction.objects.filter(
@@ -89,6 +97,15 @@ def convert_to_indian_comma_notation(table, response_data):
                         "%.2f", acc[current_str], grouping=True)
                     acc[previous_str] = locale.format(
                         "%.2f", acc[previous_str], grouping=True)
+            elif type(obj) == dict and 'data' in obj:
+                obj['current_total'] = locale.format("%.2f", obj['current_total'], grouping=True)
+                obj['previous_total'] = locale.format("%.2f", obj['previous_total'], grouping=True)
+                account_lst = obj['data']
+                for acc in account_lst:
+                    acc[current_str] = locale.format(
+                        "%.2f", acc[current_str], grouping=True)
+                    acc[previous_str] = locale.format(
+                        "%.2f", acc[previous_str], grouping=True)
             else:
                 response_data[acc_type][current_str] = locale.format("%.2f", response_data[acc_type][current_str], grouping=True)
                 response_data[acc_type][previous_str] = locale.format("%.2f", response_data[acc_type][previous_str], grouping=True)
@@ -131,6 +148,18 @@ def convert_to_indian_comma_notation(table, response_data):
         response_data[current_str] = locale.format("%.2f", response_data[current_str], grouping=True)
         response_data[previous_str] = locale.format("%.2f", response_data[previous_str], grouping=True)
         response_data[change_str] = locale.format("%.2f", response_data[change_str], grouping=True)
+
+    elif table == 'insights_trans':
+        for key in response_data:
+            trans_obj = response_data[key]
+            trans_obj[current_str] = locale.format("%.2f", trans_obj[current_str], grouping=True)
+            trans_obj[previous_str] = locale.format("%.2f", trans_obj[previous_str], grouping=True)
+            trans_obj[three_month_avg_str] = locale.format("%.2f", trans_obj[three_month_avg_str], grouping=True)
+
+    elif table == 'insights_totals':
+        response_data[current_str] = locale.format("%.2f", response_data[current_str], grouping=True)
+        response_data[previous_str] = locale.format("%.2f", response_data[previous_str], grouping=True)
+        response_data[three_month_avg_str] = locale.format("%.2f", response_data[three_month_avg_str], grouping=True)
     
     return response_data
 
