@@ -1,3 +1,4 @@
+from datetime import date
 from django.db import models
 from django.contrib.auth.models import User
 import calendar
@@ -23,7 +24,7 @@ for i in range(1, 13):
 year_choices = []
 for i in range(2015, 2025):
     year_choices.append(
-        (str(i), str(i))
+        (i, i)
     )
 
 quarter_choices = [
@@ -49,30 +50,58 @@ class TaxAlert(models.Model):
 
     client = models.ForeignKey(User, on_delete=models.CASCADE)
     alert = models.CharField(max_length=500, blank=True)
-    raised_on = models.DateTimeField(auto_now_add=True)
+    raised_on = models.DateField(auto_now_add=True)
     tax_type = models.CharField(max_length=20, choices= tax_type_choices, default='Income Tax')
     due_date = models.DateField()
 
 class ITMonthlyStatus(models.Model):
     client = models.ForeignKey(User, on_delete=models.CASCADE)
     month_name = models.CharField(max_length=20, choices= month_choices, default='Jan')
-    year = models.CharField(max_length=4, choices=year_choices)
+    year = models.IntegerField(choices=year_choices, default=2022)
     payment_status = models.CharField(max_length=30, choices=status_choices, default='Pending')
+
+    @property
+    def fin_year(self):
+        if int(self.month_name) > 3:
+            return self.year
+        else:
+            return self.year - 1
 
 class ITQuarterlyStatus(models.Model):
     client = models.ForeignKey(User, on_delete=models.CASCADE)
     quarter = models.CharField(max_length=20, choices= quarter_choices, default='Apr-Jun')
-    year = models.CharField(max_length=4, choices=year_choices)
+    year = models.IntegerField(choices=year_choices, default=2022)
     payment_status = models.CharField(max_length=30, choices=status_choices, default='Pending')
+
+    @property
+    def fin_year(self):
+        if self.quarter in ('Q1', 'Q2', 'Q3'):
+            return self.year
+        else:
+            return self.year - 1
 
 class GSTMonthlyStatus(models.Model):
     client = models.ForeignKey(User, on_delete=models.CASCADE)
     month_name = models.CharField(max_length=20, choices= month_choices, default='Jan')
-    year = models.CharField(max_length=4, choices=year_choices)
+    year = models.IntegerField(choices=year_choices, default=2022)
     payment_status = models.CharField(max_length=30, choices=status_choices, default='Pending')
+
+    @property
+    def fin_year(self):
+        if int(self.month_name) > 3:
+            return self.year
+        else:
+            return self.year - 1
 
 class GSTQuarterlyStatus(models.Model):
     client = models.ForeignKey(User, on_delete=models.CASCADE)
     quarter = models.CharField(max_length=20, choices= quarter_choices, default='Apr-Jun')
-    year = models.CharField(max_length=4, choices=year_choices)
+    year = models.IntegerField(choices=year_choices, default=2022)
     payment_status = models.CharField(max_length=30, choices=status_choices, default='Pending')
+
+    @property
+    def fin_year(self):
+        if self.quarter in ('Q1', 'Q2', 'Q3'):
+            return self.year
+        else:
+            return self.year - 1

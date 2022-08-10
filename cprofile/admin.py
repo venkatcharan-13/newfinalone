@@ -21,6 +21,7 @@ admin.site.register(BankDetail, BankDetailAdmin)
 
 class CompanyAdmin(admin.ModelAdmin):
     list_filter = ['client']
+    list_display = ['company_name', 'entity_name', 'industry_name', 'contact_number', 'company_email']
     inlines = [
         CompanyContextInline,
         CompanyAddressInline,

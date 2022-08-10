@@ -48,7 +48,7 @@ def pnl_transaction(request, account):
         selected_month, logged_client_id, account
     )
     response_data_modified = accounts_util.convert_to_indian_comma_notation('pnl_trans', response_data)
-    totals_modified = accounts_util.convert_to_indian_comma_notation('totals', totals)
+    totals_modified = accounts_util.convert_to_indian_comma_notation('pnl_totals', totals)
     current_month = prev_three_months[0]
     previous_month = prev_three_months[1]
     pre_previous_month = prev_three_months[2]

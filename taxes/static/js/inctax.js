@@ -1,20 +1,26 @@
 var endpoint = 'api/incometaxData/';
 var choosen_month = sessionStorage.getItem("choosen_month") ? sessionStorage.getItem("choosen_month"): "2022-06-30";
+var choosen_fy = sessionStorage.getItem("choosen_fy") ? sessionStorage.getItem("choosen_fy"): "2022";
 
 $(document).ready(function() {
   if(sessionStorage.getItem("choosen_month")){
     $('#periodSelector').val(sessionStorage.getItem("choosen_month").substring(0, 7));
   }
-  else{
-    $('#periodSelector').val("Choose Month");
+  if(sessionStorage.getItem("choosen_fy")){
+    $('#fySelector').val(sessionStorage.getItem("choosen_fy"));
   }
+  else{
+    $('#fySelector').val("Choose FY");
+  }
+
 });
 
 $.ajax({
   method: "GET",
   url: endpoint,
   data: {
-    selected_date: choosen_month
+    selected_date: choosen_month,
+    selected_fy: choosen_fy
   },
   success: function (response) {
     console.log("Income Tax data loaded");
@@ -29,11 +35,16 @@ $.ajax({
 })
 
 function changePeriod(params) {
-  console.log(params);
   var year = params.substring(0, 4);
   var month = params.substring(5, 7);
   var choosen_period = params + '-' + new Date(year, month, 0).getDate(); 
   sessionStorage.setItem("choosen_month", choosen_period);
+  location.reload();
+}
+
+function changeFinYear(params) {
+  console.log(params);
+  sessionStorage.setItem("choosen_fy", params);
   location.reload();
 }
 
@@ -43,8 +54,7 @@ function createAlertBoxes(data, id) {
   data.forEach(function (object) {
     var div = document.createElement('div');
     div.innerHTML = '<div class="card">' +
-      `<div class="card-body"> <p class="card-text"> ${object.desc} <b> ${object.dueDate} </b></p>` +
-      `<small> ${object.raisedOn} </small></div></div><br>`;
+      `<div class="card-body"> <p class="card-text"> ${object.desc} <b> ${object.dueDate} </b></p></div></div><br>`;
     box.appendChild(div);
   })
 }

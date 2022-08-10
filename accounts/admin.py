@@ -3,8 +3,8 @@ from accounts.models import ZohoAccount, ZohoTransaction, Ratio
 
 # Register your models here.
 class ZohoAccountAdmin(admin.ModelAdmin):
-    list_filter = ['client', 'account_name']
-    list_display = ['account_name', 'account_for_coding']
+    list_filter = ['client', 'account_type']
+    list_display = ['account_name', 'account_for_coding', 'account_type', 'parent_account_name']
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         qs = qs.order_by('account_name')
@@ -12,7 +12,7 @@ class ZohoAccountAdmin(admin.ModelAdmin):
 
 class ZohoTransactionAdmin(admin.ModelAdmin):
     list_filter = ['account']
-    list_display = ['categorized_transaction_id', 'account', 'payee', 
+    list_display = ['categorized_transaction_id', 'account', 
     'transaction_date', 'debit_amount', 'credit_amount']
     def get_queryset(self, request):
         qs = super().get_queryset(request)

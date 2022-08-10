@@ -272,7 +272,7 @@ def fetch_pnl_transactions(period, client_id, account):
 
     response_data_filtered = dict(sorted(
         response_data_filtered.items(), 
-        key=lambda x: (x[1][current_str], x[1][previous_str]),
+        key=lambda x: (x[1]['payee_category'], x[1][current_str], x[1][previous_str]),
         reverse=True
         ))
 

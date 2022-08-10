@@ -28,18 +28,13 @@ class TaxesData(APIView):
     def get(self, request, format=None):
         logged_client_id = self.request.user.id
         selected_month = self.request.query_params.get('selected_date')
+        selected_fy = int(self.request.query_params.get('selected_fy'))
+
         if selected_month is None:
             selected_month = date(2022, 6, 30)
         else:
             selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
             
-        current_month, current_year = selected_month.month, selected_month.year
-        if current_month < 4:
-            current_fy_start = date(current_year-1, 4, 1)
-            current_fy_end = date(current_year, 3, 31)
-        else:
-            current_fy_start = date(current_year, 4, 1)
-            current_fy_end = date(current_year+1, 3, 31)
 
         tax_alerts = TaxAlert.objects.filter(
             client_id = logged_client_id,
@@ -67,14 +62,15 @@ class TaxesData(APIView):
             income_tax_data_response['alerts'].append({
                 'desc': alert.alert,
                 'dueDate': datetime.strftime(alert.due_date, "%d %b, %Y"),
-                'raisedOn': datetime.strftime(alert.raised_on, "%d %b, %Y at %H:%M")
             })
 
         for monthly_stat in monthly_status:
-            income_tax_data_response['status']['monthly'][f'{monthly_stat.get_month_name_display()}-{monthly_stat.year[2:]}'] = monthly_stat.payment_status
+            if monthly_stat.fin_year == selected_fy:
+                income_tax_data_response['status']['monthly'][f'{monthly_stat.get_month_name_display()}-{monthly_stat.year%100}'] = monthly_stat.payment_status
         
         for quarterly_stat in quarterly_status:
-            income_tax_data_response['status']['quarterly'][quarterly_stat.get_quarter_display()] = quarterly_stat.payment_status
+            if quarterly_stat.fin_year == selected_fy:
+                income_tax_data_response['status']['quarterly'][f'{quarterly_stat.get_quarter_display()} {quarterly_stat.year%100}'] = quarterly_stat.payment_status
 
         return Response(income_tax_data_response)
 
@@ -85,12 +81,14 @@ class GSTData(APIView):
     def get(self, request, format=None):
         logged_client_id = self.request.user.id
         selected_month = self.request.query_params.get('selected_date')
+        selected_fy = int(self.request.query_params.get('selected_fy'))
+
         if selected_month is None:
             selected_month = date(2022, 6, 30)
         else:
             selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
             
-        
+
         tax_alerts = TaxAlert.objects.filter(
             client_id = logged_client_id,
             tax_type = 'gst',
@@ -116,14 +114,15 @@ class GSTData(APIView):
         for alert in tax_alerts:
             gst_data_response['alerts'].append({
                 'desc': alert.alert,
-                'dueDate': datetime.strftime(alert.due_date, "%d %b, %Y"),
-                'raisedOn': datetime.strftime(alert.raised_on, "%d %b, %Y at %H:%M")
+                'dueDate': datetime.strftime(alert.due_date, "%d %b, %Y")
             })
 
         for monthly_stat in monthly_status:
-            gst_data_response['status']['monthly'][f'{monthly_stat.get_month_name_display()}-{monthly_stat.year[2:]}'] = monthly_stat.payment_status
+            if monthly_stat.fin_year == selected_fy:
+                gst_data_response['status']['monthly'][f'{monthly_stat.get_month_name_display()}-{monthly_stat.year%100}'] = monthly_stat.payment_status
         
         for quarterly_stat in quarterly_status:
-            gst_data_response['status']['quarterly'][quarterly_stat.get_quarter_display()] = quarterly_stat.payment_status
+            if quarterly_stat.fin_year == selected_fy:
+                gst_data_response['status']['quarterly'][f'{quarterly_stat.get_quarter_display()} {quarterly_stat.year%100}'] = quarterly_stat.payment_status
 
         return Response(gst_data_response)

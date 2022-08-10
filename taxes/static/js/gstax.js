@@ -1,12 +1,16 @@
 var endpoint = 'api/gstData/';
 var choosen_month = sessionStorage.getItem("choosen_month") ? sessionStorage.getItem("choosen_month"): "2022-06-30";
+var choosen_fy = sessionStorage.getItem("choosen_fy") ? sessionStorage.getItem("choosen_fy"): "2022";
 
 $(document).ready(function() {
   if(sessionStorage.getItem("choosen_month")){
     $('#periodSelector').val(sessionStorage.getItem("choosen_month").substring(0, 7));
   }
+  if(sessionStorage.getItem("choosen_fy")){
+    $('#fySelector').val(sessionStorage.getItem("choosen_fy"));
+  }
   else{
-    $('#periodSelector').val("Choose Month");
+    $('#fySelector').val("Choose FY");
   }
 });
 
@@ -14,7 +18,8 @@ $.ajax({
   method: "GET",
   url: endpoint,
   data: {
-    selected_date: choosen_month
+    selected_date: choosen_month,
+    selected_fy: choosen_fy
   },
   success: function (response) {
     console.log("GST data loaded");
@@ -37,13 +42,19 @@ function changePeriod(params) {
   location.reload();
 }
 
+function changeFinYear(params) {
+  console.log(params);
+  sessionStorage.setItem("choosen_fy", params);
+  location.reload();
+}
+
+
 function createAlertBoxes(data, id) {
   var box = document.getElementById(id);
   data.forEach(function (object) {
     var div = document.createElement('div');
     div.innerHTML = '<div class="card">' +
-      `<div class="card-body"> <p class="card-text"> ${object.desc} <b> ${object.dueDate} </b></p>` +
-      `<small> ${object.raisedOn} </small></div></div><br>`;
+      `<div class="card-body"> <p class="card-text"> ${object.desc} <b> ${object.dueDate} </b></p></div></div><br>`;
     box.appendChild(div);
   })
 }
