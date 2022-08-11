@@ -1,5 +1,5 @@
 from django.contrib import admin
-from home.models import DashboardAccountStatus, PendingActionable, WatchOutPoint, StatutoryCompliance
+from home.models import Notification, DashboardAccountStatus, PendingActionable, WatchOutPoint, StatutoryCompliance
 from django.contrib.auth.models import User
 from cprofile.models import Company
 from taxes.models import TaxAlert, ITMonthlyStatus, ITQuarterlyStatus, GSTMonthlyStatus, GSTQuarterlyStatus
@@ -7,33 +7,67 @@ from taxes.models import TaxAlert, ITMonthlyStatus, ITQuarterlyStatus, GSTMonthl
 from accounts.models import Ratio
 
 # Register your models here.
+class NotificationAdmin(admin.ModelAdmin):
+    date_hierarchy = 'created_on'
+    list_filter = ['client']
+    list_display = ['content', 'created_on']
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.order_by('created_on')
+        return qs
+
+admin.site.register(Notification, NotificationAdmin)
+
+
 class DashboardAccountStatusAdmin(admin.ModelAdmin):
+    date_hierarchy = 'created_on'
     list_filter = ['client']
     list_display = ['status_desc', 'status']
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.order_by('status_desc', 'created_on')
+        return qs
 
 admin.site.register(DashboardAccountStatus, DashboardAccountStatusAdmin)
 
 class PendingActionableAdmin(admin.ModelAdmin):
+    date_hierarchy = 'created_on'
     list_filter = ['client']
     list_display = ['point', 'client_remarks', 'status']
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.order_by('created_on')
+        return qs
 
 admin.site.register(PendingActionable, PendingActionableAdmin)
 
+
 class WatchOutPointAdmin(admin.ModelAdmin):
+    date_hierarchy = 'created_on'
     list_filter = ['client']
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.order_by('created_on')
+        return qs
 
 admin.site.register(WatchOutPoint, WatchOutPointAdmin)
 
+
 class StatutoryComplianceAdmin(admin.ModelAdmin):
+    date_hierarchy = 'current_month_due_date'
     list_filter = ['client']
 
 admin.site.register(StatutoryCompliance, StatutoryComplianceAdmin)
+
 
 # Defining inlines for User
 class CompanyInline(admin.TabularInline):
     model = Company
     extra = 0
 
+class NotificationInline(admin.TabularInline):
+    model = Notification
+    extra = 0
 class DashboardAccountStatusInline(admin.TabularInline):
     model = DashboardAccountStatus
     extra = 0
@@ -73,6 +107,7 @@ def delete_object(modeladmin, request, queryset):
 
 class UserAdmin(admin.ModelAdmin):
     inlines = [
+        NotificationInline,
         CompanyInline,
         DashboardAccountStatusInline,
         PendingActionableInline,

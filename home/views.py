@@ -2,7 +2,7 @@ import json
 from django.shortcuts import render
 from django.http import JsonResponse
 from datetime import date, datetime
-from home.models import DashboardAccountStatus, PendingActionable, WatchOutPoint,  StatutoryCompliance
+from home.models import Notification, DashboardAccountStatus, PendingActionable, WatchOutPoint,  StatutoryCompliance
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from rest_framework.views import APIView
@@ -37,6 +37,18 @@ class DashboardData(APIView):
         else:
             selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
         
+        notifications_data = Notification.objects.filter(
+            client_id=logged_client_id,
+            created_on__lte=selected_month,
+            created_on__gte=selected_month.replace(day=1)
+        )
+        notifications = []
+        for notification in notifications_data:
+            notifications.append({
+                'content': notification.content,
+                'created_on': datetime.strftime(notification.created_on, "%d %b, %Y"),
+            })
+
         accounts_status_data = DashboardAccountStatus.objects.filter(
             client_id=logged_client_id,
             created_on__lte=selected_month,
@@ -95,7 +107,9 @@ class DashboardData(APIView):
                 'last_month': compliance.last_month_completion_date
             })
         
+        print(notifications)
         response = {
+            'notifications': notifications,
             'accounts_status': accounts_status,
             'pending_points': pending_actionables,
             'watchout_points': watchout_points,

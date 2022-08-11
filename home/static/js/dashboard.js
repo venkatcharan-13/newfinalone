@@ -17,7 +17,8 @@ $.ajax({
     selected_date: choosen_month
   },
   success: function (response) {
-    console.log("Success Dashbosard");
+    console.log("Success Dashboard");
+    createNotificationBoxes(response.notifications, "notification_box");
     fillDashboardStatus(response.accounts_status, "status_list");
     fillPendingActionables(response.pending_points, "pending_actionables");
     fillWatchoutPoints(response.watchout_points, "watchout_points");
@@ -36,6 +37,18 @@ function changePeriod(params) {
   var choosen_period = params + '-' + new Date(year, month, 0).getDate(); 
   sessionStorage.setItem("choosen_month", choosen_period);
   location.reload();
+}
+
+
+function createNotificationBoxes(data, id) {
+  var box = document.getElementById(id);
+  data.forEach(function (object) {
+    var div = document.createElement('div');
+    div.innerHTML = '<div class="card">' +
+      `<div class="card-body"> <p class="card-text"> ${object.content}</p>` +
+      `<small> ${object.created_on} </small></div></div><br>`;
+    box.appendChild(div);
+  })
 }
 
 

@@ -18,7 +18,7 @@ month_choices = []
 for i in range(1, 13):
     month_name = calendar.month_name[i]
     month_choices.append(
-        (str(i), month_name[:3])
+        (i, month_name[:3])
     )
 
 year_choices = []
@@ -56,7 +56,7 @@ class TaxAlert(models.Model):
 
 class ITMonthlyStatus(models.Model):
     client = models.ForeignKey(User, on_delete=models.CASCADE)
-    month_name = models.CharField(max_length=20, choices= month_choices, default='Jan')
+    month_name = models.IntegerField(choices= month_choices, default=1)
     year = models.IntegerField(choices=year_choices, default=2022)
     payment_status = models.CharField(max_length=30, choices=status_choices, default='Pending')
 
@@ -82,7 +82,7 @@ class ITQuarterlyStatus(models.Model):
 
 class GSTMonthlyStatus(models.Model):
     client = models.ForeignKey(User, on_delete=models.CASCADE)
-    month_name = models.CharField(max_length=20, choices= month_choices, default='Jan')
+    month_name = models.IntegerField(choices= month_choices, default=1)
     year = models.IntegerField(choices=year_choices, default=2022)
     payment_status = models.CharField(max_length=30, choices=status_choices, default='Pending')
 

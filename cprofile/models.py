@@ -12,10 +12,11 @@ class Company(models.Model):
     company_name = models.CharField(max_length=100)
     entity_name = models.CharField(max_length=100)
     industry_name = models.CharField(max_length=100)
+    contact_person = models.CharField(max_length=100)
     contact_number = PhoneNumberField()
     company_email = models.CharField(max_length=30, null=True)
-    gst_number = models.CharField(max_length=20)
-    pan_number = models.CharField(max_length=20)
+    gst_number = models.CharField(max_length=20, null=True)
+    pan_number = models.CharField(max_length=20, null=True)
     pf_number = models.CharField(max_length=20, null=True)
     esic_number = models.CharField(max_length=20, null=True)
 
