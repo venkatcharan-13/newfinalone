@@ -45,14 +45,16 @@ class DashboardData(APIView):
         notifications = []
         for notification in notifications_data:
             notifications.append({
+                'title': notification.title,
                 'content': notification.content,
-                'created_on': datetime.strftime(notification.created_on, "%d %b, %Y"),
+                'link': notification.link,
+                'days_ago': (date.today()- notification.created_on).days
             })
 
         accounts_status_data = DashboardAccountStatus.objects.filter(
             client_id=logged_client_id,
-            created_on__lte=selected_month,
-            created_on__gte=selected_month.replace(day=1)
+            period__lte=selected_month,
+            period__gte=selected_month.replace(day=1)
         )
         accounts_status= []
         for level in accounts_status_data:
@@ -90,8 +92,8 @@ class DashboardData(APIView):
 
         statutory_compliances_data = StatutoryCompliance.objects.filter(
             client_id=logged_client_id,
-            current_month_due_date__lte=selected_month,
-            current_month_due_date__gte=selected_month.replace(day=1)
+            due_date__lte=selected_month,
+            due_date__gte=selected_month.replace(day=1)
         )
 
         statutory_compliances = {}
@@ -101,13 +103,9 @@ class DashboardData(APIView):
                 statutory_compliances[comp_type] = []
             statutory_compliances[comp_type].append({
                 'compliance': compliance.compliance,
-                'current_month': compliance.current_month_due_date,
-                'current_status': compliance.get_current_month_status_display(),
-                'last_status': compliance.get_last_month_status_display(),
-                'last_month': compliance.last_month_completion_date
+                'current_month': compliance.due_date,
             })
         
-        print(notifications)
         response = {
             'notifications': notifications,
             'accounts_status': accounts_status,

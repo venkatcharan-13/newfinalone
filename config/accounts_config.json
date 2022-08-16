@@ -1,5 +1,55 @@
 {
+    "income_statement": {
+        "description": "The Income Statement indicates a company's financial performance measured over a reporting period. Performance is assessed by summarising how the business incurs its revenues, expenses and net profit or loss incurred over the period. It's also called the P&L statement",
+        "related_accounts": [
+            "income", "expense", "other_expense", "cost_of_goods_sold"
+        ]
+    },
+    "balance_sheet": {
+        "description": "A balance sheet outlines a company's assets, liabilities and shareholders' equity at a given point in time. It's a snapshot of what a company owns and owes, and the amount invested by shareholders. The balancing principle is Assets = Liabilities + Shareholders' equity",
+        "related_accounts": [
+            "accounts_payable",
+            "accounts_receivable",
+            "bank",
+            "cash",
+            "equity",
+            "fixed_asset",
+            "long_term_liability",
+            "other_asset",
+            "other_current_asset",
+            "other_current_liability",
+            "other_liability",
+            "stock"
+        ],
+        "asset_related_accounts": [
+            "accounts_receivable", 
+            "fixed_asset", 
+            "other_asset", 
+            "other_current_asset", 
+            "stock", 
+            "cash", 
+            "bank"
+        ]
+    },
     "cashflow": {
+        "description": "A cash-flow statement is a report of the company's cash management, which summarises all cash inflows that the company receives from its operations and investment sources, as well as cash outflows involved in the functioning of the business and investments, if any, by the company",
+        "related_accounts" : [
+            "bank_balance",
+            "cash_balance",
+            "accounts_receivable",
+            "other_current_assets",
+            "other_non_current_assets",
+            "trade_payables",
+            "other_long_term_liabilities_and_provisions",
+            "other_liabilities",
+            "other_current_liabilities_and_provisions",
+            "tangible_assets",
+            "short_term_loans_and_advances",
+            "long_term_loans_and_advances",
+            "short_term_borrowings",
+            "long_term_borrowings",
+            "share_capital"
+        ],
         "cashflow_from_operating_activities":{
             "net_income":{
                 "head": "Net Income",
@@ -78,7 +128,8 @@
             }
         }
     },
-    "ratios_info": {
+    "ratios": {
+        "description": "A financial ratio is used to calculate a company’s financial status or performance against other companies. To calculate financial ration, numbers are taken from the balance sheet, income statement, and cash flow statement",
         "gross_profit_margin": {
             "head": "Gross Profit Margin",
             "info": "The gross profit margin tells you what your business made after paying for the direct cost of doing business, which can include labour, materials and other direct production costs.",

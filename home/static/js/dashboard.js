@@ -45,8 +45,10 @@ function createNotificationBoxes(data, id) {
   data.forEach(function (object) {
     var div = document.createElement('div');
     div.innerHTML = '<div class="card">' +
-      `<div class="card-body"> <p class="card-text"> ${object.content}</p>` +
-      `<small> ${object.created_on} </small></div></div><br>`;
+      `<div class="card-body"> 
+      <h6 class="card-title">${object.title}</h6> 
+      <p class="card-text"> ${object.content}</p> 
+      <small> ${object.days_ago} days ago </small></div></div><br>`;
     box.appendChild(div);
   })
 }
@@ -128,10 +130,7 @@ function fillStatutoryCompliances(data, tid) {
     data[tax].forEach(function(comp){
       var compliance = document.createElement('tr');
       compliance.innerHTML = `<td scope="row" style="width: 40%;">${comp.compliance}</td>` + 
-      `<td style="width: 15%;">${comp.current_month}</td>` + 
-      `<td style="width: 15%;">${comp.current_status}</td>` +
-      `<td style="width: 15%;">${comp.last_status}</td>` + 
-      `<td style="width: 15%;">${comp.last_month}</td>`;
+      `<td style="width: 15%;">${comp.current_month}</td>`;
       table.appendChild(compliance);
     })
   })

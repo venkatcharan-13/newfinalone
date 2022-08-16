@@ -23,16 +23,18 @@ statutory_comp_status_choices = [
 
 class Notification(models.Model):
     client = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=50)
+    content = models.TextField(max_length=100)
+    link = models.URLField(blank=True, null=True)
     created_on = models.DateField(auto_now_add=True)
-    content = models.CharField(max_length=100)
 
 
 class DashboardAccountStatus(models.Model):
     client = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_on = models.DateField(auto_now_add=True)
     status_desc = models.CharField(max_length=100)
-    status = models.CharField(
-        max_length=10, choices=dashboard_acc_status_choices, default='pending')
+    status = models.CharField(max_length=10, choices=dashboard_acc_status_choices, default='pending')
+    period = models.DateField()
+    modified_on = models.DateField(auto_now=True)
 
 
 class PendingActionable(models.Model):
@@ -60,14 +62,6 @@ class StatutoryCompliance(models.Model):
         return self.compliance
 
     client = models.ForeignKey(User, on_delete=models.CASCADE)
-    compliance_type = models.CharField(
-        max_length=20, choices=statutory_compliance_choices, default='TDS')
+    compliance_type = models.CharField(max_length=20, choices=statutory_compliance_choices, default='TDS')
     compliance = models.CharField(max_length=100)
-    current_month_due_date = models.DateField(
-        auto_now=False, auto_now_add=False)
-    current_month_status = models.CharField(
-        max_length=20, choices=statutory_comp_status_choices, default='Not Started')
-    last_month_status = models.CharField(
-        max_length=20, choices=statutory_comp_status_choices, default='Not Started')
-    last_month_completion_date = models.DateField(
-        auto_now=False, auto_now_add=False)
+    due_date = models.DateField(auto_now=False, auto_now_add=False)

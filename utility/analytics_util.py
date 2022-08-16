@@ -49,51 +49,72 @@ def get_sales_performance(client_id, current_date):
                     transaction.credit_amount - transaction.debit_amount)
         monthly_sale[month_name] = round(monthly_sale[month_name])
 
-    quarterly_sale = {
-        'Jan-Mar': 0,
-        'Apr-Jun': 0,
-        'Jul-Sep': 0,
-        'Oct-Dec': 0
-    }
-
     # THIS PART HAS BEEN HARD CODED, WILL BE CHANGED LATER
 
-    for transaction in transactions_related_to_income:
-        trans_date = transaction.transaction_date
-        if trans_date <= date(2022, 6, 30) and trans_date >= date(2022, 4, 1):
-            quarterly_sale["Apr-Jun"] += (
-                transaction.credit_amount - transaction.debit_amount)
-    quarterly_sale["Apr-Jun"] = round(quarterly_sale["Apr-Jun"])
+    current_month = current_date.month
+    current_year = current_date.year
+
+    if 1 <= current_month <= 3:
+        current_quarter = (date(current_year, 1, 1), date(current_year, 3, 31))
+    elif 4 <= current_month <= 6:
+        current_quarter = (date(current_year, 4, 1), date(current_year, 6, 30))
+    elif 7 <= current_month <= 9:
+        current_quarter = (date(current_year, 7, 1), date(current_year, 9, 30))
+    else:
+        current_quarter = (date(current_year, 10, 1), date(current_year, 12, 31))
+
+    four_quarters = [current_quarter]
+    curr_qtr_start = current_quarter[0]
+    for i in range(3):
+        qtr_end = curr_qtr_start + relativedelta(days=-1)
+        qtr_start = date(qtr_end.year, qtr_end.month-2, 1)
+        four_quarters.append((qtr_start, qtr_end))
+        curr_qtr_start = qtr_start
+    four_quarters.reverse()
+    
+    four_quarters_label = []
+    quarterly_sale = {}
+    for quarter in four_quarters:
+        qstr = calendar.month_name[quarter[0].month][:3]
+        qend = calendar.month_name[quarter[1].month][:3]
+        qyear = quarter[0].year
+        quarterly_sale[f"{qstr}-{qend} {qyear}"] = 0
+        four_quarters_label.append(f"{qstr}-{qend} {qyear}")
+    
 
     for transaction in transactions_related_to_income:
         trans_date = transaction.transaction_date
-        if trans_date <= date(2022, 3, 31) and trans_date >= date(2022, 1, 1):
-            quarterly_sale["Jan-Mar"] += (
-                transaction.credit_amount - transaction.debit_amount)
-    quarterly_sale["Jan-Mar"] = round(quarterly_sale["Jan-Mar"])
+        credit_minus_debit = transaction.credit_amount - transaction.debit_amount
+        
+        if trans_date >= four_quarters[0][0] and trans_date <= four_quarters[0][1]:
+            quarterly_sale[four_quarters_label[0]] += credit_minus_debit
 
-    for transaction in transactions_related_to_income:
-        trans_date = transaction.transaction_date
-        if trans_date <= date(2021, 12, 31) and trans_date >= date(2021, 10, 1):
-            quarterly_sale["Oct-Dec"] += (
-                transaction.credit_amount - transaction.debit_amount)
-    quarterly_sale["Oct-Dec"] = round(quarterly_sale["Oct-Dec"])
+        elif trans_date >= four_quarters[1][0] and trans_date <= four_quarters[1][1]:
+            quarterly_sale[four_quarters_label[1]] += credit_minus_debit
+        
+        elif trans_date >= four_quarters[2][0] and trans_date <= four_quarters[2][1]:
+            quarterly_sale[four_quarters_label[2]] += credit_minus_debit
+        
+        elif trans_date >= four_quarters[3][0] and trans_date <= four_quarters[3][1]:
+            quarterly_sale[four_quarters_label[3]] += credit_minus_debit
 
-    for transaction in transactions_related_to_income:
-        trans_date = transaction.transaction_date
-        if trans_date <= date(2021, 9, 30) and trans_date >= date(2021, 7, 1):
-            quarterly_sale["Jul-Sep"] += (
-                transaction.credit_amount - transaction.debit_amount)
-    quarterly_sale["Jul-Sep"] = round(quarterly_sale["Jul-Sep"])
+    for key in quarterly_sale:
+        quarterly_sale[key] = round(quarterly_sale[key])
 
-    yearly_sale = {}
 
-    for year in (2019, 2020, 2021, 2022):
+    yearly_sale = {
+        current_year-3: 0,
+        current_year-2: 0,
+        current_year-1: 0,
+        current_year: 0,
+    }
+
+    for year in yearly_sale:
         yearly_sale[year] = 0
         for transaction in transactions_related_to_income:
+            credit_minus_debit = transaction.credit_amount - transaction.debit_amount
             if transaction.transaction_date.year == year:
-                yearly_sale[year] += (transaction.credit_amount -
-                                      transaction.debit_amount)
+                yearly_sale[year] += credit_minus_debit
         yearly_sale[year] = round(yearly_sale[year])
 
     return (monthly_sale, quarterly_sale, yearly_sale)
@@ -444,9 +465,9 @@ def get_monthly_cashflow_statement(client_id, current_date):
         'other_current_assets',
         'other_non_current_assets',
         'trade_payables',
-        'other_long_term_liabilities_&_provisions',
+        'other_long_term_liabilities_and_provisions',
         'other_liabilities',
-        'other_current_liabilities_&_provisions',
+        'other_current_liabilities_and_provisions',
         'tangible_assets',
         'short_term_loans_&_advances',
         'long_term_loans_&_advances',
@@ -560,10 +581,9 @@ def get_monthly_cashflow_statement(client_id, current_date):
    
 
     temp = cashflow_data_uncategorized['other_current_assets'] if cashflow_data_uncategorized['other_current_assets'] else [0]*7
-    temp2 = cashflow_data_uncategorized['other_non_current_assets'] if cashflow_data_uncategorized['other_non_current_assets'] else [0]*7
     lst = [0]*6
     for i in range(5, -1, -1):
-        lst[i] = temp[i] + temp2[i] - (temp[i+1] + temp2[i+1])
+        lst[i] = temp[i] - temp[i+1]
     cashflow_data['cashflow_from_operating_activities'].append(lst)
 
     temp = cashflow_data_uncategorized['trade_payables'] if cashflow_data_uncategorized['trade_payables'] else [0]*7
@@ -572,9 +592,9 @@ def get_monthly_cashflow_statement(client_id, current_date):
         lst[i] = temp[i+1] - temp[i]
     cashflow_data['cashflow_from_operating_activities'].append(lst)
 
-    temp = cashflow_data_uncategorized['other_long_term_liabilities_&_provisions'] if cashflow_data_uncategorized['other_long_term_liabilities_&_provisions'] else [0]*7
+    temp = cashflow_data_uncategorized['other_long_term_liabilities_and_provisions'] if cashflow_data_uncategorized['other_long_term_liabilities_and_provisions'] else [0]*7
     temp2 = cashflow_data_uncategorized['other_liabilities'] if cashflow_data_uncategorized['other_liabilities'] else [0]*7
-    temp3 = cashflow_data_uncategorized['other_current_liabilities_&_provisions'] if cashflow_data_uncategorized['other_current_liabilities_&_provisions'] else [0]*7
+    temp3 = cashflow_data_uncategorized['other_current_liabilities_and_provisions'] if cashflow_data_uncategorized['other_current_liabilities_and_provisions'] else [0]*7
     lst = [0]*6
     for i in range(5, -1, -1):
         lst[i] = (temp[i+1] + temp2[i+1] + temp3[i+1]) - (temp[i] + temp2[i] + temp3[i]) 
@@ -592,7 +612,12 @@ def get_monthly_cashflow_statement(client_id, current_date):
         lst[i] = temp[i] - temp[i+1]
     cashflow_data['cashflow_from_investing_activities'].append(lst)
 
-    cashflow_data['cashflow_from_investing_activities'].append([0]*6)
+    temp = cashflow_data_uncategorized['other_non_current_assets'] if cashflow_data_uncategorized['other_non_current_assets'] else [0]*7
+    lst = [0]*6
+    for i in range(5,-1,-1):
+        lst[i] = temp[i] - temp[i+1]
+    cashflow_data['cashflow_from_investing_activities'].append(lst)
+
 
     cashflow_data['net_cash_b'] = [0]*6
     for lst in cashflow_data['cashflow_from_investing_activities']:

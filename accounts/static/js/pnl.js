@@ -26,16 +26,17 @@ $.ajax({
     fillPnlTableTotals(response.response_data.income, 'income_total', 'Income');
     fillPnlTableExpenseTotals(response.response_data.total_expense, 'expense_total', 'Expenses');
     fillPnlTableGrossProfit(response.response_data.gross_profit, 'grossprofit', 'Gross Profit');
-    fillPnlTableIndividuals(response.response_data.ebitda, 'ebitda', 'EBITDA');
-    fillPnlTableIndividuals(response.response_data.depreciation_expenses, 'dep_exp', 'Depreciation Expenses');
-    fillPnlTableIndividuals(response.response_data.pbit, 'pbit', 'PBIT');
+    fillPnlTableIndividuals(response.response_data.ebit, 'ebit', 'EBIT');
+    // fillPnlTableIndividuals(response.response_data.depreciation_expenses, 'dep_exp', 'Depreciation Expenses');
+    // fillPnlTableIndividuals(response.response_data.pbit, 'pbit', 'PBIT');
     fillPnlTableIndividuals(response.response_data.interest_expenses, 'int_exp', 'Interest Expenses');
-    fillPnlTableIndividuals(response.response_data.pbt, 'pbt', 'PBT');
+    fillPnlTableIndividuals(response.response_data.tax_expenses, 'tax_exp', 'Taxes');
+    fillPnlTableIndividuals(response.response_data.net_profit, 'netprofit', 'Net Profit');
     document.getElementById('head_sales').innerHTML = response.response_data.total_income.current;
     document.getElementById('head_grossprofit').innerHTML = response.response_data.gross_profit.current;
     document.getElementById('head_cogs').innerHTML = response.response_data.cost_of_goods_sold.current ? response.response_data.cost_of_goods_sold.current : 0;
     document.getElementById('head_exp').innerHTML = response.response_data.total_expense.current;
-    document.getElementById('head_profit').innerHTML = response.response_data.pbt.current;
+    document.getElementById('head_profit').innerHTML = response.response_data.net_profit.current;
   },
   error: function (error_data) {
     console.log("Error1");

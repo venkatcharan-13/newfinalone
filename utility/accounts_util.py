@@ -1,13 +1,23 @@
 from accounts.models import ZohoAccount, ZohoTransaction
 from dateutil.relativedelta import relativedelta
+from utility import accounts_str as strvar
 from datetime import date, datetime
 import locale
+import json
 
 locale.setlocale(locale.LC_ALL, 'en_IN.utf8')
-current_str, previous_str, pre_prev_str = "current", "previous", "pre_prev"
-curr_per_str, prev_per_str = "curr_per", "prev_per"
-per_change_str, prev_per_change_str, three_month_avg_str = "per_change", "prev_per_change", "three_month_avg"
+curr_per_str, prev_per_str = strvar.current_per, strvar.previous_per
+prev_per_change_str = strvar.prev_per_change
 change_str = "change"
+current_str = strvar.current
+previous_str = strvar.previous
+pre_prev_str = strvar.pre_previous
+per_change_str = strvar.per_change
+three_month_avg_str = strvar.three_month_avg
+
+config_file = open("config/accounts_config.json")
+config_data = json.load(config_file)
+bs_config_data = config_data['balance_sheet']
 
 
 def fetch_data_from_db(table, client_id, period, account_filter):
@@ -48,7 +58,7 @@ def change_percentage(percent, trans_flag=False):
 
 def convert_to_indian_comma_notation(table, response_data):
     if table == 'pnl':
-        income_obj = response_data['income']
+        income_obj = response_data[strvar.income]
         for key in income_obj:
             if key == 'data':
                 for acc in income_obj['data']:
@@ -62,7 +72,7 @@ def convert_to_indian_comma_notation(table, response_data):
                 income_obj[key] = locale.format(
                     "%.2f", income_obj[key], grouping=True)
         
-        expense_obj = response_data['expense']
+        expense_obj = response_data[strvar.expense]
         for category in expense_obj:
             dic = expense_obj[category]
             for key in dic:
@@ -80,7 +90,7 @@ def convert_to_indian_comma_notation(table, response_data):
         
         for object in response_data:
             content = response_data[object]
-            if object not in ('income', 'expense'):
+            if object not in (strvar.income, strvar.expense):
                 content[current_str] = locale.format(
                     "%.2f", content[current_str], grouping=True)
                 content[previous_str] = locale.format(
@@ -193,7 +203,7 @@ def fetch_pnl_transactions(period, client_id, account):
         payee = transaction['payee']
         trans_date = transaction['transaction_date']
 
-        if account in ('direct_income', 'indirect_income'):
+        if account in (strvar.direct_income, strvar.indirect_income):
             amount = transaction['credit_amount'] - transaction['debit_amount']
         else:
             amount = transaction['debit_amount'] - transaction['credit_amount']
@@ -264,7 +274,7 @@ def fetch_pnl_transactions(period, client_id, account):
         else:
             obj['payee_category'] = 'New'
 
-        if not account in ('direct_income', 'indirect_income'):
+        if not account in (strvar.direct_income, strvar.indirect_income):
             if (abs(round(obj[current_str])), abs(round(obj[previous_str]))) == (0,0):
                 continue
         total[three_month_avg_str] += obj[three_month_avg_str]
@@ -295,15 +305,7 @@ def fetch_cashflow_balances(period, client_id, codings_list, sub_logic):
         account_for_coding__in=codings_list
     )
 
-    assets_related_types = (
-        'accounts_receivable', 
-        'fixed_asset', 
-        'other_asset', 
-        'other_current_asset', 
-        'stock', 
-        'cash', 
-        'bank'
-    )
+    assets_related_types = bs_config_data['asset_related_accounts']
 
     account_ids = dict((acc.account_id, (acc.account_name, acc.account_type)) for acc in accounts_according_to_coding)
 

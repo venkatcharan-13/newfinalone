@@ -21,7 +21,7 @@ $.ajax({
         document.getElementById("current_month").innerHTML = response.current_period;
         document.getElementById("previous_month").innerHTML = response.previous_period;
         fillRatiosHead(response.response_data.gross_profit, 'gross_profit', 'Gross Profit');
-        fillRatiosHead(response.response_data.pbt, 'pbt', 'PBT');
+        fillRatiosHead(response.response_data.net_profit, 'net_profit', 'Net Profit');
         fillRatiosTableRows(response.response_data.profit_ratios, 'profit_ratios');
         fillRatiosTableRows(response.response_data.liquidity_ratio, 'liquidity_ratio');
         fillRatiosTableRows(response.response_data.op_eff_ratios, 'op_eff_ratios');

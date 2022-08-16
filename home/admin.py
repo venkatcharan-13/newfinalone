@@ -7,6 +7,7 @@ from taxes.models import TaxAlert, ITMonthlyStatus, ITQuarterlyStatus, GSTMonthl
 from accounts.models import Ratio
 
 # Register your models here.
+
 class NotificationAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_on'
     list_filter = ['client']
@@ -20,7 +21,7 @@ admin.site.register(Notification, NotificationAdmin)
 
 
 class DashboardAccountStatusAdmin(admin.ModelAdmin):
-    date_hierarchy = 'created_on'
+    date_hierarchy = 'period'
     list_filter = ['client']
     list_display = ['status_desc', 'status']
     def get_queryset(self, request):
@@ -54,7 +55,7 @@ admin.site.register(WatchOutPoint, WatchOutPointAdmin)
 
 
 class StatutoryComplianceAdmin(admin.ModelAdmin):
-    date_hierarchy = 'current_month_due_date'
+    date_hierarchy = 'due_date'
     list_filter = ['client']
 
 admin.site.register(StatutoryCompliance, StatutoryComplianceAdmin)
@@ -120,6 +121,7 @@ class UserAdmin(admin.ModelAdmin):
         GSTMonthlyStatusInline,
         GSTQuarterlyStatusInline
     ]
+    exclude = ['groups','user_permissions']
     actions = [delete_object]
 
 admin.site.unregister(User)
