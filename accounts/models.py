@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from authentication.models import Client
 
 # Create your models here.
 account_for_coding_choice=[
@@ -47,11 +47,20 @@ account_for_coding_choice=[
     ('utilities_expenses','Utilities Expenses')
 ]
 
+expenses_parent_account_name_choice=[
+    ('advertising_and_marketing_expenses', 'Advertising and Marketing Expenses'),
+    ('employment_expenses', 'Employment Expenses'),
+    ('rent_rates_repairs_expenses', 'Rent, Rates & Repairs Expenses'),
+    ('brokerage_commission_charges', 'Brokerage & Commission Charges'),
+    ('general_admin_charges', 'General & Admin Charges'),
+    ('depreciation_expenses', 'Depreciation Expenses')
+]
+
 class ZohoAccount(models.Model):
     def __str__(self):
         return self.account_name
 
-    client = models.ForeignKey(User, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
     account_id = models.CharField(max_length=30, primary_key=True)
     account_name = models.CharField(max_length=100)
     account_for_coding = models.CharField(max_length=50, choices=account_for_coding_choice, default='accounts_receivable')
@@ -117,7 +126,7 @@ class Ratio(models.Model):
         ('runway', 'Runway'),
     ]
 
-    client = models.ForeignKey(User, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
     ratio_type = models.CharField(max_length=50, choices=ratio_type_choices)
     action_need_to_be_taken = models.CharField(max_length=100, blank=True, null=True)
     period = models.DateField(auto_now=False)
