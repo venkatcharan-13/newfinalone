@@ -4,8 +4,14 @@ from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 import calendar
 import locale
+from utility import accounts_str as strvar
+import json
 
 locale.setlocale(locale.LC_ALL, 'en_IN.utf8')
+
+config_file = open("config/analytics_config.json")
+config_data = json.load(config_file)
+analytics_config_data = config_data['analytics']
 
 def get_sales_performance(client_id, current_date):
     if current_date is None:
@@ -15,7 +21,7 @@ def get_sales_performance(client_id, current_date):
 
     accounts_related_to_income = list(ZohoAccount.objects.filter(
         client_id=client_id,
-        account_type='income'
+        account_type=strvar.income
     ).values_list('account_id'))
 
     account_ids_for_income = []
@@ -49,7 +55,6 @@ def get_sales_performance(client_id, current_date):
                     transaction.credit_amount - transaction.debit_amount)
         monthly_sale[month_name] = round(monthly_sale[month_name])
 
-    # THIS PART HAS BEEN HARD CODED, WILL BE CHANGED LATER
 
     current_month = current_date.month
     current_year = current_date.year
@@ -128,13 +133,13 @@ def get_income_vs_expenses(client_id, current_date):
 
     accounts_related_to_income_expenses = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_type__in=('income', 'expense', 'other_expense')
+        account_type__in=analytics_config_data['accounts_for_income_vs_expenses']
     ).values_list('account_id', 'account_type')
 
     transactions_related_to_income_expenses = ZohoTransaction.objects.filter(
         account_id__in=(tup[0] for tup in accounts_related_to_income_expenses)
     )
-    accounts_dic = {'income': [], 'expense': [], 'other_expense': []}
+    accounts_dic = {strvar.income: [], strvar.expense: [], strvar.other_expense: []}
     for tup in accounts_related_to_income_expenses:
         accounts_dic[tup[1]].append(tup[0])
 
@@ -155,10 +160,10 @@ def get_income_vs_expenses(client_id, current_date):
         for transaction in transactions_related_to_income_expenses:
             trans_date = transaction.transaction_date
             credit_minus_debit =  transaction.credit_amount - transaction.debit_amount
-            if transaction.account_id in accounts_dic['income'] and trans_date.month == month and trans_date.year == year:
+            if transaction.account_id in accounts_dic[strvar.income] and trans_date.month == month and trans_date.year == year:
                 tot_income_vs_tot_expenses[month_name]['income'] += credit_minus_debit
 
-            if (transaction.account_id in accounts_dic['expense'] or transaction.account_id in accounts_dic['other_expense']) and trans_date.month == month and trans_date.year == year:
+            if (transaction.account_id in accounts_dic[strvar.expense] or transaction.account_id in accounts_dic[strvar.other_expense]) and trans_date.month == month and trans_date.year == year:
                 tot_income_vs_tot_expenses[month_name]['expenses'] += credit_minus_debit
 
         tot_income_vs_tot_expenses[month_name]['income'] = round(
@@ -177,7 +182,7 @@ def get_cash_inflow_outflow(client_id, current_date):
 
     accounts_related_to_bank = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding='bank_balance'
+        account_for_coding=analytics_config_data['account_for_bank_balance']
     ).values_list('account_id')
 
     transactions_related_to_bank = ZohoTransaction.objects.filter(
@@ -220,7 +225,7 @@ def get_closing_bank_balance_trend(client_id, current_date):
 
     accounts_related_to_bank = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding='bank_balance'
+        account_for_coding=analytics_config_data['account_for_bank_balance']
     ).values_list('account_id')
 
     transactions_related_to_bank = ZohoTransaction.objects.filter(
@@ -260,8 +265,7 @@ def get_gross_profit_and_net_profit(client_id, current_date):
 
     accounts_related_to_profit = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_type__in=['income', 'expense',
-                          'other_expense', 'cost_of_goods_sold']
+        account_type__in=analytics_config_data['account_types_related_to_profit']
     ).values_list('account_id', 'account_type', 'account_for_coding')
 
     accounts_map = {}
@@ -285,15 +289,15 @@ def get_gross_profit_and_net_profit(client_id, current_date):
         current_date = last_date_of_previous_month
 
     gross_profit_and_net_profit = {}
-    income_accounts = accounts_map['income']['direct_income'] + \
-        accounts_map['income']['indirect_income']
-    direct_income_accounts = accounts_map['income']['direct_income']
-    cogs_accounts = accounts_map['cost_of_goods_sold']['cost_of_goods_sold']
+    income_accounts = accounts_map[strvar.income][strvar.direct_income] + \
+        accounts_map[strvar.income][strvar.indirect_income]
+    direct_income_accounts = accounts_map[strvar.income][strvar.direct_income]
+    cogs_accounts = accounts_map[strvar.cost_of_goods_sold][strvar.cost_of_goods_sold]
     expenses_accounts = []
-    for account in accounts_map['expense']:
-        expenses_accounts.extend(accounts_map['expense'][account])
-    for account in accounts_map['other_expense']:
-        expenses_accounts.extend(accounts_map['other_expense'][account])
+    for account in accounts_map[strvar.expense]:
+        expenses_accounts.extend(accounts_map[strvar.expense][account])
+    for account in accounts_map[strvar.other_expense]:
+        expenses_accounts.extend(accounts_map[strvar.other_expense][account])
 
     for i in range(5, -1, -1):
         month = prev_six_months[i].month
@@ -333,7 +337,7 @@ def get_monthly_runaway(client_id, current_date):
 
     accounts_related_to_balance = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding__in=('bank_balance', 'cash_balance')
+        account_for_coding__in=analytics_config_data['monthly_runaway_accounts']
     ).values_list('account_id')
 
     transactions_related_to_balance = ZohoTransaction.objects.filter(
@@ -375,21 +379,21 @@ def get_gp_vs_expenses_ebitda(client_id, current_date):
 
     accounts_related_to_income = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_type = 'income'
+        account_type = strvar.income
     ).values_list('account_id')
 
     accounts_related_to_direct_income = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding = 'direct_income'
+        account_for_coding = strvar.direct_income
     ).values_list('account_id')
 
     accounts_related_to_cogs = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_type = 'cogs'
+        account_type = strvar.cogs
     ).values_list('account_id')
 
-    filter1 = Q(account_type__in = ('expense', 'other_expense'))
-    filter2 = ~Q(account_for_coding__in = ('depreciation_expenses', 'interest_expenses'))
+    filter1 = Q(account_type__in = (strvar.expense, strvar.other_expense))
+    filter2 = ~Q(account_for_coding__in = (strvar.depreciation_expenses, strvar.interest_expenses))
     filter3 = Q(client_id=client_id)
     accounts_related_to_expenses = ZohoAccount.objects.filter(
         filter1, filter2, filter3
@@ -458,23 +462,7 @@ def get_monthly_cashflow_statement(client_id, current_date):
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
-    cashflow_accounts = (
-        'bank_balance',
-        'cash_balance',
-        'accounts_receivable',
-        'other_current_assets',
-        'other_non_current_assets',
-        'trade_payables',
-        'other_long_term_liabilities_and_provisions',
-        'other_liabilities',
-        'other_current_liabilities_and_provisions',
-        'tangible_assets',
-        'short_term_loans_&_advances',
-        'long_term_loans_&_advances',
-        'short_term_borrowings',
-        'long_term_borrowings',
-        'share_capital'
-    )
+    cashflow_accounts = analytics_config_data['cashflow_accounts']
 
     # Fetching data related to cashflow accounts
     cashflow_accounts_data = ZohoAccount.objects.filter(
@@ -488,7 +476,7 @@ def get_monthly_cashflow_statement(client_id, current_date):
 
     accounts_related_to_pbt = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_type__in = ('income', 'expense', 'other_expense', 'cost_of_goods_sold')
+        account_type__in = analytics_config_data['account_types_related_to_profit']
     ).values_list('account_id', 'account_type')
 
     accounts_map = dict(accounts_related_to_pbt)
@@ -515,11 +503,11 @@ def get_monthly_cashflow_statement(client_id, current_date):
             credit_minus_debit = (transaction.credit_amount - transaction.debit_amount)
             debit_mius_credit = (transaction.debit_amount - transaction.credit_amount)
             if trans_date.month == month and trans_date.year == year:
-                if accounts_map[transaction.account_id] == 'income':
+                if accounts_map[transaction.account_id] == strvar.income:
                     income += credit_minus_debit
-                if accounts_map[transaction.account_id] == 'cost_of_goods_sold':
+                if accounts_map[transaction.account_id] == strvar.cost_of_goods_sold:
                     cogs += debit_mius_credit
-                if accounts_map[transaction.account_id] in ('expense', 'other_expense'):
+                if accounts_map[transaction.account_id] in (strvar.expense, strvar.other_expense):
                     expenses += debit_mius_credit
         pbt_lst.append(round(income-cogs-expenses))
  
@@ -556,7 +544,7 @@ def get_monthly_cashflow_statement(client_id, current_date):
         prev_seven_months.append(last_date_of_previous_month)
         current_date = last_date_of_previous_month
     prev_seven_months.reverse()
-    assets_related_types = ('fixed_asset', 'accounts_receivable', 'other_asset', 'bank', 'cash', 'other_current_asset', 'stock')
+    assets_related_types = analytics_config_data['asset_related_accounts']
 
     for account_head in transactions_map:
         temp = [0]*7
@@ -573,28 +561,28 @@ def get_monthly_cashflow_statement(client_id, current_date):
 
 
     cashflow_data['cashflow_from_operating_activities'].append(pbt_lst)
-    temp = cashflow_data_uncategorized['accounts_receivable']
+    temp = cashflow_data_uncategorized[strvar.accounts_receivable]
     lst = [0]*6
     for i in range(5, -1, -1):
         lst[i] = temp[i]- temp[i+1]
     cashflow_data['cashflow_from_operating_activities'].append(lst)
    
 
-    temp = cashflow_data_uncategorized['other_current_assets'] if cashflow_data_uncategorized['other_current_assets'] else [0]*7
+    temp = cashflow_data_uncategorized[strvar.other_current_assets] if cashflow_data_uncategorized[strvar.other_current_assets] else [0]*7
     lst = [0]*6
     for i in range(5, -1, -1):
         lst[i] = temp[i] - temp[i+1]
     cashflow_data['cashflow_from_operating_activities'].append(lst)
 
-    temp = cashflow_data_uncategorized['trade_payables'] if cashflow_data_uncategorized['trade_payables'] else [0]*7
+    temp = cashflow_data_uncategorized[strvar.trade_payables] if cashflow_data_uncategorized[strvar.trade_payables] else [0]*7
     lst = [0]*6
     for i in range(5, -1, -1):
         lst[i] = temp[i+1] - temp[i]
     cashflow_data['cashflow_from_operating_activities'].append(lst)
 
-    temp = cashflow_data_uncategorized['other_long_term_liabilities_and_provisions'] if cashflow_data_uncategorized['other_long_term_liabilities_and_provisions'] else [0]*7
-    temp2 = cashflow_data_uncategorized['other_liabilities'] if cashflow_data_uncategorized['other_liabilities'] else [0]*7
-    temp3 = cashflow_data_uncategorized['other_current_liabilities_and_provisions'] if cashflow_data_uncategorized['other_current_liabilities_and_provisions'] else [0]*7
+    temp = cashflow_data_uncategorized[strvar.other_long_term_liabilities_and_provisions] if cashflow_data_uncategorized[strvar.other_long_term_liabilities_and_provisions] else [0]*7
+    temp2 = cashflow_data_uncategorized[strvar.other_liabilities] if cashflow_data_uncategorized[strvar.other_liabilities] else [0]*7
+    temp3 = cashflow_data_uncategorized[strvar.other_current_liabilities_and_provisions] if cashflow_data_uncategorized[strvar.other_current_liabilities_and_provisions] else [0]*7
     lst = [0]*6
     for i in range(5, -1, -1):
         lst[i] = (temp[i+1] + temp2[i+1] + temp3[i+1]) - (temp[i] + temp2[i] + temp3[i]) 
@@ -606,13 +594,13 @@ def get_monthly_cashflow_statement(client_id, current_date):
             cashflow_data['net_cash_a'][i] += lst[i]
     
 
-    temp = cashflow_data_uncategorized['tangible_assets'] if cashflow_data_uncategorized['tangible_assets'] else [0]*7
+    temp = cashflow_data_uncategorized[strvar.tangible_assets] if cashflow_data_uncategorized[strvar.tangible_assets] else [0]*7
     lst = [0]*6
     for i in range(5,-1,-1):
         lst[i] = temp[i] - temp[i+1]
     cashflow_data['cashflow_from_investing_activities'].append(lst)
 
-    temp = cashflow_data_uncategorized['other_non_current_assets'] if cashflow_data_uncategorized['other_non_current_assets'] else [0]*7
+    temp = cashflow_data_uncategorized[strvar.other_non_current_assets] if cashflow_data_uncategorized[strvar.other_non_current_assets] else [0]*7
     lst = [0]*6
     for i in range(5,-1,-1):
         lst[i] = temp[i] - temp[i+1]
@@ -625,16 +613,16 @@ def get_monthly_cashflow_statement(client_id, current_date):
             cashflow_data['net_cash_b'][i] += lst[i]
 
 
-    temp = cashflow_data_uncategorized['short_term_borrowings'] if cashflow_data_uncategorized['short_term_borrowings'] else [0]*7
-    temp2 = cashflow_data_uncategorized['long_term_borrowings'] if cashflow_data_uncategorized['long_term_borrowings'] else [0]*7
-    temp3 = cashflow_data_uncategorized['short_term_loans_&_advances'] if cashflow_data_uncategorized['short_term_loans_&_advances'] else [0]*7
-    temp4 = cashflow_data_uncategorized['long_term_loans_&_advances'] if cashflow_data_uncategorized['long_term_loans_&_advances'] else [0]*7
+    temp = cashflow_data_uncategorized[strvar.short_term_borrowings] if cashflow_data_uncategorized[strvar.short_term_borrowings] else [0]*7
+    temp2 = cashflow_data_uncategorized[strvar.long_term_borrowings] if cashflow_data_uncategorized[strvar.long_term_borrowings] else [0]*7
+    temp3 = cashflow_data_uncategorized[strvar.short_term_loans_and_advances] if cashflow_data_uncategorized[strvar.short_term_loans_and_advances] else [0]*7
+    temp4 = cashflow_data_uncategorized[strvar.long_term_loans_and_advances] if cashflow_data_uncategorized[strvar.long_term_loans_and_advances] else [0]*7
     lst = [0]*6
     for i in range(5,-1,-1):
         lst[i] = (temp[i+1]+temp2[i+1]) - (temp[i]+temp2[i]) + (temp3[i]+temp4[i]) - (temp3[i+1]+temp4[i+1])
     cashflow_data['cashflow_from_financing_activities'].append(lst)
 
-    temp = cashflow_data_uncategorized['share_capital']
+    temp = cashflow_data_uncategorized[strvar.share_capital]
     lst = [0]*6
     for i in range(5,-1,-1):
         lst[i] = temp[i+1] - temp[i]
@@ -666,7 +654,7 @@ def get_pnl_summary(client_id, current_date):
 
     accounts_related_to_pnl = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_type__in = ('income', 'expense', 'other_expense', 'cost_of_goods_sold')
+        account_type__in = analytics_config_data['account_types_related_to_profit']
     ).values_list('account_id', 'account_type')
 
     accounts_map = dict(accounts_related_to_pnl)
@@ -702,11 +690,11 @@ def get_pnl_summary(client_id, current_date):
             credit_minus_debit = transaction.credit_amount - transaction.debit_amount
             debit_minus_credit = transaction.debit_amount - transaction.credit_amount
             if trans_date.month == month and trans_date.year == year:
-                if accounts_map[transaction.account_id] == 'income':
+                if accounts_map[transaction.account_id] == strvar.income:
                     income += credit_minus_debit
-                if accounts_map[transaction.account_id] == 'cost_of_goods_sold':
+                if accounts_map[transaction.account_id] == strvar.cost_of_goods_sold:
                     cogs += debit_minus_credit
-                if accounts_map[transaction.account_id] in ('expense', 'other_expense'):
+                if accounts_map[transaction.account_id] in (strvar.expense, strvar.other_expense):
                     expenses += debit_minus_credit
         pnl_summary['Income'][i] = locale.format("%.2f", income, grouping=True)
         pnl_summary['Cost of Goods Sold'][i] = locale.format("%.2f", cogs, grouping=True)
@@ -725,20 +713,7 @@ def get_balance_sheet_summary(client_id, current_date):
 
     accounts_related_to_balancesheet = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_type__in = (
-            'accounts_payable',
-            'accounts_receivable',
-            'bank',
-            'cash',
-            'equity',
-            'fixed_asset',
-            'long_term_liability',
-            'other_asset',
-            'other_current_asset',
-            'other_current_liability',
-            'other_liability',
-            'stock'
-        )
+        account_type__in = analytics_config_data['balancesheet_related_accounts']
     ).values_list('account_id', 'account_type')
 
     accounts_map_one = dict(accounts_related_to_balancesheet)
@@ -749,8 +724,7 @@ def get_balance_sheet_summary(client_id, current_date):
 
     earnings_accounts_data = ZohoAccount.objects.filter(
     client_id=client_id,
-    account_type__in=('income', 'expense',
-                        'other_expense', 'cost_of_goods_sold')
+    account_type__in=analytics_config_data['account_types_related_to_profit']
     ).values_list('account_id', 'account_type')
     accounts_map_two = dict(earnings_accounts_data)
 
@@ -787,16 +761,19 @@ def get_balance_sheet_summary(client_id, current_date):
         else:
             current_year_period = date(year, 4, 1)
 
-        assets, liabilities, equity = 0, 0, 0,
+        assets, liabilities, equity = 0, 0, 0
+        assets_related_accounts = analytics_config_data['asset_related_accounts']
+        liabilities_related_accounts = analytics_config_data['liabilities_related_accounts']
+
         for transaction in transactions_related_to_balancesheet:
             debit_minus_credit = transaction.debit_amount - transaction.credit_amount
             credit_minus_debit = transaction.credit_amount - transaction.debit_amount
             if transaction.transaction_date <= prev_six_months[i]:
-                if accounts_map_one[transaction.account_id] in ('fixed_asset', 'accounts_receivable', 'other_asset', 'bank', 'cash', 'other_current_asset', 'stock'):
+                if accounts_map_one[transaction.account_id] in assets_related_accounts:
                     assets += debit_minus_credit
-                if accounts_map_one[transaction.account_id] in ('accounts_payable', 'long_term_liability', 'other_liability', 'other_current_liability'):
+                if accounts_map_one[transaction.account_id] in liabilities_related_accounts:
                     liabilities += credit_minus_debit
-                if accounts_map_one[transaction.account_id] in ('equity'):
+                if accounts_map_one[transaction.account_id] == strvar.equity:
                     equity += credit_minus_debit
         
         for transaction in transactions_related_to_earnings:
@@ -805,19 +782,19 @@ def get_balance_sheet_summary(client_id, current_date):
             trans_date = transaction.transaction_date
 
             if trans_date >= current_year_period and trans_date <= prev_six_months[i]:
-                if accounts_map_two[transaction.account_id] == 'income':
+                if accounts_map_two[transaction.account_id] == strvar.income:
                     cy_income[i] += credit_minus_debit
-                if accounts_map_two[transaction.account_id] == 'cost_of_goods_sold':
+                if accounts_map_two[transaction.account_id] == strvar.cost_of_goods_sold:
                     cy_cogs[i] += debit_minus_credit
-                if accounts_map_two[transaction.account_id] in ('expense', 'other_expense'):
+                if accounts_map_two[transaction.account_id] in (strvar.expense, strvar.other_expense):
                     cy_expenses[i] += debit_minus_credit
 
             if trans_date < current_year_period:
-                if accounts_map_two[transaction.account_id] == 'income':
+                if accounts_map_two[transaction.account_id] == strvar.income:
                     ret_income[i] += credit_minus_debit
-                if accounts_map_two[transaction.account_id] == 'cost_of_goods_sold':
+                if accounts_map_two[transaction.account_id] == strvar.cost_of_goods_sold:
                     ret_cogs[i] += debit_minus_credit
-                if accounts_map_two[transaction.account_id] in ('expense', 'other_expense'):
+                if accounts_map_two[transaction.account_id] in (strvar.expense, strvar.other_expense):
                     ret_expenses[i] += debit_minus_credit
         
         current_year_earnings[i] = cy_income[i] - cy_cogs[i] - cy_expenses[i]

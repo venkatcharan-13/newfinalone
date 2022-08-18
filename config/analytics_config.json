@@ -1,0 +1,90 @@
+{
+    "analytics": {
+        "accounts_for_income_vs_expenses" : [
+            "income", "expense", "other_expense"
+        ],
+        "account_for_bank_balance": "bank_balance",
+        "account_types_related_to_profit": [
+            "income", 
+            "expense",
+            "other_expense", 
+            "cost_of_goods_sold"
+        ],
+        "monthly_runaway_accounts": [
+            "bank_balance", 
+            "cash_balance"
+        ],
+        "cashflow_accounts": [
+            "bank_balance",
+            "cash_balance",
+            "accounts_receivable",
+            "other_current_assets",
+            "other_non_current_assets",
+            "trade_payables",
+            "other_long_term_liabilities_and_provisions",
+            "other_liabilities",
+            "other_current_liabilities_and_provisions",
+            "tangible_assets",
+            "short_term_loans_and_advances",
+            "long_term_loans_and_advances",
+            "short_term_borrowings",
+            "long_term_borrowings",
+            "share_capital"
+        ],
+        "asset_related_accounts": [
+            "accounts_receivable", 
+            "fixed_asset", 
+            "other_asset", 
+            "other_current_asset", 
+            "stock", 
+            "cash", 
+            "bank"
+        ],
+        "balancesheet_related_accounts": [
+            "accounts_payable",
+            "accounts_receivable",
+            "bank",
+            "cash",
+            "equity",
+            "fixed_asset",
+            "long_term_liability",
+            "other_asset",
+            "other_current_asset",
+            "other_current_liability",
+            "other_liability",
+            "stock"
+        ],
+        "liabilities_related_accounts": [
+            "accounts_payable",
+            "long_term_liability", 
+            "other_liability", 
+            "other_current_liability"
+        ]
+    },
+    "insights": {
+        "expense_related_types": [
+            "expense", 
+            "other_expense"
+        ],
+        "accounts_related_to_borrowings": [
+            "long_term_borrowings", 
+            "short_term_borrowings"
+        ],
+        "asset_related_accounts": [
+            "accounts_receivable", 
+            "fixed_asset", 
+            "other_asset", 
+            "other_current_asset", 
+            "stock", 
+            "cash", 
+            "bank"
+        ],
+        "liabilities_related_accounts": [
+            "accounts_payable",
+            "long_term_liability", 
+            "other_liability", 
+            "other_current_liability"
+        ],
+        "account_for_bank_balance": "bank_balance"
+    }
+}

@@ -2,12 +2,18 @@ from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 from accounts.models import ZohoAccount, ZohoTransaction
 from utility import accounts_util
+from utility import accounts_str as strvar
 import locale
+import json
 
-current_str, previous_str, pre_prev_str = "current", "previous", "pre_prev"
-curr_per_str, prev_per_str = "curr_per", "prev_per"
-per_change_str, prev_per_change_str, three_month_avg_str = "per_change", "prev_per_change", "three_month_avg"
-change_str = "change"
+current_str, previous_str, pre_prev_str = strvar.current, strvar.previous, strvar.pre_previous
+curr_per_str, prev_per_str = strvar.current_per, strvar.previous_per
+per_change_str, prev_per_change_str, three_month_avg_str = strvar.per_change, strvar.prev_per_change, strvar.three_month_avg
+change_str, account_header_str = "change", "account_header"
+
+config_file = open("config/analytics_config.json")
+config_data = json.load(config_file)
+insights_config_data = config_data['insights']
 
 def get_insights(client_id, current_period):
     if current_period is None:
@@ -26,7 +32,7 @@ def get_insights(client_id, current_period):
 
     accounts_related_to_expenses = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_type__in = ('expense', 'other_expense')
+        account_type__in = insights_config_data['expense_related_types']
     ).values_list('account_id', 'parent_account_name')
 
     accounts_map = dict(accounts_related_to_expenses)
@@ -53,26 +59,26 @@ def get_insights(client_id, current_period):
     current, previous = prev_three_months[0], prev_three_months[1]
     for expense_head in parent_summary:
         temporary_storage = {
-            "current": 0,
-            "previous": 0,
-            "per_change": 0,
-            "three_month_avg": 0
+            current_str: 0,
+            previous_str: 0,
+            per_change_str: 0,
+            three_month_avg_str: 0
         }
         if expense_head in transactions_map:
             for transaction in transactions_map[expense_head]:
                 trans_date = transaction.transaction_date
                 debit_minus_credit = transaction.debit_amount - transaction.credit_amount
                 if trans_date.month == current.month and trans_date.year == current.year:
-                    temporary_storage['current'] += debit_minus_credit
+                    temporary_storage[current_str] += debit_minus_credit
                 if trans_date.month == previous.month and trans_date.year == previous.year:
-                    temporary_storage['previous'] += debit_minus_credit
-                temporary_storage['three_month_avg'] += debit_minus_credit
+                    temporary_storage[previous_str] += debit_minus_credit
+                temporary_storage[three_month_avg_str] += debit_minus_credit
 
-        temporary_storage['per_change'] = 0 if temporary_storage['previous'] == 0 else round((temporary_storage['current']/temporary_storage['previous']-1)*100)
-        temporary_storage['three_month_avg'] = locale.format("%.2f", temporary_storage['three_month_avg'] / 3, grouping=True)
-        temporary_storage['change'] = locale.format("%.2f", temporary_storage['current'] -  temporary_storage['previous'], grouping=True)
-        temporary_storage['current'] = locale.format("%.2f", temporary_storage['current'], grouping=True)
-        temporary_storage['previous'] = locale.format("%.2f", temporary_storage['previous'], grouping=True)
+        temporary_storage[per_change_str] = 0 if temporary_storage[previous_str] == 0 else round((temporary_storage[current_str]/temporary_storage[previous_str]-1)*100)
+        temporary_storage[three_month_avg_str] = locale.format("%.2f", temporary_storage[three_month_avg_str] / 3, grouping=True)
+        temporary_storage[change_str] = locale.format("%.2f", temporary_storage[current_str] -  temporary_storage[previous_str], grouping=True)
+        temporary_storage[current_str] = locale.format("%.2f", temporary_storage[current_str], grouping=True)
+        temporary_storage[previous_str] = locale.format("%.2f", temporary_storage[previous_str], grouping=True)
         parent_summary[expense_head] = temporary_storage
 
     current_month_payees = {}
@@ -245,7 +251,7 @@ def get_deep_insight_one(client_id, current_period):
 
     accounts_related_to_cash = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_type = 'cash'
+        account_type = strvar.cash
     ).values_list('account_id', 'account_name')
 
     accounts_map = dict(accounts_related_to_cash)
@@ -296,7 +302,7 @@ def get_deep_insight_two(client_id, current_period):
     
     accounts_related_to_loans = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding__in = ('long_term_borrowings', 'short_term_borrowings')
+        account_for_coding__in = insights_config_data['accounts_related_to_borrowings']
     ).values_list('account_id', 'account_name')
 
     accounts_map = dict(accounts_related_to_loans)
@@ -331,7 +337,7 @@ def get_deep_insight_three(client_id, current_period):
 
     accounts_related_to_revenue = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding = 'direct_income'
+        account_for_coding = strvar.direct_income
     ).values_list('account_id')
 
     transactions_related_to_revenue = ZohoTransaction.objects.filter(
@@ -360,7 +366,7 @@ def get_deep_insight_four(client_id, current_period):
 
     accounts_related_to_expenses = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_type__in = ('expense', 'other_expense')
+        account_type__in = insights_config_data['expense_related_types']
     ).values_list('account_id', 'account_for_coding')
 
     accounts_map = dict(accounts_related_to_expenses)
@@ -383,29 +389,29 @@ def get_deep_insight_four(client_id, current_period):
     for account_header in transactions_map:
 
         temporary_storage = {
-            "account_header": account_header,
-            "current": 0,
-            "previous": 0,
-            "per_change": 0,
+            account_header_str: account_header,
+            current_str: 0,
+            previous_str: 0,
+            per_change_str: 0,
         }
 
         for transaction in transactions_map[account_header]:
             trans_date = transaction.transaction_date
             debit_minus_credit = transaction.debit_amount - transaction.credit_amount
             if trans_date >= current_month_start:
-                temporary_storage["current"] += debit_minus_credit
+                temporary_storage[current_str] += debit_minus_credit
             elif transaction.transaction_date >= previous_month_start and trans_date < current_month_start:
-                temporary_storage["previous"] += debit_minus_credit
+                temporary_storage[previous_str] += debit_minus_credit
 
-        if temporary_storage['previous'] == 0:
-            temporary_storage['per_change'] = 100 if temporary_storage['current'] != 0 else 0
+        if temporary_storage[previous_str] == 0:
+            temporary_storage[per_change_str] = 100 if temporary_storage[current_str] != 0 else 0
         else:
-            temporary_storage['per_change'] = round((
-                temporary_storage['current']/temporary_storage['previous'] - 1) * 100)
+            temporary_storage[per_change_str] = round((
+                temporary_storage[current_str]/temporary_storage[previous_str] - 1) * 100)
 
-        if temporary_storage['current'] > 10000 and temporary_storage['per_change'] >= 25:
-            temporary_storage['current'] = locale.format("%.2f", temporary_storage['current'], grouping=True)
-            temporary_storage['previous'] = locale.format("%.2f", temporary_storage['previous'], grouping=True)
+        if temporary_storage[current_str] > 10000 and temporary_storage[per_change_str] >= 25:
+            temporary_storage[current_str] = locale.format("%.2f", temporary_storage[current_str], grouping=True)
+            temporary_storage[previous_str] = locale.format("%.2f", temporary_storage[previous_str], grouping=True)
             deep_insight_four_data.append(temporary_storage)
 
 
@@ -420,26 +426,13 @@ def get_deep_insight_five(client_id, current_period):
 
     accounts_related_to_assets = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_type__in = (
-            'accounts_receivable',
-            'bank',
-            'cash',
-            'fixed_asset',
-            'other_asset',
-            'other_current_asset',
-            'stock'
-        )
+        account_type__in = insights_config_data['asset_related_accounts']
     ).values_list('account_id', 'account_name')
     assets_accounts_map = dict(accounts_related_to_assets)
 
     accounts_related_to_liabilities = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_type__in = (
-            'accounts_payable',
-            'long_term_liability',
-            'other_current_liability',
-            'other_liability'
-        )
+        account_type__in = insights_config_data['liabilities_related_accounts']
     ).values_list('account_id', 'account_name')
     liabilities_accounts_map = dict(accounts_related_to_liabilities)
 
@@ -550,7 +543,7 @@ def get_deep_insight_seven(client_id, current_period):
 
     accounts_related_to_rent_expenses = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding = 'rent_expenses'
+        account_for_coding = strvar.rent_expenses
     ).values_list('account_id')
 
     transactions_related_to_rent_expenses = ZohoTransaction.objects.filter(
@@ -587,7 +580,7 @@ def get_deep_insight_eight(client_id, current_period):
 
     accounts_related_to_commission = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding = 'brokerage_and_commission_charges'
+        account_for_coding = strvar.brokerage_and_commission_charges
     ).values_list('account_id')
 
     transactions_related_to_commission = ZohoTransaction.objects.filter(
@@ -624,7 +617,7 @@ def get_deep_insight_nine(client_id, current_period):
 
     accounts_related_to_professional_fees = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding = 'legal_and_professional_fees'
+        account_for_coding = strvar.legal_and_professional_fees
     ).values_list('account_id')
 
     transactions_related_to_professional_fees = ZohoTransaction.objects.filter(
@@ -658,7 +651,7 @@ def get_deep_insight_ten(client_id, current_period):
 
     accounts_related_to_expenses = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_type__in = ('expense', 'other_expense')
+        account_type__in = insights_config_data['expense_related_types']
     ).values_list('account_id', 'account_for_coding')
 
     accounts_map = dict(accounts_related_to_expenses)
@@ -679,7 +672,7 @@ def get_deep_insight_ten(client_id, current_period):
     )
 
     month_wise_payee = {
-        "1": set(), "2": set(), "3": set(), "current": set()
+        "1": set(), "2": set(), "3": set(),current_str: set()
     }
 
     for transaction in transactions_related_to_expense:
@@ -691,13 +684,13 @@ def get_deep_insight_ten(client_id, current_period):
         elif trans_date >= prev_four_months[2] and trans_date < prev_four_months[3]:
             month_wise_payee["3"].add(transaction.payee)
         else:
-            month_wise_payee["current"].add(transaction.payee)
+            month_wise_payee[current_str].add(transaction.payee)
 
     absent_payees = set()
     for transaction in transactions_related_to_expense:
         payee = transaction.payee
         if (payee in month_wise_payee['1']) and (payee in month_wise_payee['2']) and (payee in month_wise_payee['3']):
-            if payee not in month_wise_payee['current']:
+            if payee not in month_wise_payee[current_str]:
                 absent_payees.add(payee)
 
     deep_insight_ten_data = []
@@ -745,7 +738,7 @@ def get_deep_insight_twelve(client_id, current_period):
 
     accounts_related_to_bank = ZohoAccount.objects.filter(
         client_id=client_id,
-        account_for_coding = 'bank_balance'
+        account_for_coding = insights_config_data['account_for_bank_balance']
     ).values_list('account_id', 'account_name')
 
     accounts_map = dict(accounts_related_to_bank)
