@@ -7,37 +7,143 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <!-- JavaScript Bundle with Popper -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
     crossorigin="anonymous"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-  <script src="{% static 'js/jquery.table2excel.js' %}" type="text/javascript"></script>
+  <!-- <script src="{% static 'js/jquery.table2excel.js' %}" type="text/javascript"></script> -->
   <title>{% block title %}{% endblock title %}</title>
 </head>
 
-<body>
-  <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid d-flex flex-row">
-      <p class="h4 text-white">{% if user.is_authenticated %}{{ user.first_name }} {{ user.last_name }}{% endif %}</p>
+<body class="skeleton">
+  <div class="topnav" id="navbar">
+    <div class="float-start">
+      <img src="https://uploads-ssl.webflow.com/629b1dcd203ede987b4789e8/62a7035f0a53a20d320bedec_Untitled_design-14-removebg-preview.png" alt="Company Logo"
+        width="200" height="45">
     </div>
     <div class="float-end">
-      <a class="h4 navbar-brand" href="/auth/logout/">Logout</a>
+      <ul>
+        <a class="nav-link TopIcons" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNotification"
+          aria-controls="offcanvasNotification">
+          <ion-icon name="notifications-outline"></ion-icon>
+        </a>
+        <a class="nav-link TopIcons" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSettings"
+          aria-controls="offcanvasSettings">
+          <ion-icon name="settings-outline"></ion-icon>
+        </a>
+        <a class="nav-link TopIcons" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasHelp"
+          aria-controls="offcanvasHelp">
+          <ion-icon name="help-circle-outline"></ion-icon>
+        </a>
+        <a class="nav-link TopIcons" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasProfile"
+          aria-controls="offcanvasProfile">
+          <ion-icon name="person-circle-outline"></ion-icon>
+        </a>
+      </ul>
     </div>
-  </nav>
+  </div>
+
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNotification"
+    aria-labelledby="offcanvasNotificationsLabel">
+    <div class="offcanvas-header">
+      <h5 id="offcanvasNotificationsLabel">Notifications</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      Notifications shown here
+    </div>
+  </div>
+
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasSettings" aria-labelledby="offcanvasSettingsLabel">
+    <div class="offcanvas-header">
+      <h5 id="offcanvasSettingsLabel">Settings</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      Settings here
+    </div>
+  </div>
+
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasHelp" aria-labelledby="offcanvasHelpLabel">
+    <div class="offcanvas-header">
+      <h5 id="offcanvasHelpLabel">Help</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      we can help u here!
+    </div>
+  </div>
+
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasProfile" aria-labelledby="offcanvasProfileLabel">
+    <div class="offcanvas-header">
+      <h5 id="offcanvasProfileLabel">Profile</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <h4>This is profile</h4>
+
+      <a class="h4 navbar-brand" href="/auth/logout/">
+        <ion-icon name="log-out-outline" style="margin-right: 5px;font-size:50px"></ion-icon>
+      </a>
+
+    </div>
+  </div>
+
   <div class="sidenav">
-    <a href="/" class="{% block current1 %}{% endblock current1 %}">Home</a>
-    <a href="/accounts" class="{% block current2 %}{% endblock current2 %}">Accounts</a>
-    <a href="/analytics" class="{% block current3 %}{% endblock current3 %}">Analytics</a>
-    <a href="/taxes" class="{% block current4 %}{% endblock current4 %}">Taxes</a>
-    <a href="/help" class="{% block current5 %}{% endblock current5 %}">Help</a>
-    <a href="/profile" class="{% block current6 %}{% endblock current6 %}">Profile</a>
+    <a href="/" class="{% block current1 %}{% endblock current1 %}">
+      <b>
+        <ion-icon name="home-outline" style="margin-right:2px"></ion-icon>Home
+      </b></a>
+    <a href="/accounts" class="{% block current2 %}{% endblock current2 %}">
+      <b>
+        <ion-icon name="cellular-outline" style="margin-right:2px"></ion-icon> Accounts
+      </b></a>
+    <a href="/analytics" class="{% block current3 %}{% endblock current3 %}">
+      <b>
+        <ion-icon name="analytics" style="margin-right:2px"></ion-icon>Analytics
+      </b></a>
+    <a href="/taxes" class="{% block current4 %}{% endblock current4 %}">
+      <b>
+        <ion-icon name="document-text-outline" style="margin-right:2px"></ion-icon>Taxes
+      </b> </a>
+    <a href="/help" class="{% block current5 %}{% endblock current5 %}">
+      <b>
+        <ion-icon name="help-outline" style="margin-right:2px"></ion-icon>Help
+      </b> </a>
+    <a href="/profile" class="{% block current6 %}{% endblock current6 %}">
+      <b>
+        <ion-icon name="person-outline" style="margin-right:2px"></ion-icon>Profile
+      </b> </a>
   </div>
   <div class="main">
+
     {% block content %}{% endblock content %}
+
+  </div>
+  <script>
+    window.onscroll = function () {
+      myFunction()
+    };
+
+    var navbar = document.getElementById("navbar");
+    var sticky = navbar.offsetTop;
+
+    function myFunction() {
+      if (window.pageYOffset >= sticky) {
+        navbar.classList.add("sticky")
+      } else {
+        navbar.classList.remove("sticky");
+      }
+    }
+  </script>
 </body>
 
 </html>

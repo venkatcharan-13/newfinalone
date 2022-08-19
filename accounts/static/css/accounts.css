@@ -1,0 +1,54 @@
+.customCard-body {
+    margin-bottom: 25px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 25px;
+    background-color: white;
+}
+
+.customCard-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.forTopTable {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.topTable {
+    width: 70%;
+    background-color: white;
+    border-radius: 10px;
+    padding-top: 5px;
+}
+
+.topTableColumn {
+    width: 15%;
+    height: 60;
+    text-align: center;
+}
+
+.nav-link {
+    color: black;
+}
+
+.nav-link:hover {
+    background-color: #d2d3d6;
+    color: black;
+}
+
+.dropDownBtn {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    margin-bottom: 7px;
+}
+
+.alltables {
+    width: 100%;
+}

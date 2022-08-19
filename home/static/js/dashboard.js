@@ -135,3 +135,9 @@ function fillStatutoryCompliances(data, tid) {
     })
   })
 }
+
+function copyToClipboard() {
+  var copyText = document.getElementById("referralCode");
+  navigator.clipboard.writeText(copyText.innerText);
+  alert(copyText.innerText)
+}

@@ -42,13 +42,15 @@ $.ajax({
     fillBalsheetRows(response.response_data.other_current_liability.data, 'ocliab');
     fillBalsheetHeads(response.response_data.other_liability, 'Other Liability', 'othliab_head')
     fillBalsheetRows(response.response_data.other_liability.data, 'othliab');
-    fillBalsheetRows(response.response_data.equity, 'equity');
+    fillBalsheetRows(response.response_data.equity.data, 'equity');
     document.getElementById('head_equity').innerHTML = response.response_data.total_equity.current;
     document.getElementById('head_liabilities').innerHTML = response.response_data.total_liabilities.current;
     document.getElementById('head_assets').innerHTML = response.response_data.total_assets.current;
     fillTotalHead(response.response_data.total_assets, 'total_of_assets', 'Total Assets');
     fillTotalHead(response.response_data.total_liabilities, 'total_of_liabilities', 'Total Liabilities');
     fillTotalHead(response.response_data.total_equity, 'total_of_equity', 'Total Equity');
+    document.getElementById('table_info').innerHTML = response.description;
+    document.getElementById('table_info_head').innerHTML = "Balance Sheet";
   },
   error: function (error_data) {
     console.log("Error2");

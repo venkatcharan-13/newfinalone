@@ -26,6 +26,8 @@ $.ajax({
         fillRatiosTableRows(response.response_data.liquidity_ratio, 'liquidity_ratio');
         fillRatiosTableRows(response.response_data.op_eff_ratios, 'op_eff_ratios');
         fillRatiosTableRows(response.response_data.solvency_ratios, 'solvency_ratios');
+        document.getElementById('table_info').innerHTML = response.description;
+        document.getElementById('table_info_head').innerHTML = "Ratios";
     },
     error: function (error_data) {
         console.log("Error4");

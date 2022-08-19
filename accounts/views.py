@@ -185,7 +185,7 @@ class BalanceSheetData(APIView):
         bal_sheet_data = acc_gets.get_balsheet(selected_month, logged_client_id)
         current_year_earnings, retained_earnings = acc_gets.get_earnings(selected_month, logged_client_id)
 
-        bal_sheet_data['equity'].extend([
+        bal_sheet_data['equity']['data'].extend([
             {
                 account_header_str: "Current Year earnings",
                 current_str: current_year_earnings[current_str],

@@ -4,17 +4,27 @@
 
 {% block content %}
 
-<ul class="nav nav-tabs">
-  <li class="nav-item">
-    <a class="nav-link {%block active%}{%endblock active%}" aria-current="page" href="/help/">Chat</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link {%block active2%}{%endblock active2%}" href="/help/resources/">Resources</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link {%block active3%}{%endblock active3%}" href="/help/raise_ticket/">Raise Ticket</a>
-  </li>
-</ul>
+<div class="forTopSection">
+  <h5 id="DispalyNameOfCompany">JordenSky</h5>
+  <h1><b>Help</b></h1>
+</div><br>
+
+<div class="row">
+  <div class="col-7">
+    <ul class="nav nav-pills nav-fill">
+      <li class="nav-item">
+        <a class="nav-link {%block active%}{%endblock active%} " aria-current="page" href="/help/">Chat</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {%block active2%}{%endblock active2%}" href="/help/resources/">Resources</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {%block active3%}{%endblock active3%}" href="/help/raise_ticket/">Raise Ticket</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
 {% block body %}{% endblock body %}
 
 {% block script %}{% endblock script %}

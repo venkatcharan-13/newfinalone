@@ -3,23 +3,33 @@
 {% block current6 %} current {% endblock current6 %}
 
 {% block content %}
-<ul class="nav nav-tabs">
-  <li class="nav-item">
-    <a class="nav-link {%block active%}{%endblock active%}" aria-current="page" href="/profile">Overview</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link {%block active2%}{%endblock active2%}" href="/profile/company">Company</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link {%block active3%}{%endblock active3%}" href="/profile/context">Context</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link {%block active4%}{%endblock active4%}" href="/profile/connections">Connections</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link {%block active5%}{%endblock active5%}" href="/profile/banks">Bank Details</a>
-  </li>
-</ul>
+<div class="forTopSection">
+  <h5 id="DispalyNameOfCompany">JordenSky</h5>
+  <h1><b>Profile</b></h1>
+</div>
+
+<div class="row">
+  <div class="col-7">
+    <ul class="nav nav-pills nav-fill">
+      <li class="nav-item">
+        <a class="nav-link {%block active%}{%endblock active%}" aria-current="page" href="/profile">Overview</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {%block active2%}{%endblock active2%} forAlignmentM" href="/profile/company">Company</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {%block active3%}{%endblock active3%} forAlignmentM" href="/profile/context">Context</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {%block active4%}{%endblock active4%} forAlignmentM"
+          href="/profile/connections">Connections</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {%block active5%}{%endblock active5%} forAlignmentM" href="/profile/banks">Bank Details</a>
+      </li>
+    </ul>
+  </div>
+</div>
 {% block body %}{% endblock body %}
 {% block script %}{% endblock script %}
 

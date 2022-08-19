@@ -1,40 +1,54 @@
-.navbar {
-    z-index: 2;
+.skeleton {
+    font-family: 'Poppins';
+    color: black;
+    background-color: #f4f5fa;
 }
+
+
+h6 {
+    font-weight: 500;
+}
+
+b {
+    font-weight: 900;
+}
+
 .sidenav {
 	height: 100%;
 	width: 200px;
 	position: fixed;
 	z-index: 1;
-	top: 50;
-	left: 0;
-	background-color: #212529;
+	background-color: #f4f5fa;
 	overflow-x: hidden;
-	padding-top: 40px;
+	padding-top: 30px;
 }
 
 .sidenav a {
-	padding: 20px 6px 6px 32px;
+	padding: 15px 6px 6px 32px;
 	text-decoration: none;
-	font-size: 25px;
-	color: #818181;
+	font-size: 18px;
+	color: black;
 	display: block;
 }
 
 .sidenav a:hover {
-	color: #f6f6f6;
+	background-color: white;
+    border-radius: 10px;
+	color: #7a85f5;
 }
 
 .sidenav .current {
-	color: #f6f6f6;
+	color: #4a3aff;
 }
 
 .main {
+	align-items: center;
+    justify-content: center;
 	margin-top: 50px;
 	margin-left: 250px;
 	margin-right: 20px;
-	width: 70%;
-	/* Same as the width of the sidenav */
+	width: 80%;
+	padding-top: 50px;
 }
 
 .month-dropdown {
@@ -59,4 +73,59 @@
 	.sidenav a {
 		font-size: 18px;
 	}
+}
+
+.TopIcons {
+    font-size: 23px;
+}
+
+.topnav {
+    overflow: hidden;
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    width: 100%;
+    background-color: #f4f5fa;
+}
+
+.topnav a {
+    float: left;
+    display: block;
+    color: black;
+    padding: 14px 10px;
+    font-size: 25px;
+}
+
+
+/* Apps common css */
+
+.form {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+}
+
+.nav-link {
+    color: black !important;
+}
+
+.nav-link:hover {
+    background-color: #d2d3d6 !important;
+    color: black !important;
+}
+
+.customCard {
+    background-color: white;
+    border-radius: 5px;
+}
+
+.customCard-header {
+    padding: 15px;
+    border-bottom: 1px solid #f5f3f2;
+}
+
+.sticky {
+    position: fixed;
+    top: 0;
+    width: 100%;
 }

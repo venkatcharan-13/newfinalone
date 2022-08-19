@@ -3,25 +3,32 @@
 {% block current4 %} current {% endblock current4 %}
 
 {% block content %}
-<br>
-<div>
-  <form action="" class="form">
-    <input type="month" name="date" id="periodSelector" onchange="changePeriod(this.value)">
-  </form>
+<div class="forTopSection">
+  <h5 id="DispalyNameOfCompany">JordenSky</h5>
+  <h1><b>Taxes</b></h1>
 </div>
 <br>
 
-<ul class="nav nav-tabs">
-  <li class="nav-item">
-    <a class="nav-link {%block active%}{%endblock active%}" aria-current="page" href="/taxes">Income Tax</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link {%block active2%}{%endblock active2%}" href="/taxes/gst">GST</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link {%block active3%}{%endblock active3%}" href="/taxes/othertax">Other Taxes</a>
-  </li>
-</ul>
+<div class="row">
+  <div class="col-7">
+    <ul class="nav nav-pills nav-fill">
+      <li class="nav-item">
+        <a class="nav-link {%block active%}{%endblock active%}" aria-current="page" href="/taxes">Income Tax</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {%block active2%}{%endblock active2%} forAlignmentM" href="/taxes/gst">GST</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {%block active3%}{%endblock active3%}" href="/taxes/othertax">Other Taxes</a>
+      </li>
+    </ul>
+  </div>
+  <div class="col-5 form">
+    <form action="">
+      <input type="month" name="date" id="periodSelector" onchange="changePeriod(this.value)">
+    </form>
+  </div>
+</div>
 {% block body %}{% endblock body %}
 {% block script %}{% endblock script %}
 

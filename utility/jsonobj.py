@@ -22,7 +22,12 @@ json_structure = {
         'accounts_receivable': [],
         'cash': [],
         'bank': [],
-        'equity': [],
+        'equity': {
+            'current_total': 0,
+            'previous_total': 0,
+            'overall_change': 0,
+            'data': []
+        },
         'fixed_asset': {
             'current_total': 0,
             'previous_total': 0,

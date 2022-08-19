@@ -29,6 +29,8 @@ $.ajax({
     fillCashflowTotals(response.response_data.net_cash_c, 'netC', 'Cashflow from Financing');
     fillCashflowTotals(response.response_data.net_change_abc, 'netABC', 'Net Change in Cash (A)+(B)+(C)');
     fillCashflowTotals(response.response_data.ending_cash_balance, 'endbal', 'Ending Cash Balance');
+    document.getElementById('table_info').innerHTML = response.description;
+    document.getElementById('table_info_head').innerHTML = "Cashflow";
   },
   error: function (error_data) {
     console.log("Error3");

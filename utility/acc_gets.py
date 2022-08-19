@@ -349,7 +349,7 @@ def get_balsheet(period, logged_client_id):
             temporary_storage[per_change_str] = round((
                 temporary_storage[current_str]/temporary_storage[previous_str] - 1) * 100)
 
-        if account_header[0] in (strvar.accounts_payable, strvar.accounts_receivable, strvar.cash, strvar.bank, strvar.equity):
+        if account_header[0] in (strvar.accounts_payable, strvar.accounts_receivable, strvar.cash, strvar.bank):
             bal_sheet_data[account_header[0]].append(temporary_storage)
         else:
             bal_sheet_data[account_header[0]]['data'].append(temporary_storage)
@@ -402,9 +402,9 @@ def get_balsheet(period, logged_client_id):
         (bal_sheet_data[total_liabilities][current_str]/bal_sheet_data[total_liabilities][previous_str]-1)*100)
 
     bal_sheet_data[total_equity] = {current_str: 0, previous_str: 0}
-    for acc in bal_sheet_data[strvar.equity]:
-        bal_sheet_data[total_equity][current_str] = acc[current_str]
-        bal_sheet_data[total_equity][previous_str] = acc[previous_str]
+    for acc in bal_sheet_data[strvar.equity]['data']:
+        bal_sheet_data[total_equity][current_str] += acc[current_str]
+        bal_sheet_data[total_equity][previous_str] += acc[previous_str]
     bal_sheet_data[total_equity][per_change_str] = 0 if bal_sheet_data[total_equity][previous_str] == 0 else round(
         (bal_sheet_data[total_equity][current_str]/bal_sheet_data[total_equity][previous_str]-1)*100)
 
@@ -767,7 +767,10 @@ def get_ratios(period, logged_client_id):
     ratios_data['profit_ratios'].append(temporary_storage)
 
     if balsheet_data[strvar.equity]:
-        equity = balsheet_data[strvar.equity][0]
+        for acc in balsheet_data[strvar.equity]['data']:
+            if acc[account_header_str] == "Share Capital":
+                equity = acc
+                break
     else:
         equity = {
             account_header_str: "Share Capital",
