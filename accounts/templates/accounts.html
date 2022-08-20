@@ -4,26 +4,30 @@
 {% block active %}active{% endblock active %}
 {% block body %}
 
-<table class="table " style="width:100%;margin-top:20px;">
-  <thead>
-    <tr>
-      <th scope="col"> Sales </th>
-      <th scope="col"> COGS </th>
-      <th scope="col"> Gross Profit </th>
-      <th scope="col"> Expenses </th>
-      <th scope="col"> Profit </th>
-    </tr>
-  </thead>
-  <tbody>
-    <td id="head_sales"></td>
-    <td id="head_cogs"></td>
-    <td id="head_grossprofit"></td>
-    <td id="head_exp"></td>
-    <td id="head_profit"></td>
-  </tbody>
-</table>
+<div class="summary">
+  <div class="shadow-sm summaryTable">
+    <table class="table table-borderless">
+      <thead>
+        <tr>
+          <th scope="col"> Revenue </th>
+          <th scope="col"> COGS </th>
+          <th scope="col"> Gross Profit </th>
+          <th scope="col"> Expenses </th>
+          <th scope="col"> Profit </th>
+        </tr>
+      </thead>
+      <tbody>
+        <td id="head_sales"></td>
+        <td id="head_cogs"></td>
+        <td id="head_grossprofit"></td>
+        <td id="head_exp"></td>
+        <td id="head_profit"></td>
+      </tbody>
+    </table>
+  </div>
+</div>
 
-<table class="table table-bordered" id="pnltable">
+<table class="table border table-borderless" id="pnltable">
   <thead>
     <tr>
       <th scope="col" style="width: 35%;">Particulars</th>
@@ -39,14 +43,6 @@
     <tr class="table-active" id="income_total">
       <th scope="row" colspan="7">Income</th>
     </tr>
-    <tr>
-      <td colspan="7">
-        <table class="table mb-0" id="income">
-          <tbody>
-          </tbody>
-        </table>
-      </td>
-    </tr>
     <tr class="table-active" id="cogs">
     </tr>
     <tr>
@@ -58,14 +54,6 @@
     </tr>
     <tr class="table-active" id="expense_total">
       <th scope="row" colspan="7">Expenses</th>
-    </tr>
-    <tr>
-      <td colspan="7">
-        <table class="table mb-0" id="expense">
-          <tbody>
-          </tbody>
-        </table>
-      </td>
     </tr>
     <tr class="table-active" id="ebit"></tr>
     <tr id="int_exp"></tr>

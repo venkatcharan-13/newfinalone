@@ -20,12 +20,12 @@ $.ajax({
     console.log("Success PNL");
     document.getElementById('current_month').innerHTML = response.current_period;
     document.getElementById('previous_month').innerHTML = response.previous_period;
-    fillPnlTableIncome(response.response_data.income.data, 'income');
-    fillPnlTableCogs(response.response_data.cost_of_goods_sold, 'cogs', 'Costs of Goods Sold');
-    fillPnlTableExpenses(response.response_data.expense, 'expense');
     fillPnlTableTotals(response.response_data.income, 'income_total', 'Income');
-    fillPnlTableExpenseTotals(response.response_data.total_expense, 'expense_total', 'Expenses');
+    fillPnlTableIncome(response.response_data.income.data);
+    fillPnlTableCogs(response.response_data.cost_of_goods_sold, 'cogs', 'Costs of Goods Sold');
     fillPnlTableGrossProfit(response.response_data.gross_profit, 'grossprofit', 'Gross Profit');
+    fillPnlTableExpenseTotals(response.response_data.total_expense, 'expense_total', 'Expenses');
+    fillPnlTableExpenses(response.response_data.expense, 'expense');
     fillPnlTableIndividuals(response.response_data.ebit, 'ebit', 'EBIT');
     fillPnlTableIndividuals(response.response_data.interest_expenses, 'int_exp', 'Interest Expenses');
     fillPnlTableIndividuals(response.response_data.tax_expenses, 'tax_exp', 'Taxes');
@@ -73,10 +73,15 @@ function fillPnlTableExpenseTotals(object, tid, head) {
     '<th style="width: 13%; text-align:right;">' + object.three_month_avg + '</th>';
 }
 
-function fillPnlTableIncome(data, tid) {
-  var table = document.getElementById(tid);
+function fillPnlTableIncome(data) {
+  var table = document.getElementById('pnltable');
+  var i = document.getElementById('income_total').rowIndex + 1;
+  if(data.length == 0){
+    var tr = table.insertRow(i);
+    tr.innerHTML = '<td></td>';
+  }
   data.forEach(function (object) {
-    var tr = document.createElement('tr');
+    var tr = table.insertRow(i);
     tr.innerHTML = '<td style="width:35%;"> <a href="pnl/' + object.account_for_coding + '/?selected_date=' + choosen_month + '" style="text-decoration: none">' + object.account_header + '</a></td>' +
       '<td style="width: 12%; text-align:right;">' + object.current + '</td>' +
       '<td style="width: 8%; text-align:right;">' + '' + '</td>' +
@@ -84,7 +89,7 @@ function fillPnlTableIncome(data, tid) {
       '<td style="width: 8%; text-align:right;">' + '' + '</td>' +
       '<td style="width: 12%; text-align:center;">' + object.per_change + '%</td>' +
       '<td style="width: 13%; text-align:right;">' + object.three_month_avg + '</td>';
-    table.appendChild(tr);
+    i++;
   })
 }
 
@@ -119,9 +124,14 @@ function fillPnlTableIndividuals(object, tid, head) {
 }
 
 function fillPnlTableExpenses(data, tid) {
-  var table = document.getElementById(tid);
+  var table = document.getElementById('pnltable');
+  var i = document.getElementById('expense_total').rowIndex + 1;
+  if(data.length == 0){
+    var tr = table.insertRow(i);
+    tr.innerHTML = '<td></td>';
+  }
   Object.keys(data).forEach(function (category) {
-    var tr = document.createElement('tr');
+    var tr = table.insertRow(i);
     tr.innerHTML = '<th style="width:35%">' + category + '</th>' +
     '<th style="width: 12%; text-align:right;">' + data[category]['current'] + '</th>' +
     '<th style="width: 8%;text-align: center;">' +  data[category]['curr_per'] + '%</th>' +
@@ -129,9 +139,9 @@ function fillPnlTableExpenses(data, tid) {
     '<th style="width: 8%; text-align: center;">' +  data[category]['prev_per'] + '%</th>' +
     '<th style="width: 12%; text-align:center;">' + data[category]['per_change'] + '%</th>' +
     '<th style="width: 13%; text-align:right;">' + data[category]['three_month_avg'] + '</th>';
-    table.appendChild(tr)
+    i++;
     data[category]['data'].forEach(function (object) {
-      var tr = document.createElement('tr');
+      var tr = table.insertRow(i);
       tr.innerHTML = '<td style="width:35%;"> <a href="pnl/' + object.account_for_coding + '/?selected_date=' + choosen_month + '" style="text-decoration: none">' + object.account_header + '</a></td>' +
         '<td style="width: 12%; text-align:right;">' + object.current + '</td>' +
         '<td style="width: 8%; text-align:right;">' + '' + '</td>' +
@@ -139,7 +149,7 @@ function fillPnlTableExpenses(data, tid) {
         '<td style="width: 8%; text-align:right;">' + '' + '</td>' +
         '<td style="width: 12%; text-align:center;">' + object.per_change + '%</td>' +
         '<td style="width: 13%; text-align:right;">' + object.three_month_avg + '</td>';
-      table.appendChild(tr);
+      i++;
     })
   })
 }

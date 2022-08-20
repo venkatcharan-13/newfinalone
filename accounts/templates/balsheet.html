@@ -4,205 +4,79 @@
 {% block active2 %}active{% endblock active2 %}
 {% block body %}
 
-<table class="table " style="width:100%;margin-top:20px;">
-  <thead>
-    <tr>
-      <th scope="col"> Total Assets </th>
-      <th scope="col"> Total Liabilities </th>
-      <th scope="col"> Equity </th>
-    </tr>
-  </thead>
-  <tbody>
-    <td id="head_assets"></td>
-    <td id="head_liabilities"></td>
-    <td id="head_equity"></td>
-  </tbody>
-</table>
+<div class="summary">
+  <div class="shadow-sm summaryTable">
+    <table class="table table-borderless">
+      <thead>
+        <tr>
+          <th scope="col"> Total Assets </th>
+          <th scope="col"> Total Liabilities </th>
+          <th scope="col"> Equity </th>
+        </tr>
+      </thead>
+      <tbody>
+        <td id="head_assets"></td>
+        <td id="head_liabilities"></td>
+        <td id="head_equity"></td>
+      </tbody>
+    </table>
+  </div>
+</div>
 
-<table class="table table-striped table-bordered" id="assets">
+<table class="table border table-borderless" id="balsheet_table">
   <thead>
     <tr>
-      <th scope="col" style="width: 40%;">ASSETS</th>
-      <th scope="col" style="width: 20%; text-align: right;" id="current_month_assets"></th>
-      <th scope="col" style="width: 20%; text-align: right;" id="previous_month_assets"></th>
-      <th scope="col" style="width: 20%; text-align: center;">% Change</th>
+      <th scope="col" style="width: 34%;">Particulars</th>
+      <th scope="col" style="width: 22%; text-align: right;" id="current_month"></th>
+      <th scope="col" style="width: 22%; text-align: right;" id="previous_month"></th>
+      <th scope="col" style="width: 22%; text-align: center;">Increase/Decrease(%)</th>
     </tr>
   </thead>
+
   <tbody>
-    <tr id="fixasset_head">
-    </tr>
-    <tr>
-      <td colspan="4">
-        <table class="table mb-0" id="fixasset">
-          <tbody>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-    <tr id="othasset_head">
-    </tr>
-    <tr>
-      <td colspan="4">
-        <table class="table mb-0" id="othasset">
-          <tbody>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-    <!-- <tr>
-      <th scope="row" colspan="4">Accounts Receivable</th>
-    </tr> -->
-    <tr>
-      <td colspan="4">
-        <table class="table mb-0" id="acc_rec">
-          <tbody>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-    <tr>
-      <td></td>
-    </tr>
-    <!-- <tr>
-      <th scope="row" colspan="4">Bank</th>
-    </tr> -->
-    <tr>
-      <td colspan="4">
-        <table class="table mb-0" id="bank">
-          <tbody>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-    <tr>
-      <td></td>
-    </tr>
-    <!-- <tr>
-      <th scope="row" colspan="4">Cash</th>
-    </tr> -->
-    <tr>
-      <td colspan="4">
-        <table class="table mb-0" id="cash">
-          <tbody>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-    <tr>
-      <td></td>
-    </tr>
-    <tr id="ocasset_head">
-    </tr>
-    <tr>
-      <td colspan="4">
-        <table class="table mb-0" id="ocasset">
-          <tbody>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-    <tr id="stock_head">
-    </tr>
-    <tr>
-      <td colspan="4">
-        <table class="table mb-0" id="stock">
-          <tbody>
-          </tbody>
-        </table>
-      </td>
-    </tr>
     <tr class="table-dark" id="total_of_assets">
 
     </tr>
-  </tbody>
-</table>
+    <tr id="fixasset_head" class="table-secondary">
+    </tr>
+    <tr id="othasset_head" class="table-secondary">
+    </tr>
+    <tr><td></td></tr>
+    <tr id="acc_rec" class="table-secondary"></tr>
+    <tr id="bank" class="table-secondary"></tr>
+    <tr id="cash" class="table-secondary"></tr>
+    <tr><td></td></tr>
+    <tr id="ocasset_head" class="table-secondary">
+    </tr>
+    <tr id="stock_head" class="table-secondary">
+    </tr>
+    <tr><td></td></tr>
 
-<table class="table table-striped table-bordered" id="liabilities">
-  <thead>
-    <tr>
-      <th scope="col" style="width: 40%;">LIABILITIES</th>
-      <th scope="col" style="width: 20%; text-align: right;" id="current_month_liabilities"></th>
-      <th scope="col" style="width: 20%; text-align: right;" id="previous_month_liabilities"></th>
-      <th scope="col" style="width: 20%; text-align: center;">% Change</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr id="ltliab_head">
-    </tr>
-    <tr>
-      <td colspan="4">
-        <table class="table mb-0" id="ltliab">
-          <tbody>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-    <tr id="othliab_head">
-    </tr>
-    <tr>
-      <td colspan="4">
-        <table class="table mb-0" id="othliab">
-          <tbody>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-    <!-- <tr>
-      <th scope="row" colspan="4">Accounts Payable</th>
-    </tr> -->
-    <tr>
-      <td colspan="4">
-        <table class="table mb-0" id="acc_pay">
-          <tbody>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-    <tr>
-      <td></td>
-    </tr>
-    <tr id="ocliab_head">
-    </tr>
-    <tr>
-      <td colspan="4">
-        <table class="table mb-0" id="ocliab">
-          <tbody>
-          </tbody>
-        </table>
-      </td>
-    </tr>
     <tr class="table-dark" id="total_of_liabilities">
+    
+    </tr>
+    <tr id="ltliab_head" class="table-secondary">
+    </tr>
+    <tr><td></td></tr>
+    <tr id="othliab_head" class="table-secondary">
+    </tr>
+    <tr><td></td></tr>
+    <tr id="acc_pay" class="table-secondary"></tr>
+    <tr><td></td></tr>
+    <tr id="ocliab_head" class="table-secondary">
+    </tr>
+    <tr><td></td></tr>
 
-    </tr>
-  </tbody>
-</table>
-
-<table class="table table-striped table-bordered" id="liabilities">
-  <thead>
-    <tr>
-      <th scope="col" style="width: 40%;">EQUITIES</th>
-      <th scope="col" style="width: 20%; text-align: right;" id="current_month_equity"></th>
-      <th scope="col" style="width: 20%; text-align: right;" id="previous_month_equity"></th>
-      <th scope="col" style="width: 20%; text-align: center;">% Change</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row" colspan="4">Equity</th>
-    </tr>
-    <tr>
-      <td colspan="4">
-        <table class="table mb-0" id="equity">
-          <tbody>
-          </tbody>
-        </table>
-      </td>
-    </tr>
     <tr class="table-dark" id="total_of_equity">
-
+    
     </tr>
+    <tr id="equity" class="table-secondary">
+    </tr>
+
   </tbody>
+
 </table>
+
 
 {% endblock body %}
 

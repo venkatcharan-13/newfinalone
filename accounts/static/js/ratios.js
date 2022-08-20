@@ -23,7 +23,7 @@ $.ajax({
         fillRatiosHead(response.response_data.gross_profit, 'gross_profit', 'Gross Profit');
         fillRatiosHead(response.response_data.net_profit, 'net_profit', 'Net Profit');
         fillRatiosTableRows(response.response_data.profit_ratios, 'profit_ratios');
-        fillRatiosTableRows(response.response_data.liquidity_ratio, 'liquidity_ratio');
+        fillRatiosTableRows(response.response_data.liquidity_ratio, 'liquidity_ratios');
         fillRatiosTableRows(response.response_data.op_eff_ratios, 'op_eff_ratios');
         fillRatiosTableRows(response.response_data.solvency_ratios, 'solvency_ratios');
         document.getElementById('table_info').innerHTML = response.description;
@@ -52,17 +52,22 @@ function fillRatiosHead(object, tid, head) {
         '<td style="width: 20%; text-align:center;"></td>';
 }
 
-function fillRatiosTableRows(data, tid) {
-    var table = document.getElementById(tid);
+function fillRatiosTableRows(data, rid) {
+    var table = document.getElementById("ratios_table");
+    var i = document.getElementById(rid).rowIndex + 1;
+    if(data.length == 0){
+        var tr = table.insertRow(i);
+        tr.innerHTML = '<td></td>';
+    }
     data.forEach(function (object) {
-        var tr = document.createElement('tr');
-        tr.style.cssText = 'border-bottom: 1px solid black';
-        tr.innerHTML = `<th style="width:20%"> ${object.ratio_head}<span class="fa fa-info-circle" title="${object.ratio_info}"></span></th>` +
+        var tr = table.insertRow(i);
+        // tr.style.cssText = 'border-bottom: 1px solid black';
+        tr.innerHTML = `<th style="width:20%"> ${object.ratio_head} <span class="fa fa-info-circle" title="${object.ratio_info}"></span></th>` +
             `<td style="width: 15%; text-align:right;"> ${object.current + object.ratio_format} </td>` +
             `<td style="width: 15%; text-align:right;"> ${object.previous + object.ratio_format} </td>` +
             `<td style="width: 15%; text-align:center;"> ${object.three_month_avg + object.ratio_format} </td>` +
             `<td style="width: 15%; text-align:center;"> ${object.ideal_ratio}</td>` + 
             `<td style="width: 20%; text-align:center;"> ${object.action_to_be_taken} </td>`;
-        table.appendChild(tr);
+        i++;
     })
 }

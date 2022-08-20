@@ -4,78 +4,75 @@
 {% block active3 %}active{% endblock active3 %}
 {% block body %}
 
-<table class="table table-striped table-bordered" id="cashflow">
+<div class="summary">
+  <div class="shadow-sm summaryTable">
+    <table class="table table-borderless">
+      <thead>
+        <tr>
+          <th scope="col">Cashflow from Operations</th>
+          <th scope="col">Cashflow from Investing</th>
+          <th scope="col">Cashflow from Financing</th>
+          <th scope="col">Cash Balance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <td id="head_cf_operations"></td>
+        <td id="head_cf_investing"></td>
+        <td id="head_cf_financing"></td>
+        <td id="head_cash_bal"></td>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<table class="table border table-borderless" id="cashflow_table">
   <thead>
     <tr>
-      <th scope="col" style="width: 40%;">ACCOUNT</th>
+      <th scope="col" style="width: 40%;">Particulars</th>
       <th scope="col" style="width: 20%; text-align: right;" id="current_month"></th>
       <th scope="col" style="width: 20%; text-align: right;" id="previous_month"></th>
-      <th scope="col" style="width: 20%; text-align: center;">% Change</th>
+      <th scope="col" style="width: 20%; text-align: center;">Increase/Decrease(%)</th>
     </tr>
   </thead>
   <tbody>
-    <tr id="beg_cash_bal">
+    <tr id="beg_cash_bal" class="table-secondary">
     </tr>
     <tr>
       <td colspan="5"></td>
     </tr>
-    <tr>
+    <tr id="cf_op_head" class="table-secondary">
       <th scope="row" colspan="5">A. Cash Flow from Operating Activities <span class="fa fa-info-circle"
           title="Cashflow from Operating activities info"></span></th>
-    </tr>
-    <tr>
-      <td colspan="5">
-        <table class="table mb-0" id="cashflowA">
-          <tbody>
-          </tbody>
-        </table>
-      </td>
     </tr>
     <tr id="netA">
     </tr>
     <tr>
       <td colspan="5"></td>
     </tr>
-    <tr>
+    <tr id="cf_inv_head" class="table-secondary">
       <th scope="row" colspan="5">B. Cash Flow from Investing Activities <span class="fa fa-info-circle"
           title="Cashflow from Investing activities info"></span></th>
-    </tr>
-    <tr>
-      <td colspan="5">
-        <table class="table mb-0" id="cashflowB">
-          <tbody>
-          </tbody>
-        </table>
-      </td>
     </tr>
     <tr id="netB">
     </tr>
     <tr>
       <td colspan="5"></td>
     </tr>
-    <tr>
+    <tr id="cf_fin_head" class="table-secondary">
       <th scope="row" colspan="5">C. Cash Flow from Financing Activities <span class="fa fa-info-circle"
           title="Cashflow from Financing activities info"></span></th>
-    </tr>
-    <tr>
-      <td colspan="5">
-        <table class="table mb-0" id="cashflowC">
-          <tbody>
-          </tbody>
-        </table>
-      </td>
     </tr>
     <tr id="netC">
     </tr>
     <tr>
       <td colspan="5"></td>
     </tr>
-    <tr id="netABC">
+    <tr id="netABC" class="table-secondary">
     </tr>
     <tr>
       <td colspan="5"></td>
     </tr>
-    <tr id="endbal">
+    <tr id="endbal" class="table-secondary">
     </tr>
   </tbody>
 </table>
