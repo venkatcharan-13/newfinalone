@@ -240,6 +240,9 @@ class CashFlowData(APIView):
         cashflow_data_response[current_period_str] = calendar.month_name[current_month] + '-' + str(current_month_year)[2:]
         cashflow_data_response[previous_period_str] = calendar.month_name[previous_month] + '-' + str(previous_month_year)[2:]
         cashflow_data_response[response_data_str] = accounts_util.convert_to_indian_comma_notation('cashflow', cashflow_data)
+        cashflow_data_response['cashflow_A_info'] = cashflow_config_data['cashflow_from_operating_activities']['info_title']
+        cashflow_data_response['cashflow_B_info'] = cashflow_config_data['cashflow_from_investing_activities']['info_title']
+        cashflow_data_response['cashflow_C_info'] = cashflow_config_data['cashflow_from_financing_activities']['info_title']
         
         return Response(cashflow_data_response)
 

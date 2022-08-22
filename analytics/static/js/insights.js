@@ -18,16 +18,18 @@ $.ajax({
   },
   success: function (response) {
     console.log("Success Insights");
-    fillExpenseHeader(response.advt_and_marketing_header, "advt_and_marketing", "Advertising and Marketing Expenses");
-    fillExpenseHeader(response.employement_header, "employement", "Employment Expenses");
-    fillExpenseHeader(response.rent_rates_and_repairs_header, "rent_rate_repair", "Rent, Rates & Repairs Expenses");
-    fillExpenseHeader(response.brokerage_and_commission_header, "brokerage_commission", "Brokerage & Commission Charges");
-    fillExpenseHeader(response.general_and_admin_header, "general_and_admin", "General & Admin Charges");
-    fillInsightsData(response.advt_and_marketing_insights, "advt_and_marketing_insights");
-    fillInsightsData(response.employement_insights, "employement_insights");
-    fillInsightsData(response.rent_rates_and_repairs_insights, "rent_rate_repair_insights");
-    fillInsightsData(response.brokerage_and_commission_insights, "brokerage_commission_insights");
-    fillInsightsData(response.general_and_admin_insights, "general_and_admin_insights");
+    fillExpenseHeader(response.response_data.advt_and_marketing_header, "advt_and_marketing", "Advertising and Marketing Expenses");
+    fillExpenseHeader(response.response_data.employement_header, "employement", "Employment Expenses");
+    fillExpenseHeader(response.response_data.rent_rates_and_repairs_header, "rent_rate_repair", "Rent, Rates & Repairs Expenses");
+    fillExpenseHeader(response.response_data.brokerage_and_commission_header, "brokerage_commission", "Brokerage & Commission Charges");
+    fillExpenseHeader(response.response_data.general_and_admin_header, "general_and_admin", "General & Admin Charges");
+    fillInsightsData(response.response_data.advt_and_marketing_insights, "advt_and_marketing_insights");
+    fillInsightsData(response.response_data.employement_insights, "employement_insights");
+    fillInsightsData(response.response_data.rent_rates_and_repairs_insights, "rent_rate_repair_insights");
+    fillInsightsData(response.response_data.brokerage_and_commission_insights, "brokerage_commission_insights");
+    fillInsightsData(response.response_data.general_and_admin_insights, "general_and_admin_insights");
+    document.getElementById("current_month").innerHTML = response.current_period;
+    document.getElementById("previous_month").innerHTML = response.previous_period;
   },
   error: function (error_data) {
     console.log("Error Insights");
@@ -57,7 +59,8 @@ function fillInsightsData(data, tid) {
   var table = document.getElementById(tid);
   data.forEach(function (object) {
     var tr = document.createElement('tr');
-    tr.innerHTML = `<li> This month Additional amount of ${object.additional} is paid to<b> ${object.payee ? object.payee : 'Unknown'} </b></li>`;
+    tr.innerHTML = `<li> This month we incurred additional expenses amounting to <b>INR ${object.additional}</b>
+    for the product/services availed from<b>${object.payee ? object.payee : 'Unknown'}</b></li>`;
     table.appendChild(tr);
   })
 }

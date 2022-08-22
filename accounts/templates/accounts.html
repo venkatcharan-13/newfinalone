@@ -40,9 +40,10 @@
     </tr>
   </thead>
   <tbody>
-    <tr class="table-active" id="income_total">
-      <th scope="row" colspan="7">Income</th>
+    <tr class="table-active accordion-toggle" id="income_total" data-bs-toggle="collapse" data-bs-target=".incomeHiddenRows" aria-expanded="true">
+      <th scope="row" colspan="7">Revenue</th>
     </tr>
+    <tr><td colspan="7"></td></tr>
     <tr class="table-active" id="cogs">
     </tr>
     <tr>
@@ -52,7 +53,7 @@
     <tr>
       <td colspan="7"></td>
     </tr>
-    <tr class="table-active" id="expense_total">
+    <tr class="table-active accordion-toggle" id="expense_total" data-bs-toggle="collapse" data-bs-target=".expenseHiddenRows" aria-expanded="true">
       <th scope="row" colspan="7">Expenses</th>
     </tr>
     <tr class="table-active" id="ebit"></tr>

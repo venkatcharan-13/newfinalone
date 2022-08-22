@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block current4 %} current {% endblock current4 %}
 
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/taxes.css' %}">
 <div class="forTopSection">
   <h5 id="DispalyNameOfCompany">JordenSky</h5>
   <h1><b>Taxes</b></h1>
@@ -29,8 +31,48 @@
     </form>
   </div>
 </div><br>
-{% block body %}{% endblock body %}
-{% block script %}{% endblock script %}
 
+<h1>{% block taxhead %} {% endblock taxhead %}</h1><br>
+
+<h3>Alerts</h3>
+<div id="alertsBox">
+
+</div><br>
+
+<h3>Status</h3>
+<div class="container">
+  <div class="row">
+    <div class="form-check col-2">
+      <input class="form-check-input" type="radio" style="background-color: green" checked>
+      <label class="form-check-label" for="flexRadioDefault1"> Completed </label>
+    </div>
+    <div class="form-check col-2">
+      <input class="form-check-input" type="radio" style="background-color: blue" checked>
+      <label class="form-check-label" for="flexRadioDefault1"> Quality Check</label>
+    </div>
+    <div class="form-check col-3">
+      <input class="form-check-input" type="radio" style="background-color: red" checked>
+      <label class="form-check-label" for="flexRadioDefault1"> Client Action needed </label>
+    </div>
+    <div class="form-check col-2">
+      <input class="form-check-input" type="radio" style="background-color: white" checked>
+      <label class="form-check-label" for="flexRadioDefault1"> Pending </label>
+    </div>
+    <div class="col-3">
+      <select class="form-select" id="fySelector" onchange="changeFinYear(this.value)" style="width:auto;">
+        <option value="Choose FY">Financial Year</option>
+        <option value="2018">FY 2018-19</option>
+        <option value="2019">FY 2019-20</option>
+        <option value="2020">FY 2020-21</option>
+        <option value="2021">FY 2021-22</option>
+        <option value="2022">FY 2022-23</option>
+      </select>
+    </div>
+  </div>
+</div><br>
+
+{% block body %}{% endblock body %}
+
+{% block script %}{% endblock script %}
 
 {% endblock content %}

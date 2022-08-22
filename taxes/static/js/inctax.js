@@ -53,7 +53,7 @@ function createAlertBoxes(data, id) {
   var box = document.getElementById(id);
   data.forEach(function (object) {
     var div = document.createElement('div');
-    div.innerHTML = '<div class="card">' +
+    div.innerHTML = '<div class="card w-50">' +
       `<div class="card-body"> <p class="card-text"> ${object.desc} <b> ${object.dueDate} </b></p></div></div><br>`;
     box.appendChild(div);
   })

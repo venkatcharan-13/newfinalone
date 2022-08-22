@@ -17,12 +17,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
+from authentication.views import ZohoApi
 
 admin.site.site_header = "JordenSky Admin"
 admin.site.site_title = "JordenSky Admin Portal"
 admin.site.index_title = "Welcome to JordenSky Admin Portal"
 
 urlpatterns = [
+    path('admin/updatezoho/<int:client_id>/', ZohoApi.as_view(), name='updatezoho'),
     path('admin/', admin.site.urls),
     path('auth/', include('authentication.urls')),
     path('', include('home.urls')),

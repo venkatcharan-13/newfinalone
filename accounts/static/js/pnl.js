@@ -82,6 +82,7 @@ function fillPnlTableIncome(data) {
   }
   data.forEach(function (object) {
     var tr = table.insertRow(i);
+    tr.setAttribute('class', 'accordion-collapse collapse incomeHiddenRows');
     tr.innerHTML = '<td style="width:35%;"> <a href="pnl/' + object.account_for_coding + '/?selected_date=' + choosen_month + '" style="text-decoration: none">' + object.account_header + '</a></td>' +
       '<td style="width: 12%; text-align:right;">' + object.current + '</td>' +
       '<td style="width: 8%; text-align:right;">' + '' + '</td>' +
@@ -142,6 +143,7 @@ function fillPnlTableExpenses(data, tid) {
     i++;
     data[category]['data'].forEach(function (object) {
       var tr = table.insertRow(i);
+      tr.setAttribute('class', 'accordion-collapse collapse expenseHiddenRows');
       tr.innerHTML = '<td style="width:35%;"> <a href="pnl/' + object.account_for_coding + '/?selected_date=' + choosen_month + '" style="text-decoration: none">' + object.account_header + '</a></td>' +
         '<td style="width: 12%; text-align:right;">' + object.current + '</td>' +
         '<td style="width: 8%; text-align:right;">' + '' + '</td>' +

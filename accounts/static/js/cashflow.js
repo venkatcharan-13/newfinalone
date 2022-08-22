@@ -22,11 +22,11 @@ $.ajax({
     document.getElementById("previous_month").innerHTML = response.previous_period;
     fillCashflowTotals(response.response_data.beginning_cash_balance, 'beg_cash_bal', 'Beginning Cash Balance');
     fillCashflowRows(response.response_data.cashflow_from_operating_activities, 'cf_op_head');
-    fillCashflowTotals(response.response_data.net_cash_a, 'netA', 'Cashflow from Operations');
+    fillCashflowHeaders(response.response_data.net_cash_a, 'cf_op_head', 'A. Cash Flow from Operating Activities', response.cashflow_A_info);
     fillCashflowRows(response.response_data.cashflow_from_investing_activities, 'cf_inv_head');
-    fillCashflowTotals(response.response_data.net_cash_b, 'netB', 'Cashflow from Investing');
+    fillCashflowHeaders(response.response_data.net_cash_b, 'cf_inv_head', 'B. Cash Flow from Investing Activities', response.cashflow_B_info);
     fillCashflowRows(response.response_data.cashflow_from_financing_activities, 'cf_fin_head');
-    fillCashflowTotals(response.response_data.net_cash_c, 'netC', 'Cashflow from Financing');
+    fillCashflowHeaders(response.response_data.net_cash_c, 'cf_fin_head', 'C. Cash Flow from Financing Activities', response.cashflow_C_info);
     fillCashflowTotals(response.response_data.net_change_abc, 'netABC', 'Net Change in Cash (A)+(B)+(C)');
     fillCashflowTotals(response.response_data.ending_cash_balance, 'endbal', 'Ending Cash Balance');
     document.getElementById('head_cf_operations').innerHTML = response.response_data.net_cash_a.current;
@@ -50,7 +50,7 @@ function changePeriod(params) {
   location.reload();
 }
 
-function fillCashflowRows(data, rid) {
+function fillCashflowRows(data, rid, rowType) {
   var table = document.getElementById('cashflow_table');
   var i = document.getElementById(rid).rowIndex + 1;
   if(data.length == 0){
@@ -64,6 +64,7 @@ function fillCashflowRows(data, rid) {
       var href = `${object.activity}/?selected_date=${choosen_month}`;
     }
     var tr = table.insertRow(i);
+    tr.setAttribute('class', `accordion-collapse collapse ${rid}`);
     tr.innerHTML = `<th style="width:40%"><a href="${href}" 
     style="text-decoration: none">${object.activity}</a></th>` +
       '<td style="width: 20%; text-align:right;">' + object.current + '</td>' +
@@ -71,6 +72,14 @@ function fillCashflowRows(data, rid) {
       '<td style="width: 20%; text-align:center;">' + object.per_change + '%</td>';
     i++;
   })
+}
+
+function fillCashflowHeaders(object, tid, head, info) {
+  document.getElementById(tid).innerHTML = `<th style="width:40%"> ${head} 
+    <span class="fa fa-info-circle" title="${info}"></span></th>` +
+    '<th style="width: 20%; text-align:right;">' + object.current + '</th>' +
+    '<th style="width: 20%; text-align:right;">' + object.previous + '</th>' +
+    '<th style="width: 20%; text-align:center;">' + object.per_change + '%</th>';
 }
 
 function fillCashflowTotals(object, tid, head) {

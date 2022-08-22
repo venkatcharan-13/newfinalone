@@ -2,7 +2,7 @@ import json
 from django.shortcuts import render
 from django.http import JsonResponse
 from datetime import date, datetime
-from home.models import Notification, DashboardAccountStatus, PendingActionable, WatchOutPoint,  StatutoryCompliance
+from home.models import Notification, ContactPerson, DashboardAccountStatus, PendingActionable, WatchOutPoint,  StatutoryCompliance
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from rest_framework.views import APIView
@@ -11,7 +11,7 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework.permissions import IsAuthenticated
 
 
-# Create your views here.
+# Create your views here
 
 @login_required()
 def index(request):
@@ -36,6 +36,17 @@ class DashboardData(APIView):
             selected_month = date(2022, 6, 30)
         else:
             selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
+
+        contacts_data = ContactPerson.objects.filter(
+            client_id=logged_client_id
+        )
+        contacts = []
+        for contact in contacts_data:
+            contacts.append({
+                'name': contact.person_name,
+                'profile': contact.profile,
+                'number': contact.contact_number
+            })
         
         notifications_data = Notification.objects.filter(
             client_id=logged_client_id,
@@ -107,6 +118,7 @@ class DashboardData(APIView):
             })
         
         response = {
+            'contact_card': contacts,
             'notifications': notifications,
             'accounts_status': accounts_status,
             'pending_points': pending_actionables,

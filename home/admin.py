@@ -1,7 +1,5 @@
 from django.contrib import admin
-from home.models import Notification, DashboardAccountStatus, PendingActionable, WatchOutPoint, StatutoryCompliance
-# from accounts.admin import ZohoAccountInline
-from accounts.models import Ratio
+from home.models import Notification, ContactPerson, DashboardAccountStatus, PendingActionable, WatchOutPoint, StatutoryCompliance
 
 # Register your models here.
 
@@ -16,6 +14,15 @@ class NotificationAdmin(admin.ModelAdmin):
 
 admin.site.register(Notification, NotificationAdmin)
 
+class ContactPersonAdmin(admin.ModelAdmin):
+    list_filter = ['client']
+    list_display = ['person_name', 'profile', 'contact_number']
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.order_by('person_name')
+        return qs
+
+admin.site.register(ContactPerson, ContactPersonAdmin)
 
 class DashboardAccountStatusAdmin(admin.ModelAdmin):
     date_hierarchy = 'period'

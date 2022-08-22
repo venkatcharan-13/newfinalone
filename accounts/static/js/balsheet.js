@@ -22,28 +22,28 @@ $.ajax({
     document.getElementById("previous_month").innerHTML = response.previous_period;
     fillTotalHead(response.response_data.total_assets, 'total_of_assets', 'Assets');
     fillBalsheetHeads(response.response_data.fixed_asset, 'Fixed Asset', 'fixasset_head');
-    addBalsheetRows(response.response_data.fixed_asset.data, 'fixasset_head');
+    addBalsheetRows(response.response_data.fixed_asset.data, 'fixasset_head', 'asset_type');
     fillBalsheetHeads(response.response_data.other_asset, 'Other Asset', 'othasset_head');
-    addBalsheetRows(response.response_data.other_asset.data, 'othasset_head');
+    addBalsheetRows(response.response_data.other_asset.data, 'othasset_head', 'asset_type');
     fillSingleBalsheetRow(response.response_data.accounts_receivable[0], 'acc_rec');
     fillSingleBalsheetRow(response.response_data.bank[0], 'bank');
     fillSingleBalsheetRow(response.response_data.cash[0], 'cash');
     fillBalsheetHeads(response.response_data.other_current_asset, 'Other Current Asset', 'ocasset_head');
-    addBalsheetRows(response.response_data.other_current_asset.data, 'ocasset_head');
+    addBalsheetRows(response.response_data.other_current_asset.data, 'ocasset_head', 'asset_type');
     fillBalsheetHeads(response.response_data.stock, 'Stock', 'stock_head');
-    addBalsheetRows(response.response_data.stock.data, 'stock_head');
+    addBalsheetRows(response.response_data.stock.data, 'stock_head', 'asset_type');
 
     fillTotalHead(response.response_data.total_liabilities, 'total_of_liabilities', 'Liabilities');
     fillBalsheetHeads(response.response_data.long_term_liability, 'Long Term Liability', 'ltliab_head');
-    addBalsheetRows(response.response_data.long_term_liability.data, 'ltliab_head');
+    addBalsheetRows(response.response_data.long_term_liability.data, 'ltliab_head', 'liability_type');
     fillBalsheetHeads(response.response_data.other_liability, 'Other Liability', 'othliab_head')
-    addBalsheetRows(response.response_data.other_liability.data, 'othliab_head');
+    addBalsheetRows(response.response_data.other_liability.data, 'othliab_head', 'liability_type');
     fillSingleBalsheetRow(response.response_data.accounts_payable[0], 'acc_pay');
     fillBalsheetHeads(response.response_data.other_current_liability, 'Other Current Liability', 'ocliab_head');
-    addBalsheetRows(response.response_data.other_current_liability.data, 'ocliab_head');
+    addBalsheetRows(response.response_data.other_current_liability.data, 'ocliab_head', 'liability_type');
 
     fillTotalHead(response.response_data.total_equity, 'total_of_equity', 'Equity');
-    addBalsheetRows(response.response_data.equity.data, 'equity');
+    addBalsheetRows(response.response_data.equity.data, 'equity', 'equity_type');
 
     document.getElementById('head_equity').innerHTML = response.response_data.total_equity.current;
     document.getElementById('head_liabilities').innerHTML = response.response_data.total_liabilities.current;
@@ -82,12 +82,19 @@ function fillSingleBalsheetRow(data, rid){
     '<td style="width: 22%; text-align:center;">' + data.per_change + '%</td>';
 }
 
-function addBalsheetRows(data, rid) {
+function addBalsheetRows(data, rid, rowType) {
   var table = document.getElementById('balsheet_table');
   var i = document.getElementById(rid).rowIndex + 1;
 
   data.forEach(function (object) {
     var tr = table.insertRow(i);
+    if(rowType == 'asset_type'){
+      tr.setAttribute('class', 'accordion-collapse collapse assetsHiddenRows');
+    } else if (rowType == 'liability_type') {
+      tr.setAttribute('class', 'accordion-collapse collapse liabilitiesHiddenRows');
+    } else {
+      tr.setAttribute('class', 'accordion-collapse collapse equityHiddenRows');
+    }
     tr.innerHTML = '<th style="width:34%">' + object.account_header + '</th>' +
       '<td style="width: 22%; text-align:right;">' + object.current + '</td>' +
       '<td style="width: 22%; text-align:right;">' + object.previous + '</td>' +

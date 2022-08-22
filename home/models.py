@@ -20,6 +20,12 @@ statutory_comp_status_choices = [
 
 # Create your models here.
 
+class ContactPerson(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    person_name = models.CharField(max_length=50)
+    profile = models.CharField(max_length=30)
+    contact_number = models.CharField(max_length=14)
+
 
 class Notification(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)

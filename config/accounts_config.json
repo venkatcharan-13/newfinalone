@@ -51,6 +51,7 @@
             "share_capital"
         ],
         "cashflow_from_operating_activities":{
+            "info_title": "This is info related to Operating activities",
             "net_income":{
                 "head": "Net Income",
                 "accounts_for_coding": [],
@@ -93,6 +94,7 @@
             }
         },
         "cashflow_from_investing_activities":{
+            "info_title": "This is info related to Investing activities",
             "investments_property_equipment":{
                 "head": "Investments in Property and Equipment",
                 "accounts_for_coding": [
@@ -109,6 +111,7 @@
             }
         },
         "cashflow_from_financing_activities":{
+            "info_title": "This is info related to Financing activities",
             "issuance_of_debt":{
                 "head": "Issuance (repayment) of debt",
                 "accounts_for_coding": [

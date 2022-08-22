@@ -61,7 +61,7 @@ function fillRatiosTableRows(data, rid) {
     }
     data.forEach(function (object) {
         var tr = table.insertRow(i);
-        // tr.style.cssText = 'border-bottom: 1px solid black';
+        tr.setAttribute('class', `accordion-collapse collapse ${rid}`);
         tr.innerHTML = `<th style="width:20%"> ${object.ratio_head} <span class="fa fa-info-circle" title="${object.ratio_info}"></span></th>` +
             `<td style="width: 15%; text-align:right;"> ${object.current + object.ratio_format} </td>` +
             `<td style="width: 15%; text-align:right;"> ${object.previous + object.ratio_format} </td>` +

@@ -152,17 +152,7 @@
                       </tr>
                     </thead>
                     <tbody id="stat_comp">
-                      {% for tax_head, compliances in statutory_compliances.items %}
-                      <tr>
-                        <th scope="row" colspan="2">{{ tax_head }}</th>
-                      </tr>
-                      {% for compliance in compliances %}
-                      <tr>
-                        <td scope="row" style="width: 60%;">{{ compliance.compliance }}</td>
-                        <td style="width: 40%;">{{ compliance.current_month }}</td>
-                      </tr>
-                      {% endfor %}
-                      {% endfor %}
+                     
                     </tbody>
                   </table>
                 </div>
@@ -184,6 +174,9 @@
               <ion-icon name="people-outline" class="forIcons"></ion-icon>
             </div>
           </div>
+          <ul id="contact_persons">
+
+          </ul>
 
         </div> <br>
         <div class="shadow-sm child_2">

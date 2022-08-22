@@ -1,6 +1,6 @@
 from django.contrib import admin
 from authentication.models import Client
-from home.models import Notification, DashboardAccountStatus, PendingActionable, WatchOutPoint, StatutoryCompliance
+from home.models import Notification, ContactPerson, DashboardAccountStatus, PendingActionable, WatchOutPoint, StatutoryCompliance
 from cprofile.models import Company
 from accounts.models import Ratio
 from taxes.models import TaxAlert, ITMonthlyStatus, ITQuarterlyStatus, GSTMonthlyStatus, GSTQuarterlyStatus
@@ -8,6 +8,9 @@ from taxes.models import TaxAlert, ITMonthlyStatus, ITQuarterlyStatus, GSTMonthl
 # Register your models here.
 
 # Inlines related to Home App (Dashboard section)
+class ContactPersonInline(admin.TabularInline):
+    model = ContactPerson
+    extra = 0
 class NotificationInline(admin.TabularInline):
     model = Notification
     extra = 0
@@ -54,6 +57,7 @@ class CompanyInline(admin.TabularInline):
 
 class ClientAdmin(admin.ModelAdmin):
     inlines = [
+        ContactPersonInline,
         NotificationInline,
         CompanyInline,
         DashboardAccountStatusInline,

@@ -2,43 +2,9 @@
 {% load static %}
 {% block title %}Taxes | GST{% endblock title %}
 {% block active2 %}active{% endblock active2 %}
-{% block body %}
-<h1>GST</h1><br>
-<h2>Alerts</h2>
-<div id="alertsBox">
+{% block taxhead %} GST {% endblock taxhead %}
 
-</div><br>
-<h2>Status</h2>
-<div class="container">
-  <div class="row">
-    <div class="form-check col-2">
-      <input class="form-check-input" type="radio" style="background-color: green" checked>
-      <label class="form-check-label" for="flexRadioDefault1"> Completed </label>
-    </div>
-    <div class="form-check col-2">
-      <input class="form-check-input" type="radio" style="background-color: blue" checked>
-      <label class="form-check-label" for="flexRadioDefault1"> Quality Check</label>
-    </div>
-    <div class="form-check col-3">
-      <input class="form-check-input" type="radio" style="background-color: red" checked>
-      <label class="form-check-label" for="flexRadioDefault1"> Client Action needed </label>
-    </div>
-    <div class="form-check col-2">
-      <input class="form-check-input" type="radio" style="background-color: white" checked>
-      <label class="form-check-label" for="flexRadioDefault1"> Pending </label>
-    </div>
-    <div class="col-3">
-      <select class="form-select" id="fySelector" onchange="changeFinYear(this.value)" style="width:auto;">
-        <option value="Choose FY">Financial Year</option>
-        <option value="2018">FY 2018-19</option>
-        <option value="2019">FY 2019-20</option>
-        <option value="2020">FY 2020-21</option>
-        <option value="2021">FY 2021-22</option>
-        <option value="2022">FY 2022-23</option>
-      </select>
-    </div>
-  </div>
-</div><br>
+{% block body %}
 <div class="accordion" id="accordionPanelsStayOpenExample">
   <div class="accordion-item">
     <h2 class="accordion-header" id="panelsStayOpen-headingOne">
@@ -65,7 +31,6 @@
     </div>
   </div>
 </div>
-
 {% endblock body %}
 
 {% block script %}

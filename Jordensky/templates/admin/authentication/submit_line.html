@@ -1,0 +1,10 @@
+{% extends "admin/submit_line.html" %}
+{% load static %}
+
+{% block extra-actions %}
+<script src="{% static 'js/zohoapi.js' %}"></script>
+
+<div class="btn btn-outline-info form-control" onclick="updateFromZoho('{{ original.pk }}')">Zoho Update</div>
+
+
+{% endblock extra-actions %}

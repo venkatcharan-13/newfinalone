@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from dateutil.relativedelta import relativedelta
 import calendar
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -196,7 +197,19 @@ class InsightsData(APIView):
         selected_month = self.request.query_params.get('selected_date')
         logged_client_id = self.request.user.id
 
-        insights_data_response = insights_util.get_insights(logged_client_id, selected_month)
+        if selected_month is None:
+            selected_month = date(2022, 6, 30)
+        else:
+            selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
+
+        insights_data_response = {}
+        current_month, current_month_year = selected_month.month, selected_month.year
+        previous_month = (selected_month.replace(day=1) + relativedelta(days=-1)).month
+        previous_month_year = (selected_month.replace(day=1) + relativedelta(days=-1)).year
+        insights_data_response[current_period_str] = calendar.month_name[current_month] + '-' + str(current_month_year)[2:]
+        insights_data_response[previous_period_str] = calendar.month_name[previous_month] + '-' + str(previous_month_year)[2:]
+        insights_data_response[response_data_str] = insights_util.get_insights(logged_client_id, selected_month)
+
         return Response(insights_data_response)
 
 
