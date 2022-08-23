@@ -7,6 +7,7 @@ function updateFromZoho(clientId) {
         // dataType: 'json',
     }).done(function (data) {
         console.log("Made an API call from admin");
+        document.location.reload();
     }).fail(function (error) {
         console.log("Error making API call");
     });

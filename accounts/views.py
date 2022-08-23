@@ -85,7 +85,7 @@ def cashflow_balances(request, activity):
         if type(dic) != dict:
             continue
         for val in dic.values():
-            if val['head'] == activity:
+            if type(val) != str and val['head'] == activity:
                 codings_lst = val['accounts_for_coding']
                 subtraction_logic = val['logic']
                 break
