@@ -1,11 +1,15 @@
 import calendar
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
+from django.http import JsonResponse
 import locale
 from django.shortcuts import render
 from utility import accounts_util, acc_gets
 from rest_framework.views import APIView
+from accounts.models import ClientNote
+from authentication.models import Client
 from rest_framework.response import Response
 import json
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
@@ -24,6 +28,7 @@ per_change_str = strvar.per_change
 response_data_str, totals_str = "response_data", "totals"
 description = "description"
 account_header_str = "account_header"
+client_notes_str = "client_notes"
 
 config_file = open("config/accounts_config.json")
 config_data = json.load(config_file)
@@ -45,6 +50,24 @@ def balsheet(request):
 @login_required()
 def cashflow(request):
     return render(request, 'cashflow.html')
+
+@login_required()
+@csrf_exempt
+def add_client_note(request):
+    written_note = json.loads(request.body)["note"]
+    period = datetime.strptime(json.loads(request.body)["period"], '%Y-%m-%d').date()
+    table_type = json.loads(request.body)["table"]
+    logged_client = Client.objects.get(
+        pk = request.user.id
+    )
+    client_note = ClientNote(
+        client = logged_client,
+        period = period,
+        related_table = table_type,
+        note = written_note,
+    )
+    client_note.save()
+    return JsonResponse({'Message': 'Success'})
 
 @login_required()
 def pnl_transaction(request, account):
@@ -140,10 +163,23 @@ class PnlData(APIView):
             selected_month = date(2022, 6, 30)
         else:
             selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
-            
+        
         current_month, current_month_year = selected_month.month, selected_month.year
         previous_month = (selected_month.replace(day=1) + relativedelta(days=-1)).month
         previous_month_year = (selected_month.replace(day=1) + relativedelta(days=-1)).year
+
+        client_notes_data = ClientNote.objects.filter(
+            client_id=logged_client_id,
+            period=selected_month,
+            related_table='pnl'
+        )
+        client_notes = []
+        for note in client_notes_data:
+            client_notes.append({
+                'created_on': datetime.strftime(note.created_on, "%d %b, %Y (%H:%M)"),
+                'note': note.note,
+                'admin_response': note.admin_response
+            })
 
         pnl_data = acc_gets.get_pnl(selected_month, logged_client_id)[0]
 
@@ -161,6 +197,7 @@ class PnlData(APIView):
         pnl_data_response[description] = pnl_config_data[description]
         pnl_data_response[current_period_str] = calendar.month_name[current_month] + '-' + str(current_month_year)[2:]
         pnl_data_response[previous_period_str] = calendar.month_name[previous_month] + '-' + str(previous_month_year)[2:]
+        pnl_data_response[client_notes_str] = client_notes
         pnl_data_response[response_data_str] = accounts_util.convert_to_indian_comma_notation('pnl', pnl_data)
 
         return Response(pnl_data_response)
@@ -178,9 +215,23 @@ class BalanceSheetData(APIView):
             selected_month = date(2022, 6, 30)
         else:
             selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
+
         current_month, current_month_year = selected_month.month, selected_month.year
         previous_month = (selected_month.replace(day=1) + relativedelta(days=-1)).month
         previous_month_year = (selected_month.replace(day=1) + relativedelta(days=-1)).year
+
+        client_notes_data = ClientNote.objects.filter(
+            client_id=logged_client_id,
+            period=selected_month,
+            related_table='balsheet'
+        )
+        client_notes = []
+        for note in client_notes_data:
+            client_notes.append({
+                'created_on': datetime.strftime(note.created_on, "%d %b, %Y (%H:%M)"),
+                'note': note.note,
+                'admin_response': note.admin_response
+            })
 
         bal_sheet_data = acc_gets.get_balsheet(selected_month, logged_client_id)
         current_year_earnings, retained_earnings = acc_gets.get_earnings(selected_month, logged_client_id)
@@ -211,6 +262,7 @@ class BalanceSheetData(APIView):
         bal_sheet_data_response[description] = bs_config_data[description]
         bal_sheet_data_response[current_period_str] = calendar.month_name[current_month] + '-' + str(current_month_year)[2:]
         bal_sheet_data_response[previous_period_str] = calendar.month_name[previous_month] + '-' + str(previous_month_year)[2:]
+        bal_sheet_data_response[client_notes_str] = client_notes
         bal_sheet_data_response[response_data_str] = accounts_util.convert_to_indian_comma_notation('balsheet', bal_sheet_data)
        
        
@@ -233,12 +285,26 @@ class CashFlowData(APIView):
         previous_month = (selected_month.replace(day=1) + relativedelta(days=-1)).month
         previous_month_year = (selected_month.replace(day=1) + relativedelta(days=-1)).year
 
+        client_notes_data = ClientNote.objects.filter(
+            client_id=logged_client_id,
+            period=selected_month,
+            related_table='cashflow'
+        )
+        client_notes = []
+        for note in client_notes_data:
+            client_notes.append({
+                'created_on': datetime.strftime(note.created_on, "%d %b, %Y (%H:%M)"),
+                'note': note.note,
+                'admin_response': note.admin_response
+            })
+
         cashflow_data = acc_gets.get_cashflow(selected_month, logged_client_id)
         
         cashflow_data_response = {}
         cashflow_data_response[description] = cashflow_config_data[description]
         cashflow_data_response[current_period_str] = calendar.month_name[current_month] + '-' + str(current_month_year)[2:]
         cashflow_data_response[previous_period_str] = calendar.month_name[previous_month] + '-' + str(previous_month_year)[2:]
+        cashflow_data_response[client_notes_str] = client_notes
         cashflow_data_response[response_data_str] = accounts_util.convert_to_indian_comma_notation('cashflow', cashflow_data)
         cashflow_data_response['cashflow_A_info'] = cashflow_config_data['cashflow_from_operating_activities']['info_title']
         cashflow_data_response['cashflow_B_info'] = cashflow_config_data['cashflow_from_investing_activities']['info_title']
@@ -263,6 +329,19 @@ class RatiosData(APIView):
         current_month, current_month_year = selected_month.month, selected_month.year
         previous_month = (selected_month.replace(day=1) + relativedelta(days=-1)).month
         previous_month_year = (selected_month.replace(day=1) + relativedelta(days=-1)).year
+
+        client_notes_data = ClientNote.objects.filter(
+            client_id=logged_client_id,
+            period=selected_month,
+            related_table='ratio'
+        )
+        client_notes = []
+        for note in client_notes_data:
+            client_notes.append({
+                'created_on': datetime.strftime(note.created_on, "%d %b, %Y (%H:%M)"),
+                'note': note.note,
+                'admin_response': note.admin_response
+            })
         
         ratios_data = acc_gets.get_ratios(selected_month, logged_client_id)
 
@@ -270,6 +349,7 @@ class RatiosData(APIView):
         ratios_data_response[description] = ratios_config_data[description]
         ratios_data_response[current_period_str] = calendar.month_name[current_month] + '-' + str(current_month_year)[2:]
         ratios_data_response[previous_period_str] = calendar.month_name[previous_month] + '-' + str(previous_month_year)[2:]
+        ratios_data_response[client_notes_str] = client_notes
         ratios_data_response[response_data_str] = ratios_data
                     
         return Response(ratios_data_response)

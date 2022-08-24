@@ -28,6 +28,7 @@ $.ajax({
         fillRatiosTableRows(response.response_data.solvency_ratios, 'solvency_ratios');
         document.getElementById('table_info').innerHTML = response.description;
         document.getElementById('table_info_head').innerHTML = "Ratios";
+        displayClientNotes(response.client_notes, 'clientNotesBlock');
     },
     error: function (error_data) {
         console.log("Error4");
@@ -71,3 +72,37 @@ function fillRatiosTableRows(data, rid) {
         i++;
     })
 }
+
+function displayClientNotes(notes, id) {
+    var box = document.getElementById(id);
+    notes.forEach(function (note) {
+      var div = document.createElement('div');
+      div.setAttribute('class', 'card mb-2');
+      div.innerHTML = `<div class="card-header"> <small> ${note.created_on} </small></div>` + 
+      `<div class="card-body"> <p class="card-text"> ${note.note}</p>` +
+      `<footer class="blockquote-footer">Response: ${note.admin_response == null ? '': note.admin_response}</footer> </div>`;
+      box.appendChild(div);
+    })
+  }
+  
+
+function add_client_note() {
+    var written_note = $('#newNote').val();
+    console.log(written_note);
+    $.ajax({
+        url: "/accounts/add_client_note/",
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify({
+          note: written_note,
+          period: choosen_month,
+          table: 'ratio'
+        }),
+        dataType: 'json',
+    }).done(function (data) {
+        console.log("Success");
+        document.location.reload();
+    }).fail(function (error) {
+        console.log("error");
+    });
+  }

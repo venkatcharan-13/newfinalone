@@ -110,6 +110,24 @@ class ZohoTransaction(models.Model):
     fcy_credit_amount = models.CharField(max_length=20, null=True)
     reconcile_status = models.CharField(max_length=20, null=True)
 
+class ClientNote(models.Model):
+    table_choices=[
+        ('pnl', 'Income Statement'),
+        ('balsheet', 'Balance Sheet'),
+        ('cashflow', 'Cashflow Statement'),
+        ('ratio', 'Ratios')
+    ]
+
+    def __str__(self):
+        return self.note
+
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    period = models.DateField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    related_table = models.CharField(max_length=30, choices=table_choices)
+    note = models.TextField()
+    admin_response = models.TextField(null=True, blank=True)
+
 class Ratio(models.Model):
     ratio_type_choices=[
         ('gross_profit_margin', 'Gross Profit Margin'),

@@ -42,6 +42,11 @@
     color: black;
 }
 
+#add_note_button {
+    float: right;
+    margin-bottom: 15px;
+}
+
 .dropDownBtn {
     display: flex;
     align-items: flex-end;
@@ -51,4 +56,12 @@
 
 .alltables {
     width: 100%;
+}
+
+#clientNotesBlock {
+    padding: 15px;
+    margin-bottom: 15px;
+    margin-left: 0;
+    background-color: white;
+    width: 60%;
 }

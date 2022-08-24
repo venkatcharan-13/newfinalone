@@ -1,5 +1,5 @@
 from django.contrib import admin
-from accounts.models import ZohoAccount, ZohoTransaction, Ratio
+from accounts.models import ZohoAccount, ZohoTransaction, ClientNote, Ratio
 from django.utils.translation import gettext_lazy as _
 from datetime import date
 
@@ -27,6 +27,15 @@ class ZohoTransactionAdmin(admin.ModelAdmin):
         qs = qs.order_by('transaction_date')
         return qs
 
+class ClientNoteAdmin(admin.ModelAdmin):
+    date_hierarchy = 'period'
+    list_filter = ['client']
+    list_display = ['note', 'admin_response']
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.order_by('period')
+        return qs
+
 class RatioAdmin(admin.ModelAdmin):
     date_hierarchy = 'period'
     list_filter = ['client']
@@ -38,4 +47,5 @@ class RatioAdmin(admin.ModelAdmin):
 
 admin.site.register(ZohoAccount, ZohoAccountAdmin)
 admin.site.register(ZohoTransaction, ZohoTransactionAdmin)
+admin.site.register(ClientNote, ClientNoteAdmin)
 admin.site.register(Ratio, RatioAdmin)
