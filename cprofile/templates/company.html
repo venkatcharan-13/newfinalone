@@ -6,7 +6,7 @@
 <br>
 <div class="info">
   <div class="accordion" id="accordionExample">
-    <div class="accordion-item">
+    <div class="accordion-item border-light shadow-sm">
       <h2 class="accordion-header" id="headingOne">
         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
           aria-expanded="false" aria-controls="collapseOne">
@@ -16,47 +16,53 @@
       <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
         data-bs-parent="#accordionExample">
         <div class="accordion-body">
-          <div class="form-group col-md-6">
-            <label for="company_name">Company</label>
+          <div class="form-group col-md-6 mb-3">
+            <label class="fw-bold mb-1" for="company_name">Company</label>
             <input type="text" class="form-control" id="company_name" value="">
           </div>
-          <div class="form-group col-md-4">
-            <label for="industry">Industry</label>
-            <select id="industry" class="form-control">
-              <option value="agency_sales_housing">Agency & Sales Housing</option>
-              <option value="art_and_design">Art & Design</option>
-              <option value="automation">Automation</option>
-              <option value="construction">Construction</option>
-              <option value="consulting">Consulting</option>
-              <option value="consumer_packaged_goods">Consumer Packaged Goods</option>
-              <option value="education">Education</option>
-              <option value="engineering">Engineering</option>
-              <option value="entertainment">Entertainment</option>
-              <option value="financial_services">Financial Services</option>
-              <option value="food_services">Food Services (Restaurants/Fast Food)</option>
-              <option value="gaming">Gaming</option>
-              <option value="government">Government</option>
-              <option value="healthcare">Health Care</option>
-              <option value="interior_design">Interior Design</option>
-              <option value="legal">Legal</option>
-              <option value="manufacturing">Manufacturing</option>
-              <option value="marketing">Marketing</option>
-              <option value="mining_and_logistics">Mining and Logistics</option>
-              <option value="non_profit">Non-Profit</option>
-              <option value="publishing_and_media">Publishing and Web Media</option>
-              <option value="real_estate">Real Estate</option>
-              <option value="retail">Retail (E-Commerce and Retails)</option>
-              <option value="services">Services</option>
-              <option value="technology">Technology</option>
-              <option value="telecommunications">Telecommunications</option>
-              <option value="travel_hospitality">Travel/Hospitality</option>
-            </select>
+          <div class="row">
+            <div class="form-group col-md-4">
+              <label class="fw-bold mb-1" for="industry">Industry</label>
+              <select id="industry" class="form-control">
+                <option value="agency_sales_housing">Agency & Sales Housing</option>
+                <option value="art_and_design">Art & Design</option>
+                <option value="automation">Automation</option>
+                <option value="construction">Construction</option>
+                <option value="consulting">Consulting</option>
+                <option value="consumer_packaged_goods">Consumer Packaged Goods</option>
+                <option value="education">Education</option>
+                <option value="engineering">Engineering</option>
+                <option value="entertainment">Entertainment</option>
+                <option value="financial_services">Financial Services</option>
+                <option value="food_services">Food Services (Restaurants/Fast Food)</option>
+                <option value="gaming">Gaming</option>
+                <option value="government">Government</option>
+                <option value="healthcare">Health Care</option>
+                <option value="interior_design">Interior Design</option>
+                <option value="legal">Legal</option>
+                <option value="manufacturing">Manufacturing</option>
+                <option value="marketing">Marketing</option>
+                <option value="mining_and_logistics">Mining and Logistics</option>
+                <option value="non_profit">Non-Profit</option>
+                <option value="publishing_and_media">Publishing and Web Media</option>
+                <option value="real_estate">Real Estate</option>
+                <option value="retail">Retail (E-Commerce and Retails)</option>
+                <option value="services">Services</option>
+                <option value="technology">Technology</option>
+                <option value="telecommunications">Telecommunications</option>
+                <option value="travel_hospitality">Travel/Hospitality</option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label class="fw-bold mb-1" for="company_name">Entity Name</label>
+              <input type="text" class="form-control" id="entity_name" value="">
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="accordion-item">
+    <div class="accordion-item border-light shadow-sm">
       <h2 class="accordion-header" id="headingTwo">
         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo"
           aria-expanded="false" aria-controls="collapseTwo">
@@ -67,16 +73,16 @@
         data-bs-parent="#accordionExample">
         <div class="accordion-body">
           <form>
-            <div class="form-group">
-              <label for="address">Address</label>
+            <div class="form-group mb-3">
+              <label class="fw-bold mb-1" for="address">Address</label>
               <input type="text" class="form-control" id="address" value="">
             </div>
             <div class="form-row">
-              <div class="row">
-                <div class="col-6"><label for="city">City</label>
+              <div class="row mb-3">
+                <div class="col-6"><label class="fw-bold mb-1" for="city">City</label>
                   <input type="text" class="form-control" id="city" value="">
                 </div>
-                <div class="col-6"><label for="state">State</label>
+                <div class="col-6"><label class="fw-bold mb-1" for="state">State</label>
                   <select id="state" class="form-control">
                     <option value="maharashtra"> Maharashtra </option>
                     <option value="andhra_pradesh">Andhra Pradesh</option>
@@ -113,11 +119,11 @@
               </div>
               <div class="row">
                 <div class="form-group col-4">
-                  <label for="zip">Zip Code</label>
+                  <label class="fw-bold mb-1" for="zip">Zip Code</label>
                   <input type="number" class="form-control" id="zip" value="">
                 </div>
                 <div class="form-group col-6">
-                  <label for="country">Country</label>
+                  <label class="fw-bold mb-1" for="country">Country</label>
                   <input type="text" class="form-control" id="country" value="" disabled>
                 </div>
               </div>
@@ -127,7 +133,7 @@
       </div>
     </div>
 
-    <div class="accordion-item">
+    <div class="accordion-item border-light shadow-sm">
       <h2 class="accordion-header" id="headingThree">
         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
           data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
@@ -138,16 +144,24 @@
         data-bs-parent="#accordionExample">
         <div class="accordion-body">
           <div class="form-row">
+            <div class="row mb-3">
+              <div class="col-6">
+                <div>
+                  <label class="fw-bold mb-1" for="contact_person">Name of Contact</label>
+                  <input type="text" class="form-control" id="contact_person" placeholder="Name" value="">
+                </div>
+              </div>
+            </div>
             <div class="row">
               <div class="col-6">
                 <div>
-                  <label for="contact_email">Primary Contact Email Address</label>
+                  <label class="fw-bold mb-1" for="contact_email">Primary Contact Email Address</label>
                   <input type="email" class="form-control" id="contact_email" placeholder="Email" value="">
                 </div>
               </div>
               <div class="col-6">
                 <div>
-                  <label for="contact_num">Phone number</label>
+                  <label class="fw-bold mb-1" for="contact_num">Phone number</label>
                   <input type="text" class="form-control" id="contact_num" value="">
                 </div>
               </div>
@@ -157,7 +171,7 @@
       </div>
     </div>
 
-    <div class="accordion-item">
+    <div class="accordion-item border-light shadow-sm">
       <h2 class="accordion-header" id="headingFour">
         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
           data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
@@ -166,60 +180,43 @@
       </h2>
       <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
         data-bs-parent="#accordionExample">
-        <div class="accordion-body" style="text-align: center;">
-          <div class="innertable">
-            <table class="table">
-              <tbody>
-                <tr>
-                  <td> GST No</td>
-                  <td><input type="text" value="" id="gst_no"></td>
-                  <td class="rowsstyle">
-                    <form method="post" class="post-form" enctype="multipart/form-data" action="">
-                      <input type="file" id="myFile" name="filename">
-                      <input type="submit" id="myFilee">
-                    </form>
-                  </td>
-                </tr>
-                <tr>
-                  <td> PAN No</td>
-                  <td><input type="text" id="pan_no" value=""></td>
-                  <td class="rowsstyle">
-                    <form method="post" class="post-form" enctype="multipart/form-data" action="">
-                      <input type="file" id="myFile" name="filename">
-                      <input type="submit" id="myFilee">
-                    </form>
-                  </td>
-                </tr>
-                <tr>
-                  <td> PF No</td>
-                  <td><input type="text" id="pf_no" value=""></td>
-                  <td>
-                    <form class="post-form" enctype="multipart/form-data" method="post" action="">
-                      <input type="file" id="myFile" name="filename">
-                      <input type="submit" id="myFilee">
-                    </form>
-                  </td>
-                </tr>
-                <tr>
-                  <td> ESIC No</td>
-                  <td><input type="text" id="esic_no" value=""></td>
-                  <td class="rowsstyle">
-                    <form method="post" class="post-form" enctype="multipart/form-data" action="">
-                      <input type="file" id="myFile" name="filename">
-                      <input type="submit" id="myFilee">
-                    </form>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <div class="accordion-body">
+          <form>
+            <div class="row mb-3">
+              <label for="inputEmail3" class="col-sm-2 col-form-label fw-bold">GST No</label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control" id="gst_no">
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label for="inputPassword3" class="col-sm-2 col-form-label fw-bold">PAN No</label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control" id="pan_no">
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label for="inputPassword3" class="col-sm-2 col-form-label fw-bold">PF No</label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control" id="pf_no">
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label for="inputPassword3" class="col-sm-2 col-form-label fw-bold">ESIC No</label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control" id="esic_no">
+              </div>
+            </div>
+            <div class="col-auto" style="display: flex;justify-content:flex-end">
+              <a href='#' type="submit" class="btn btn-primary" style="text-align:right">Upload Docs</a>
+            </div>
+          </form>
         </div>
       </div>
     </div>
   </div>
   <div class="for_btn" style="text-align: right;margin:10px;">
     <button type="button" class="btn btn-primary btn-lg btn-block float-right" id="Save_context"
-      onclick="save_company_info()">Save</button>
+      onclick="saveCompanyInfo()">Save</button>
   </div>
 </div>
 {% endblock body %}

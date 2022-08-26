@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
-from taxes.models import TaxAlert, ITMonthlyStatus, ITQuarterlyStatus, GSTMonthlyStatus, GSTQuarterlyStatus
+from taxes.models import TaxAlert, IncomeTaxMonthlyStatus, IncomeTaxQuarterlyStatus, GSTMonthlyStatus, GSTQuarterlyStatus
 
 # Create your views here.
 @login_required()
@@ -43,10 +43,10 @@ class TaxesData(APIView):
             raised_on__gte = selected_month.replace(day=1)
         )
 
-        monthly_status = ITMonthlyStatus.objects.filter(
+        monthly_status = IncomeTaxMonthlyStatus.objects.filter(
             client_id = logged_client_id,
         )
-        quarterly_status = ITQuarterlyStatus.objects.filter(
+        quarterly_status = IncomeTaxQuarterlyStatus.objects.filter(
             client_id = logged_client_id
         )
         

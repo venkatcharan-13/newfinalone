@@ -3,80 +3,117 @@
 {% block title %}Analytics | MIS Report{% endblock title %}
 {% block active %}active{% endblock active %}
 {% block body %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js"></script>
-<h1>Graphs</h1><br>
+<br>
 <div class="container">
-  <h3 style="text-align: center;">Sales Performance</h3>
   <div class="row mb-5">
-    <div class="col-12">
-      <canvas id="sales_performance1"></canvas>
+
+    <div class="shadow-sm col-6">
+      <div class="forDisplayGraphs">
+        <div id="monthly" style="margin-top:10px;">
+          <div class="row mb-2">
+            <div class="col-12">
+              <div id="sales_performance1"></div>
+            </div>
+          </div>
+        </div>
+        <div id="quaterly" style="margin-top:10px; display:none">
+          <div class="row mb-2">
+            <div class="col-12">
+              <div id="sales_performance2"></div>
+            </div>
+          </div>
+        </div>
+        <div id="yearly" style="margin-top:10px; display:none">
+          <div class="row mb-2">
+            <div class="col-12">
+              <div id="sales_performance3"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="text-center mb-3" role="group">
+        <button id="button1" type="button" class="btn btn-primary" onclick="changeGraph('monthly', this.id)">Monthly</button>
+        <button id="button2" type="button" class="btn btn-primary" onclick="changeGraph('quaterly', this.id)">Quaterly</button>
+        <button id="button3" type="button" class="btn btn-primary" onclick="changeGraph('yearly', this.id)">Yearly</button>
+      </div>
     </div>
+
+    <div class="shadow-sm col-6">
+      <div id="gross_and_net_profit"></div>
+    </div>
+
   </div>
+
+
   <div class="row mb-5">
-    <div class="col-6">
-      <canvas id="sales_performance2"></canvas>
+
+    <div class="shadow-sm col-6">
+      <div id="income_vs_expenses" style="padding-top: 50px;"></div>
     </div>
-    <div class="col-6">
-      <canvas id="sales_performance3"></canvas>
+
+    <div class="shadow-sm col-6">
+      <div id="gp_expenses_ebitda"></div>
     </div>
+
   </div>
+
+
+  <h2>P&L Summary</h2>
+  <table class="table table-bordered">
+    <thead class="table-dark" id="pnl_head">
+    </thead>
+    <tbody id="pnl_summary">
+
+    </tbody>
+  </table><br><br><hr>
+
+
   <div class="row mb-5">
-    <div class="col-6">
-      <canvas id="income_vs_expenses"></canvas>
+
+    <div class=" shadow-sm col-6">
+      <div id="inflow_vs_outflow"></div>
     </div>
-    <div class="col-6">
-      <canvas id="inflow_vs_outflow"></canvas>
+
+    <div class="shadow-sm col-6">
+      <div id="monthly_cashflow"></div>
     </div>
+
   </div>
+
+
+  <h2>Cashflow Statement Summary</h2>
+  <table class="table table-bordered">
+    <thead class="table-dark" id="cashflow_head">
+    </thead>
+    <tbody id="cashflow_summary">
+
+    </tbody>
+  </table><br><br><hr>
+
+
   <div class="row mb-5">
-    <div class="col-6">
-      <canvas id="closing_bank_balance"></canvas>
+
+    <div class="shadow-sm col-6">
+      <div id="closing_bank_balance"></div>
     </div>
-    <div class="col-6">
-      <canvas id="gross_and_net_profit"></canvas>
+
+    <div class="shadow-sm col-6">
+      <div id="monthly_runaway"></div>
     </div>
+
   </div>
-  <div class="row mb-5">
-    <div class="col-6">
-      <canvas id="monthly_runaway"></canvas>
-    </div>
-    <div class="col-6">
-      <canvas id="gp_expenses_ebitda"></canvas>
-    </div>
-  </div>
-  <div class="row mb-5">
-    <div class="col-12">
-      <canvas id="monthly_cashflow"></canvas>
-    </div>
-  </div>
+
+
+  <h2>Balance Sheet Summary</h2>
+  <table class="table table-bordered">
+    <thead class="table-dark" id="bal_sheet_head">
+    </thead>
+    <tbody id="bal_sheet_summary">
+
+    </tbody>
+  </table>
+
 </div>
-<h1>Tabular Summaries</h1><br>
-<h2>P&L Summary</h2>
-<table class="table table-bordered">
-  <thead class="table-dark" id="pnl_head">
-  </thead>
-  <tbody id="pnl_summary">
-
-  </tbody>
-</table>
-<br>
-<h2>Balance Sheet Summary</h2>
-<table class="table table-bordered">
-  <thead class="table-dark" id="bal_sheet_head">
-  </thead>
-  <tbody id="bal_sheet_summary">
-
-  </tbody>
-</table>
-<br>
-<h2>Cashflow Statement Summary</h2>
-<table class="table table-bordered">
-  <thead class="table-dark" id="cashflow_head">
-  </thead>
-  <tbody id="cashflow_summary">
-
-  </tbody>
-</table>
 
 {% endblock body %}
 

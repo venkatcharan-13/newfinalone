@@ -1,0 +1,15 @@
+{% extends 'help_base.html' %}
+{% load static %}
+
+{% block title %}Help | Chat{% endblock title %}
+{%block active%}active{%endblock active%}
+{% block body %}
+<br>
+<h1>Scedule a Call</h1>
+<!-- Calendly inline widget begin -->
+<div class="calendly-inline-widget" data-url="https://calendly.com/jordensky" style="max-width:900px;height:500px;"></div>
+<script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+<!-- Calendly inline widget end -->
+{% endblock body %}
+
+{% block script %}{% endblock script %}

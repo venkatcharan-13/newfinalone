@@ -1,15 +1,15 @@
 var endpoint = 'api/incometaxData/';
-var choosen_month = sessionStorage.getItem("choosen_month") ? sessionStorage.getItem("choosen_month"): "2022-06-30";
-var choosen_fy = sessionStorage.getItem("choosen_fy") ? sessionStorage.getItem("choosen_fy"): "2022";
+var choosen_month = sessionStorage.getItem("choosen_month") ? sessionStorage.getItem("choosen_month") : "2022-06-30";
+var choosen_fy = sessionStorage.getItem("choosen_fy") ? sessionStorage.getItem("choosen_fy") : "2022";
 
-$(document).ready(function() {
-  if(sessionStorage.getItem("choosen_month")){
+$(document).ready(function () {
+  if (sessionStorage.getItem("choosen_month")) {
     $('#periodSelector').val(sessionStorage.getItem("choosen_month").substring(0, 7));
   }
-  if(sessionStorage.getItem("choosen_fy")){
+  if (sessionStorage.getItem("choosen_fy")) {
     $('#fySelector').val(sessionStorage.getItem("choosen_fy"));
   }
-  else{
+  else {
     $('#fySelector').val("Choose FY");
   }
 
@@ -25,8 +25,8 @@ $.ajax({
   success: function (response) {
     console.log("Income Tax data loaded");
     createAlertBoxes(response.alerts, "alertsBox");
-    createRadioElement(response.status.monthly, "monthly_status");
-    createRadioElement(response.status.quarterly, "quarterly_status");
+    fillMonthlyTaxStatus(response.status.monthly, "monthly_status");
+    fillQuarterlyTaxStatus(response.status.quarterly, "quarterly_status");
   },
   error: function (error_data) {
     console.log("Error");
@@ -37,7 +37,7 @@ $.ajax({
 function changePeriod(params) {
   var year = params.substring(0, 4);
   var month = params.substring(5, 7);
-  var choosen_period = params + '-' + new Date(year, month, 0).getDate(); 
+  var choosen_period = params + '-' + new Date(year, month, 0).getDate();
   sessionStorage.setItem("choosen_month", choosen_period);
   location.reload();
 }
@@ -59,27 +59,71 @@ function createAlertBoxes(data, id) {
   })
 }
 
-function createRadioElement(data, eid) {
+function showPending(params) {
+  for (var i = 0; i < document.getElementsByClassName(params).length; i++) {
+    document.getElementsByClassName(params)[i].style.display = 'none';
+  }
+}
+
+function showAll(params) {
+  for (var i = 0; i < document.getElementsByClassName(params).length; i++) {
+    document.getElementsByClassName(params)[i].setAttribute('style', 'display:flex;align-items:center;justify-content:center;');
+  }
+}
+
+function fillMonthlyTaxStatus(data, eid) {
   elem = document.getElementById(eid);
+  var icon = '';
   Object.entries(data).forEach(function (month) {
     var div = document.createElement('div');
-    div.className = "form-check col-3";
+    div.setAttribute('style', 'display:flex; align-items:center; justify-content:center;');
+    div.setAttribute('class', 'col-2 shadow-sm monthlyStatus');
     switch (month[1]) {
       case "done":
-        var color = "green";
+        icon = `<i class="fi fi-rs-check"></i>`;
         break;
       case "action_required":
-        var color = "red";
+        icon = `<i class="fi fi-rs-sensor-alert"></i>`;
         break;
-      case "quality_check":
-        var color = "blue";
+      case "not_applicable":
+        icon = `<i class="fi fi-rs-lock"></i>`;
         break;
       default:
-        var color = "white";
+        div.setAttribute('class', 'col-2 shadow-sm');
+        icon = `<i class="fi fi-rs-hourglass-end"></i>`;
         break;
     }
-    div.innerHTML = `<input class="form-check-input" type="radio" style="background-color: ${color}" checked>` +
-      `<label class="form-check-label" for="flexRadioDefault1">${month[0]}</label>`;
+    div.innerHTML = icon +
+      `<label class="fa" for="flexRadioDefault1">${month[0]}</label>`;
+
+    elem.appendChild(div, elem.nextSibling);
+  })
+}
+
+function fillQuarterlyTaxStatus(data, eid) {
+  elem = document.getElementById(eid);
+  var icon = '';
+  Object.entries(data).forEach(function (month) {
+    var div = document.createElement('div');
+    div.setAttribute('style', 'display:flex; align-items:center; justify-content:center;');
+    div.setAttribute('class', 'col-3 shadow-sm quarterlyStatus');
+    switch (month[1]) {
+      case "done":
+        icon = `<i class="fi fi-rs-check"></i>`;
+        break;
+      case "action_required":
+        icon = `<i class="i fi-rs-sensor-alert"></i>`;
+        break;
+      case "not_applicable":
+        icon = `<i class="fi fi-rs-lock"></i>`;
+        break;
+      default:
+        div.setAttribute('class', 'col-3 shadow-sm');
+        icon = `<i class="fi fi-rs-hourglass-end"></i>`;
+        break;
+    }
+    div.innerHTML = icon +
+      `<label class="fa" for="flexRadioDefault1">${month[0]}</label>`;
 
     elem.appendChild(div, elem.nextSibling);
   })

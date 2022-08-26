@@ -3,7 +3,7 @@ from authentication.models import Client
 from home.models import Notification, ContactPerson, DashboardAccountStatus, PendingActionable, WatchOutPoint, StatutoryCompliance
 from cprofile.models import Company
 from accounts.models import Ratio
-from taxes.models import TaxAlert, ITMonthlyStatus, ITQuarterlyStatus, GSTMonthlyStatus, GSTQuarterlyStatus
+from taxes.models import TaxAlert, IncomeTaxMonthlyStatus, IncomeTaxQuarterlyStatus, GSTMonthlyStatus, GSTQuarterlyStatus
 
 # Register your models here.
 
@@ -36,11 +36,11 @@ class RatioInline(admin.TabularInline):
 class TaxAlertInline(admin.TabularInline):
     model = TaxAlert
     extra = 0
-class ITMonthlyStatusInline(admin.TabularInline):
-    model = ITMonthlyStatus
+class IncomeTaxMonthlyStatusInline(admin.TabularInline):
+    model = IncomeTaxMonthlyStatus
     extra = 0
-class ITQuarterlyStatusInline(admin.TabularInline):
-    model = ITQuarterlyStatus
+class IncomeTaxQuarterlyStatusInline(admin.TabularInline):
+    model = IncomeTaxQuarterlyStatus
     extra = 0
 class GSTMonthlyStatusInline(admin.TabularInline):
     model = GSTMonthlyStatus
@@ -66,8 +66,8 @@ class ClientAdmin(admin.ModelAdmin):
         StatutoryComplianceInline,
         RatioInline,
         TaxAlertInline,
-        ITMonthlyStatusInline,
-        ITQuarterlyStatusInline,
+        IncomeTaxMonthlyStatusInline,
+        IncomeTaxQuarterlyStatusInline,
         GSTMonthlyStatusInline,
         GSTQuarterlyStatusInline
     ]

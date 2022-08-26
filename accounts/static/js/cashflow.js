@@ -76,8 +76,9 @@ function fillCashflowRows(data, rid, rowType) {
 }
 
 function fillCashflowHeaders(object, tid, head, info) {
+  var expandButton = `<button type="button" id="rotateBtn" class="accordion-toggle" data-bs-toggle="collapse" data-bs-target=".${tid}" aria-expanded="false" aria-hidden="true"><svg cla xmlns="\http://www.w3.org/2000/svg&quot;" viewBox="0 0 66.91 122.88" focusable="false" ><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z"></path></svg></button>`;
   document.getElementById(tid).innerHTML = `<th style="width:40%"> ${head} 
-    <span class="fa fa-info-circle" title="${info}"></span></th>` +
+    <span class="fa fa-info-circle" title="${info}"></span> ${expandButton} </th>` + 
     '<th style="width: 20%; text-align:right;">' + object.current + '</th>' +
     '<th style="width: 20%; text-align:right;">' + object.previous + '</th>' +
     '<th style="width: 20%; text-align:center;">' + object.per_change + '%</th>';

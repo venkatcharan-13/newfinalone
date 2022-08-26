@@ -10,6 +10,9 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
+config_file = open("config/profile_config.json")
+config_data = json.load(config_file)
+overview_config_data = config_data['profile_overview']
 
 @login_required()
 def profiles(request):
@@ -31,8 +34,14 @@ def save_company_info(request):
     
     company.company_name = request_body['edited_name']
     company.industry_name = request_body['edited_industry']
+    company.entity_name = request_body['edited_entity']
+    company.contact_person = request_body['edited_contact_person']
     company.company_email = request_body['edited_email']
     company.contact_number = request_body['edited_number']
+    company.gst_number = request_body['edited_gst_no']
+    company.pan_number = request_body['edited_pan_no']
+    company.pf_number = request_body['edited_pf_no']
+    company.esic_number = request_body['edited_esic_no']
     company.save()
 
     company_address.address_line = request_body['edited_address']
@@ -74,6 +83,20 @@ def bank_details(request):
     return render(request, 'bankdet.html')
     
 
+class Overview(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        response = {
+            'add_ons_cards': []
+        }
+        for content in overview_config_data['add_ons_cards']:
+            response['add_ons_cards'].append(content)
+        
+        return Response(response)
+
+
 class CompanyInfo(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
@@ -88,11 +111,13 @@ class CompanyInfo(APIView):
         company_information_response = {
             "name": company.company_name,
             "industry": company.industry_name,
+            "entity_name": company.entity_name,
             "address": company_address.address_line,
             "city": company_address.city,
             "state": company_address.state,
             "zip": company_address.pin_code,
             "country": company_address.country,
+            "contact_person": company.contact_person,
             "email": company.company_email,
             "phone": str(company.contact_number),
             "gst_no": company.gst_number,

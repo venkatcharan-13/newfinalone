@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 # Create your views here.
 def help(request):
-    return render(request, 'chat.html')
+    return render(request, 'schedule.html')
 
 def resources(request):
     return render(request, 'resources.html')

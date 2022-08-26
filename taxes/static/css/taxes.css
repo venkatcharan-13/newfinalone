@@ -3,3 +3,15 @@
 	border-radius: 5px;
 	padding: 10px;
 }
+
+i {
+	margin-right: 10px;
+}
+
+#monthly_status{
+	height: 120px;
+}
+
+#quarterly_status{
+	height: 80px;
+}

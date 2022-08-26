@@ -4,13 +4,13 @@ import calendar
 
 PENDING = 'pending'
 ACTION_REQUIRED = 'action_required'
-QUALITY_CHECK = 'quality_check'
+NOT_APPLICABLE = 'not_applicable'
 DONE = 'done'
 status_choices = [
     (PENDING, 'Pending'),
     (ACTION_REQUIRED, 'Client Action Required'),
-    (QUALITY_CHECK, 'Quality Check'),
-    (DONE, 'Completed')
+    (NOT_APPLICABLE, 'Not Applicable'),
+    (DONE, 'Done')
 ]
 
 month_choices = []
@@ -53,11 +53,11 @@ class TaxAlert(models.Model):
     tax_type = models.CharField(max_length=20, choices= tax_type_choices, default='Income Tax')
     due_date = models.DateField()
 
-class ITMonthlyStatus(models.Model):
+class IncomeTaxMonthlyStatus(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     month_name = models.IntegerField(choices= month_choices, default=1)
     year = models.IntegerField(choices=year_choices, default=2022)
-    payment_status = models.CharField(max_length=30, choices=status_choices, default='Pending')
+    payment_status = models.CharField(max_length=30, choices=status_choices, default='not_applicable')
 
     @property
     def fin_year(self):
@@ -66,11 +66,11 @@ class ITMonthlyStatus(models.Model):
         else:
             return self.year - 1
 
-class ITQuarterlyStatus(models.Model):
+class IncomeTaxQuarterlyStatus(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     quarter = models.CharField(max_length=20, choices= quarter_choices, default='Apr-Jun')
     year = models.IntegerField(choices=year_choices, default=2022)
-    payment_status = models.CharField(max_length=30, choices=status_choices, default='Pending')
+    payment_status = models.CharField(max_length=30, choices=status_choices, default='not_applicable')
 
     @property
     def fin_year(self):
@@ -83,7 +83,7 @@ class GSTMonthlyStatus(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     month_name = models.IntegerField(choices= month_choices, default=1)
     year = models.IntegerField(choices=year_choices, default=2022)
-    payment_status = models.CharField(max_length=30, choices=status_choices, default='Pending')
+    payment_status = models.CharField(max_length=30, choices=status_choices, default='not_applicable')
 
     @property
     def fin_year(self):
@@ -96,7 +96,34 @@ class GSTQuarterlyStatus(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     quarter = models.CharField(max_length=20, choices= quarter_choices, default='Apr-Jun')
     year = models.IntegerField(choices=year_choices, default=2022)
-    payment_status = models.CharField(max_length=30, choices=status_choices, default='Pending')
+    payment_status = models.CharField(max_length=30, choices=status_choices, default='not_applicable')
+
+    @property
+    def fin_year(self):
+        if self.quarter in ('Q1', 'Q2', 'Q3'):
+            return self.year
+        else:
+            return self.year - 1
+
+
+class OtherTaxesMonthlyStatus(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    month_name = models.IntegerField(choices= month_choices, default=1)
+    year = models.IntegerField(choices=year_choices, default=2022)
+    payment_status = models.CharField(max_length=30, choices=status_choices, default='not_applicable')
+
+    @property
+    def fin_year(self):
+        if int(self.month_name) > 3:
+            return self.year
+        else:
+            return self.year - 1
+
+class OtherTaxesQuarterlyStatus(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    quarter = models.CharField(max_length=20, choices= quarter_choices, default='Apr-Jun')
+    year = models.IntegerField(choices=year_choices, default=2022)
+    payment_status = models.CharField(max_length=30, choices=status_choices, default='not_applicable')
 
     @property
     def fin_year(self):

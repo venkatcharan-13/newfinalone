@@ -1,11 +1,11 @@
 const endpoint = 'api/pnlData/';
-var choosen_month = sessionStorage.getItem("choosen_month") ? sessionStorage.getItem("choosen_month"): "2022-06-30";
+var choosen_month = sessionStorage.getItem("choosen_month") ? sessionStorage.getItem("choosen_month") : "2022-06-30";
 
-$(document).ready(function() {
-  if(sessionStorage.getItem("choosen_month")){
+$(document).ready(function () {
+  if (sessionStorage.getItem("choosen_month")) {
     $('#periodSelector').val(sessionStorage.getItem("choosen_month").substring(0, 7));
   }
-  else{
+  else {
     $('#periodSelector').val("Choose Month");
   }
 });
@@ -49,13 +49,14 @@ function changePeriod(params) {
   console.log(params);
   var year = params.substring(0, 4);
   var month = params.substring(5, 7);
-  var choosen_period = params + '-' + new Date(year, month, 0).getDate(); 
+  var choosen_period = params + '-' + new Date(year, month, 0).getDate();
   sessionStorage.setItem("choosen_month", choosen_period);
   location.reload();
 }
 
 function fillPnlTableTotals(object, tid, head) {
-  document.getElementById(tid).innerHTML = '<th style="width:35%">' + head + '</th>' +
+  var expandButton = '<button type="button" id="rotateBtn" class="accordion-toggle" data-bs-toggle="collapse" data-bs-target=".incomeHiddenRows" aria-expanded="false" aria-hidden="true"><svg cla xmlns="\http://www.w3.org/2000/svg&quot;" viewBox="0 0 66.91 122.88" focusable="false" ><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z"></path></svg></button>';
+  document.getElementById(tid).innerHTML = '<th style="width:35%">'  + head + expandButton +'</th>' +
     '<th style="width: 12%; text-align:right;">' + object.current + '</th>' +
     '<th style="width: 8%;text-align: center;">' + '' + '</th>' +
     '<th style="width: 12%; text-align:right;">' + object.previous + '</th>' +
@@ -65,7 +66,8 @@ function fillPnlTableTotals(object, tid, head) {
 }
 
 function fillPnlTableExpenseTotals(object, tid, head) {
-  document.getElementById(tid).innerHTML = '<th style="width:35%">' + head + '</th>' +
+  var expandButton = '<button type="button" id="rotateBtn" class="accordion-toggle" data-bs-toggle="collapse" data-bs-target=".expenseHiddenRows" aria-expanded="false" aria-hidden="true"><svg cla xmlns="\http://www.w3.org/2000/svg&quot;" viewBox="0 0 66.91 122.88" focusable="false" ><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z"></path></svg></button>';
+  document.getElementById(tid).innerHTML = '<th style="width:35%">' + head + expandButton + '</th>' +
     '<th style="width: 12%; text-align:right;">' + object.current + '</th>' +
     '<th style="width: 8%;text-align: center;">' + object.curr_per + '%</th>' +
     '<th style="width: 12%; text-align:right;">' + object.previous + '</th>' +
@@ -77,7 +79,7 @@ function fillPnlTableExpenseTotals(object, tid, head) {
 function fillPnlTableIncome(data) {
   var table = document.getElementById('pnltable');
   var i = document.getElementById('income_total').rowIndex + 1;
-  if(data.length == 0){
+  if (data.length == 0) {
     var tr = table.insertRow(i);
     tr.innerHTML = '<td></td>';
   }
@@ -128,19 +130,19 @@ function fillPnlTableIndividuals(object, tid, head) {
 function fillPnlTableExpenses(data, tid) {
   var table = document.getElementById('pnltable');
   var i = document.getElementById('expense_total').rowIndex + 1;
-  if(data.length == 0){
+  if (data.length == 0) {
     var tr = table.insertRow(i);
     tr.innerHTML = '<td></td>';
   }
   Object.keys(data).forEach(function (category) {
     var tr = table.insertRow(i);
     tr.innerHTML = '<th style="width:35%">' + category + '</th>' +
-    '<th style="width: 12%; text-align:right;">' + data[category]['current'] + '</th>' +
-    '<th style="width: 8%;text-align: center;">' +  data[category]['curr_per'] + '%</th>' +
-    '<th style="width: 12%; text-align:right;">' + data[category]['previous'] + '</th>' +
-    '<th style="width: 8%; text-align: center;">' +  data[category]['prev_per'] + '%</th>' +
-    '<th style="width: 12%; text-align:center;">' + data[category]['per_change'] + '%</th>' +
-    '<th style="width: 13%; text-align:right;">' + data[category]['three_month_avg'] + '</th>';
+      '<th style="width: 12%; text-align:right;">' + data[category]['current'] + '</th>' +
+      '<th style="width: 8%;text-align: center;">' + data[category]['curr_per'] + '%</th>' +
+      '<th style="width: 12%; text-align:right;">' + data[category]['previous'] + '</th>' +
+      '<th style="width: 8%; text-align: center;">' + data[category]['prev_per'] + '%</th>' +
+      '<th style="width: 12%; text-align:center;">' + data[category]['per_change'] + '%</th>' +
+      '<th style="width: 13%; text-align:right;">' + data[category]['three_month_avg'] + '</th>';
     i++;
     data[category]['data'].forEach(function (object) {
       var tr = table.insertRow(i);
@@ -162,9 +164,9 @@ function displayClientNotes(notes, id) {
   notes.forEach(function (note) {
     var div = document.createElement('div');
     div.setAttribute('class', 'card mb-2');
-    div.innerHTML = `<div class="card-header"> <small> ${note.created_on} </small></div>` + 
-    `<div class="card-body"> <p class="card-text"> ${note.note}</p>` +
-    `<footer class="blockquote-footer">Response: ${note.admin_response == null ? '': note.admin_response}</footer> </div>`;
+    div.innerHTML = `<div class="card-header"> <small> ${note.created_on} </small></div>` +
+      `<div class="card-body"> <p class="card-text"> ${note.note}</p>` +
+      `<footer class="blockquote-footer">Response: ${note.admin_response == null ? '' : note.admin_response}</footer> </div>`;
     box.appendChild(div);
   })
 }
@@ -173,19 +175,19 @@ function add_client_note() {
   var written_note = $('#newNote').val();
   console.log(written_note);
   $.ajax({
-      url: "add_client_note/",
-      type: 'POST',
-      contentType: 'application/json; charset=utf-8',
-      data: JSON.stringify({
-        note: written_note,
-        period: choosen_month,
-        table: 'pnl'
-      }),
-      dataType: 'json',
+    url: "add_client_note/",
+    type: 'POST',
+    contentType: 'application/json; charset=utf-8',
+    data: JSON.stringify({
+      note: written_note,
+      period: choosen_month,
+      table: 'pnl'
+    }),
+    dataType: 'json',
   }).done(function (data) {
-      console.log("Success");
-      document.location.reload();
+    console.log("Success");
+    document.location.reload();
   }).fail(function (error) {
-      console.log("error");
+    console.log("error");
   });
 }

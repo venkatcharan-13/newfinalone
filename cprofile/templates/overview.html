@@ -3,13 +3,51 @@
 {% block title %}Profile | Overview{% endblock title %}
 {% block active %}active{% endblock active %}
 {% block body %}
-<br>
+
 <h1>Overview</h1>
 {% if user.is_authenticated %}
-  <br><h2>Hello {{ user.first_name }} {{ user.last_name }}</h2><br>
+<br>
+<div class="container">
+  <div class=" shadow-sm customCard">
+    <div class="customCard-header">
+      <h6><b>Feedback</b> </h6>
+    </div>
+    <div class="customCard-body" style="padding-left: 15px;padding-bottom: 7px;">
+      <p>First Time using the Jordensky App?</p>
+      <p>We will do a quick walkthrough of the platform and show you what's new !</p>
+      <a class="btn btn-primary">Feedback</a>
+      <a class="btn btn-primary">Tour</a>
+    </div>
+  </div>
+  <br>
+
+  <h4>Explore Add-ons</h4><br>
+  <div class="addOns d-inline">
+    <div class="row" id="addOnsList">
+    </div>
+    <br>
+  </div>
+  <h4>Explore Free Add-ons</h4><br>
+  <div class="row">
+    <div class="col-6">
+      <div class=" shadow-sm customCard">
+        <div class="customCard-header">
+          <h5><b>Do you have burning questions?</b></h5>
+        </div>
+        <div class=" customCard-body">
+          <p>Do you have burning questions relating to finance or your accounts, our expert team can answer every
+            questions.</p>
+          <a href="#">Click here to schedule a call</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
 {% endif %}
+
 {% endblock body %}
 
 {% block script %}
-<!-- <script src="{% static 'js/pnl.js' %}"></script> -->
+<script src="{% static 'js/overview.js' %}"></script>
 {% endblock script %}

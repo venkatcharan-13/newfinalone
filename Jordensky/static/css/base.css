@@ -1,3 +1,8 @@
+i {
+    font-size: 20px;
+    margin-right: 15px;
+}
+
 .skeleton {
     font-family: 'Poppins';
     color: black;
@@ -75,10 +80,6 @@ b {
 	}
 }
 
-.TopIcons {
-    font-size: 23px;
-}
-
 .topnav {
     overflow: hidden;
     position: fixed;
@@ -124,8 +125,34 @@ b {
     border-bottom: 1px solid #f5f3f2;
 }
 
+.customCard-body {
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: white;
+}
+
 .sticky {
     position: fixed;
     top: 0;
     width: 100%;
+}
+
+#rotateBtn {
+    display: inline-flex;
+    font-size: 60%;
+    background-color: inherit;
+    border: none;
+    text-align: center;
+}
+
+#rotateBtn svg {
+    width: 1.25em;
+    height: 1.25em;
+    fill: black;
+    transition: transform 0.20s ease-in;
+    transform-origin: center 45%;
+}
+
+#rotateBtn[aria-expanded="true"] svg {
+    transform: rotate(90deg);
 }

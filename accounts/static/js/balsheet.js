@@ -20,7 +20,7 @@ $.ajax({
     console.log("Success Balance Sheet");
     document.getElementById("current_month").innerHTML = response.current_period;
     document.getElementById("previous_month").innerHTML = response.previous_period;
-    fillTotalHead(response.response_data.total_assets, 'total_of_assets', 'Assets');
+    fillTotalHead(response.response_data.total_assets, 'total_of_assets', 'Assets', 'asset_type');
     fillBalsheetHeads(response.response_data.fixed_asset, 'Fixed Asset', 'fixasset_head');
     addBalsheetRows(response.response_data.fixed_asset.data, 'fixasset_head', 'asset_type');
     fillBalsheetHeads(response.response_data.other_asset, 'Other Asset', 'othasset_head');
@@ -33,7 +33,7 @@ $.ajax({
     fillBalsheetHeads(response.response_data.stock, 'Stock', 'stock_head');
     addBalsheetRows(response.response_data.stock.data, 'stock_head', 'asset_type');
 
-    fillTotalHead(response.response_data.total_liabilities, 'total_of_liabilities', 'Liabilities');
+    fillTotalHead(response.response_data.total_liabilities, 'total_of_liabilities', 'Liabilities', 'liability_type');
     fillBalsheetHeads(response.response_data.long_term_liability, 'Long Term Liability', 'ltliab_head');
     addBalsheetRows(response.response_data.long_term_liability.data, 'ltliab_head', 'liability_type');
     fillBalsheetHeads(response.response_data.other_liability, 'Other Liability', 'othliab_head')
@@ -42,7 +42,7 @@ $.ajax({
     fillBalsheetHeads(response.response_data.other_current_liability, 'Other Current Liability', 'ocliab_head');
     addBalsheetRows(response.response_data.other_current_liability.data, 'ocliab_head', 'liability_type');
 
-    fillTotalHead(response.response_data.total_equity, 'total_of_equity', 'Equity');
+    fillTotalHead(response.response_data.total_equity, 'total_of_equity', 'Equity', 'equity_type');
     addBalsheetRows(response.response_data.equity.data, 'equity', 'equity_type');
 
     document.getElementById('head_equity').innerHTML = response.response_data.total_equity.current;
@@ -89,13 +89,7 @@ function addBalsheetRows(data, rid, rowType) {
 
   data.forEach(function (object) {
     var tr = table.insertRow(i);
-    if(rowType == 'asset_type'){
-      tr.setAttribute('class', 'accordion-collapse collapse assetsHiddenRows');
-    } else if (rowType == 'liability_type') {
-      tr.setAttribute('class', 'accordion-collapse collapse liabilitiesHiddenRows');
-    } else {
-      tr.setAttribute('class', 'accordion-collapse collapse equityHiddenRows');
-    }
+    tr.setAttribute('class', `accordion-collapse collapse ${rowType}`);
     tr.innerHTML = '<th style="width:34%">' + object.account_header + '</th>' +
       '<td style="width: 22%; text-align:right;">' + object.current + '</td>' +
       '<td style="width: 22%; text-align:right;">' + object.previous + '</td>' +
@@ -104,9 +98,10 @@ function addBalsheetRows(data, rid, rowType) {
   })
 }
 
-function fillTotalHead(data, tid, head) {
+function fillTotalHead(data, tid, head, table_head_type) {
   var tr = document.getElementById(tid);
-  tr.innerHTML = '<th style="width:34%">' + head + '</th>' +
+  var expandButton = `<button type="button" id="rotateBtn" class="accordion-toggle" data-bs-toggle="collapse" data-bs-target=".${table_head_type}" aria-expanded="false" aria-hidden="true"><svg cla xmlns="\http://www.w3.org/2000/svg&quot;" viewBox="0 0 66.91 122.88" focusable="false" ><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z"></path></svg></button>`;
+  tr.innerHTML = '<th style="width:34%">' + head + ' ' + expandButton + '</th>' +
     '<th style="width: 22%; text-align:right;">' + data.current + '</th>' +
     '<th style="width: 22%; text-align:right;">' + data.previous + '</th>' +
     '<th style="width: 22%; text-align:center;">' + data.per_change + '%</th>';

@@ -1,0 +1,22 @@
+{
+    "profile_overview": {
+        "add_ons_cards": [
+            {
+                "title": "Explore Accounting and Bookkeeping",
+                "content": "Missing monthly or even yearly accounting? we will handle your overdue accounting with total accuracy, and ensure to get back on track with ease"
+            },
+            {
+                "title": "Add another Business",
+                "content": "Do you have other business which need accounting service? Bring on additional business and avail 20% off"
+            },
+            {
+                "title": "Explore CFO Services",
+                "content": "Do you want to accelerate the growth? Our CFO team will be dedicated to your business and provide financial projections, scenario modelling, actual vs budget analysis and various board presentations"
+            },
+            {
+                "title": "Explore MIS Services",
+                "content": "Do you want to transform your financial data into actionable reports? Our Analyst team will handle your spreadsheet and unit economics for your business on monthly basis"
+            }
+        ] 
+    }
+}

@@ -47,7 +47,8 @@ function changePeriod(params) {
 }
 
 function fillExpenseHeader(object, tid, head) {
-  document.getElementById(tid).innerHTML = `<th style="width:40%"><a href="${head}/?selected_date=${choosen_month}" style="text-decoration: none">${head}</a><br><em>Change: ${object.change}</em></th>` +
+  var rowbtn = `<button type="button" id="rotateBtn" class="accordion-toggle" data-bs-toggle="collapse" data-bs-target=".${tid}" aria-expanded="false" aria-hidden="true"><svg cla xmlns="\http://www.w3.org/2000/svg&quot;" viewBox="0 0 66.91 122.88" focusable="false" ><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z"></path></svg></button>`
+  document.getElementById(tid).innerHTML = `<th style="width:40%"> <a href="${head}/?selected_date=${choosen_month}" style="text-decoration: none">${head}</a> ${rowbtn} <br><em>Change: ${object.change}</em></th>` +
     '<td style="width: 15%; text-align:right;">' + object.current + '</td>' +
     '<td style="width: 15%; text-align:right;">' + object.previous + '</td>' +
     '<td style="width: 15%; text-align:center;">' + object.per_change + '%</td>' +

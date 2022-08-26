@@ -65,3 +65,8 @@
     background-color: white;
     width: 60%;
 }
+
+#total_of_assets, #total_of_liabilities, #total_of_equity {
+    background: rgb(100, 100, 100);
+    color: white;
+}
