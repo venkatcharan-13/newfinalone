@@ -3,11 +3,13 @@ from django.db.models import Q
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 import calendar
+from utility import accounts_util
 import locale
 from utility import accounts_str as strvar
 import json
 
 locale.setlocale(locale.LC_ALL, 'en_IN.utf8')
+CURRENT_DATE_PERIOD = accounts_util.get_current_date_period()
 
 config_file = open("config/analytics_config.json")
 config_data = json.load(config_file)
@@ -15,7 +17,7 @@ analytics_config_data = config_data['analytics']
 
 def get_sales_performance(client_id, current_date):
     if current_date is None:
-        current_date = date(2022, 6, 30)
+        current_date = CURRENT_DATE_PERIOD
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
@@ -127,7 +129,7 @@ def get_sales_performance(client_id, current_date):
 
 def get_income_vs_expenses(client_id, current_date):
     if current_date is None:
-        current_date = date(2022, 6, 30)
+        current_date = CURRENT_DATE_PERIOD
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
@@ -176,7 +178,7 @@ def get_income_vs_expenses(client_id, current_date):
 
 def get_cash_inflow_outflow(client_id, current_date):
     if current_date is None:
-        current_date = date(2022, 6, 30)
+        current_date = CURRENT_DATE_PERIOD
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
@@ -219,7 +221,7 @@ def get_cash_inflow_outflow(client_id, current_date):
 
 def get_closing_bank_balance_trend(client_id, current_date):
     if current_date is None:
-        current_date = date(2022, 6, 30)
+        current_date = CURRENT_DATE_PERIOD
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
@@ -259,7 +261,7 @@ def get_closing_bank_balance_trend(client_id, current_date):
 
 def get_gross_profit_and_net_profit(client_id, current_date):
     if current_date is None:
-        current_date = date(2022, 6, 30)
+        current_date = CURRENT_DATE_PERIOD
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
@@ -331,7 +333,7 @@ def get_gross_profit_and_net_profit(client_id, current_date):
 
 def get_monthly_runaway(client_id, current_date):
     if current_date is None:
-        current_date = date(2022, 6, 30)
+        current_date = CURRENT_DATE_PERIOD
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
@@ -373,7 +375,7 @@ def get_monthly_runaway(client_id, current_date):
 
 def get_gp_vs_expenses_ebitda(client_id, current_date):
     if current_date is None:
-        current_date = date(2022, 6, 30)
+        current_date = CURRENT_DATE_PERIOD
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
@@ -458,7 +460,7 @@ def get_gp_vs_expenses_ebitda(client_id, current_date):
 
 def get_monthly_cashflow_statement(client_id, current_date):
     if current_date is None:
-        current_date = date(2022, 6, 30)
+        current_date = CURRENT_DATE_PERIOD
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
@@ -648,7 +650,7 @@ def get_monthly_cashflow_statement(client_id, current_date):
 
 def get_pnl_summary(client_id, current_date):
     if current_date is None:
-        current_date = date(2022, 6, 30)
+        current_date = CURRENT_DATE_PERIOD
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
@@ -707,7 +709,7 @@ def get_pnl_summary(client_id, current_date):
 
 def get_balance_sheet_summary(client_id, current_date):
     if current_date is None:
-        current_date = date(2022, 6, 30)
+        current_date = CURRENT_DATE_PERIOD
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
 
@@ -811,7 +813,7 @@ def get_balance_sheet_summary(client_id, current_date):
 
 def get_cashflow_summary(client_id, current_date):
     if current_date is None:
-        current_date = date(2022, 6, 30)
+        current_date = CURRENT_DATE_PERIOD
     elif not isinstance(current_date, date):
         current_date = datetime.strptime(current_date, '%Y-%m-%d').date()
         

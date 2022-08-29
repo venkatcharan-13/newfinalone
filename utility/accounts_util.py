@@ -1,7 +1,8 @@
 from accounts.models import ZohoAccount, ZohoTransaction
 from dateutil.relativedelta import relativedelta
 from utility import accounts_str as strvar
-from datetime import date, datetime
+from datetime import date
+import calendar
 import locale
 import json
 
@@ -18,6 +19,14 @@ three_month_avg_str = strvar.three_month_avg
 config_file = open("config/accounts_config.json")
 config_data = json.load(config_file)
 bs_config_data = config_data['balance_sheet']
+
+
+def get_current_date_period():
+    CURRENT_DATE = date.today()
+    current_year, current_month = CURRENT_DATE.year, CURRENT_DATE.month
+    last_day = calendar.monthrange(current_year, current_month)[1]
+    current_period = date(current_year, current_month, last_day)
+    return current_period
 
 
 def fetch_data_from_db(table, client_id, period, account_filter):

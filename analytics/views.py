@@ -9,7 +9,7 @@ from utility import analytics_util, insights_util, accounts_util
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-SELECTED_DATE = date(2022, 6, 30)
+CURRENT_DATE_PERIOD = accounts_util.get_current_date_period()
 current_period_str, previous_period_str  = "current_period", "previous_period"
 response_data_str, totals_str = "response_data", "totals"
 
@@ -28,7 +28,7 @@ def insight_transactions(request, expense):
     logged_client_id = request.user.id
 
     if selected_month is None:
-        selected_month = date(2022, 6, 30)
+        selected_month = CURRENT_DATE_PERIOD
     else:
         selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
     
@@ -198,7 +198,7 @@ class InsightsData(APIView):
         logged_client_id = self.request.user.id
 
         if selected_month is None:
-            selected_month = date(2022, 6, 30)
+            selected_month = CURRENT_DATE_PERIOD
         else:
             selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
 

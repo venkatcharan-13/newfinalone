@@ -6,8 +6,12 @@ from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 from taxes.models import TaxAlert, IncomeTaxMonthlyStatus, IncomeTaxQuarterlyStatus, GSTMonthlyStatus, GSTQuarterlyStatus
+from utility import accounts_util
 
 # Create your views here.
+CURRENT_DATE_PERIOD = accounts_util.get_current_date_period()
+
+
 @login_required()
 def taxes(request):
     return render(request, 'taxes.html')
@@ -31,7 +35,7 @@ class TaxesData(APIView):
         selected_fy = int(self.request.query_params.get('selected_fy'))
 
         if selected_month is None:
-            selected_month = date(2022, 6, 30)
+            selected_month = CURRENT_DATE_PERIOD
         else:
             selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
             
@@ -84,7 +88,7 @@ class GSTData(APIView):
         selected_fy = int(self.request.query_params.get('selected_fy'))
 
         if selected_month is None:
-            selected_month = date(2022, 6, 30)
+            selected_month = CURRENT_DATE_PERIOD
         else:
             selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
             

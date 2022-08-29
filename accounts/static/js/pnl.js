@@ -1,12 +1,13 @@
 const endpoint = 'api/pnlData/';
-var choosen_month = sessionStorage.getItem("choosen_month") ? sessionStorage.getItem("choosen_month") : "2022-06-30";
+var choosen_month = sessionStorage.getItem("choosen_month") ? 
+sessionStorage.getItem("choosen_month"): new Date().toISOString().slice(0, 10);
 
 $(document).ready(function () {
   if (sessionStorage.getItem("choosen_month")) {
     $('#periodSelector').val(sessionStorage.getItem("choosen_month").substring(0, 7));
   }
   else {
-    $('#periodSelector').val("Choose Month");
+    $('#periodSelector').val(choosen_month.slice(0, 7));
   }
 });
 
@@ -46,7 +47,6 @@ $.ajax({
 })
 
 function changePeriod(params) {
-  console.log(params);
   var year = params.substring(0, 4);
   var month = params.substring(5, 7);
   var choosen_period = params + '-' + new Date(year, month, 0).getDate();

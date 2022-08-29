@@ -2,6 +2,7 @@ import json
 from django.shortcuts import render
 from django.http import JsonResponse
 from datetime import date, datetime
+import calendar
 from home.models import Notification, ContactPerson, DashboardAccountStatus, PendingActionable, WatchOutPoint,  StatutoryCompliance
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -12,6 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 
 
 # Create your views here
+CURRENT_DATE = date.today()
 
 @login_required()
 def index(request):
@@ -33,7 +35,9 @@ class DashboardData(APIView):
         logged_client_id = self.request.user.id
         selected_month = self.request.query_params.get('selected_date')
         if selected_month is None:
-            selected_month = date(2022, 6, 30)
+            current_year, current_month = CURRENT_DATE.year, CURRENT_DATE.month
+            last_day = calendar.monthrange(current_year, current_month)[1]
+            selected_month = date(current_year, current_month, last_day)
         else:
             selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
 

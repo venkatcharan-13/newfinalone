@@ -18,7 +18,8 @@ from accounts.models import account_for_coding_choice
 from utility import accounts_str as strvar
 
 locale.setlocale(locale.LC_ALL, 'en_IN.utf8')
-SELECTED_DATE = date(2022, 6, 30)
+CURRENT_DATE_PERIOD = accounts_util.get_current_date_period()
+
 current_period_str = strvar.current_period
 previous_period_str = strvar.previous_period
 pre_previous_period_str  = strvar.pre_previous_period
@@ -75,7 +76,7 @@ def pnl_transaction(request, account):
     logged_client_id = request.user.id
 
     if selected_month is None:
-        selected_month = date(2022, 6, 30)
+        selected_month = CURRENT_DATE_PERIOD
     else:
         selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
 
@@ -114,7 +115,7 @@ def cashflow_balances(request, activity):
                 break
     
     if selected_month is None:
-        selected_month = date(2022, 6, 30)
+        selected_month = CURRENT_DATE_PERIOD
     else:
         selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
 
@@ -160,7 +161,7 @@ class PnlData(APIView):
         )
 
         if selected_month is None:
-            selected_month = date(2022, 6, 30)
+            selected_month = CURRENT_DATE_PERIOD
         else:
             selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
         
@@ -212,7 +213,7 @@ class BalanceSheetData(APIView):
         logged_client_id = self.request.user.id
 
         if selected_month is None:
-            selected_month = date(2022, 6, 30)
+            selected_month = CURRENT_DATE_PERIOD
         else:
             selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
 
@@ -278,7 +279,7 @@ class CashFlowData(APIView):
         logged_client_id = self.request.user.id
 
         if selected_month is None:
-            selected_month = date(2022, 6, 30)
+            selected_month = CURRENT_DATE_PERIOD
         else:
             selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
         current_month, current_month_year = selected_month.month, selected_month.year
@@ -322,7 +323,7 @@ class RatiosData(APIView):
         logged_client_id = self.request.user.id
 
         if selected_month is None:
-            selected_month = date(2022, 6, 30)
+            selected_month = CURRENT_DATE_PERIOD
         else:
             selected_month = datetime.strptime(selected_month, '%Y-%m-%d').date()
 
