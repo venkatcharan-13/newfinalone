@@ -5,47 +5,77 @@
 {% block body %}
 <br>
 <h1>Context</h1><br>
-<div class="context" style=" width: 100%;
-height: 100%;
-border-style: double;
-padding: 25px;">
-  <div class="row">
-    <div class="col-5">
-      <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-        <a class="nav-link active" id="v-pills-about_company-tab" data-toggle="pill" href="#v-pills-about_company"
-          role="tab" aria-controls="v-pills-about_company" aria-selected="true">About Company</a>
-        <a class="nav-link" id="v-pills-work_profile-tab" data-toggle="pill" href="#v-pills-work_profile" role="tab"
-          aria-controls="v-pills-work_profile" aria-selected="false">What Company Will Do</a>
-        <a class="nav-link" id="v-pills-key_info-tab" data-toggle="pill" href="#v-pills-key_info" role="tab"
-          aria-controls="v-pills-key_info" aria-selected="false">Key Information To be Stored</a>
-        <a class="nav-link" id="v-pills-specific_request-tab" data-toggle="pill" href="#v-pills-specific_request" role="tab"
-          aria-controls="v-pills-specific_request" aria-selected="false">Any Specific Request of the Company</a>
-      </div>
-    </div>
-    <div class="col-7">
+<div class="info">
+  <div class="accordion" id="accordionExample">
+    <div class="accordion-item border-light shadow-sm">
+      <h2 class="accordion-header" id="headingOne">
+        <button class="accordion-button collapsed fw-bold " type="button" data-bs-toggle="collapse"
+          data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+          <h6>About Company</h6>
+        </button>
+      </h2>
+      <div id="collapseOne" class="accordion-collapse collapse " aria-labelledby="headingOne"
+        data-bs-parent="#accordionExample">
+        <div class="accordion-body">
 
-      <div class="tab-content" id="v-pills-tabContent">
-        <div class="tab-pane fade show active" id="v-pills-about_company" role="tabpanel"
-          aria-labelledby="v-pills-about_company-tab">
           <textarea class="form-control" id="about_company" cols="80" rows="10"></textarea>
         </div>
-        <div class="tab-pane fade" id="v-pills-work_profile" role="tabpanel" aria-labelledby="v-pills-work_profile-tab">
-          <textarea class="form-control" id="work_profile" cols="80" rows="10"></textarea></div>
-        <div class="tab-pane fade" id="v-pills-key_info" role="tabpanel" aria-labelledby="v-pills-key_info-tab">
-          <textarea class="form-control" id="key_info" cols="80" rows="10"></textarea></div>
-        <div class="tab-pane fade" id="v-pills-specific_request" role="tabpanel" aria-labelledby="v-pills-specific_request-tab">
-          <textarea class="form-control" id="specific_request" cols="80" rows="10"></textarea></div>
+      </div>
+    </div>
+
+    <div class="accordion-item border-light shadow-sm">
+      <h2 class="accordion-header" id="headingTwo">
+        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse"
+          data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          <h6>What Company Will Do</h6>
+        </button>
+      </h2>
+      <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+        data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+          <textarea class="form-control" id="work_profile" cols="80" rows="10"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item border-light shadow-sm">
+      <h2 class="accordion-header" id="headingThree">
+        <button class="accordion-button collapsed " type="button" data-bs-toggle="collapse"
+          data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+          <h6>Key Information To be Stored</h6>
+        </button>
+      </h2>
+      <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+        data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+          <textarea class="form-control" id="key_info" cols="80" rows="10"></textarea>
+
+        </div>
+
+      </div>
+    </div>
+
+    <div class="accordion-item border-light shadow-sm">
+      <h2 class="accordion-header" id="headingFour">
+        <button class="accordion-button collapsed " type="button" data-bs-toggle="collapse"
+          data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+          <h6>Any Specific Request of the Company</h6>
+        </button>
+      </h2>
+      <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
+        data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+          <textarea class="form-control" id="specific_request" cols="80" rows="10"></textarea>
+        </div>
       </div>
     </div>
   </div>
-  <div class="for_btn" style="text-align: right;margin:10px;">
-    <button type="button" class="btn btn-primary btn-lg btn-block float-right" id="Save_context" onclick="save_context()"
-      style="margin:2px;">Save</button>
-  </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
-{% endblock body %}
+<div class="for_btn" style="text-align: right;margin:10px;">
+  <button type="button" class="btn btn-primary btn-lg btn-block float-right" id="Save_context" onclick="save_context()"
+    style="margin:2px;">Save</button>
+</div>
+</div>{% endblock body %}
 
 {% block script %}
 <script src="{% static 'js/context.js' %}"></script>

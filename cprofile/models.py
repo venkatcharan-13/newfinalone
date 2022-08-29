@@ -1,6 +1,7 @@
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from authentication.models import Client
+from froala_editor.fields import FroalaField
 
 # Create your models here.
 industry_choice=[
@@ -102,10 +103,10 @@ class CompanyContext(models.Model):
         return self.company.company_name
 
     company = models.OneToOneField(Company, on_delete=models.CASCADE)
-    about = models.TextField(blank=True, null=True)
-    work_profile = models.TextField(blank=True, null=True)
-    key_info = models.TextField(blank=True, null=True)
-    specific_request = models.TextField(blank=True, null=True)
+    about = FroalaField(theme='gray', blank=True, null=True)
+    work_profile = FroalaField(theme='gray', blank=True, null=True)
+    key_info = FroalaField(theme='gray', blank=True, null=True)
+    specific_request = FroalaField(theme='gray', blank=True, null=True)
 
 
 class BankDetail(models.Model):

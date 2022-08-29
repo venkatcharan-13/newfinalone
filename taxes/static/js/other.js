@@ -1,4 +1,4 @@
-var endpoint = 'api/incometaxData/';
+var endpoint = 'api/othercompData/';
 var choosen_month = sessionStorage.getItem("choosen_month") ? 
 sessionStorage.getItem("choosen_month"): new Date().toISOString().slice(0, 10);
 var choosen_fy = sessionStorage.getItem("choosen_fy") ? 
@@ -28,11 +28,10 @@ $.ajax({
     selected_fy: choosen_fy
   },
   success: function (response) {
-    console.log("Income Tax data loaded");
+    console.log("Other compliances data loaded");
     createAlertBoxes(response.alerts, "alertsBox");
-    fillMonthlyTaxStatus(response.status.monthly, "monthly_status");
-    fillQuarterlyTaxStatus(response.status.quarterly, "quarterly_status", "quarterlyStatus");
-    fillQuarterlyTaxStatus(response.status.advance, "advance_status", "advanceStatus");
+    fillMonthlyTaxStatus(response.status.pf_status, "pf_status", "PFstatus");
+    fillMonthlyTaxStatus(response.status.esic_status, "esic_status", "ESICstatus");
   },
   error: function (error_data) {
     console.log("Error");
@@ -76,13 +75,13 @@ function showAll(taxClass) {
   }
 }
 
-function fillMonthlyTaxStatus(data, eid) {
+function fillMonthlyTaxStatus(data, eid, taxClass) {
   elem = document.getElementById(eid);
   var icon = '';
   Object.entries(data).forEach(function (month) {
     var div = document.createElement('div');
     div.setAttribute('style', 'display:flex; align-items:center; justify-content:center;');
-    div.setAttribute('class', 'col-2 shadow-sm monthlyStatus');
+    div.setAttribute('class', `col-2 shadow-sm ${taxClass}`);
     switch (month[1]) {
       case "done":
         icon = `<i class="fi fi-rs-check"></i>`;
@@ -95,35 +94,6 @@ function fillMonthlyTaxStatus(data, eid) {
         break;
       default:
         div.setAttribute('class', 'col-2 shadow-sm');
-        icon = `<i class="fi fi-rs-hourglass-end"></i>`;
-        break;
-    }
-    div.innerHTML = icon +
-      `<label class="fa" for="flexRadioDefault1">${month[0]}</label>`;
-
-    elem.appendChild(div, elem.nextSibling);
-  })
-}
-
-function fillQuarterlyTaxStatus(data, eid, taxClass) {
-  elem = document.getElementById(eid);
-  var icon = '';
-  Object.entries(data).forEach(function (month) {
-    var div = document.createElement('div');
-    div.setAttribute('style', 'display:flex; align-items:center; justify-content:center;');
-    div.setAttribute('class', `col-3 shadow-sm ${taxClass}`);
-    switch (month[1]) {
-      case "done":
-        icon = `<i class="fi fi-rs-check"></i>`;
-        break;
-      case "action_required":
-        icon = `<i class="i fi-rs-sensor-alert"></i>`;
-        break;
-      case "not_applicable":
-        icon = `<i class="fi fi-rs-lock"></i>`;
-        break;
-      default:
-        div.setAttribute('class', 'col-3 shadow-sm');
         icon = `<i class="fi fi-rs-hourglass-end"></i>`;
         break;
     }

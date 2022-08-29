@@ -1,9 +1,9 @@
 from django.contrib import admin
 from authentication.models import Client
-from home.models import Notification, ContactPerson, DashboardAccountStatus, PendingActionable, WatchOutPoint, StatutoryCompliance
+from home.models import NextDeliveryDate, ClientNotification, ContactPerson, DashboardAccountStatus, PendingActionable, WatchOutPoint, StatutoryCompliance
 from cprofile.models import Company
 from accounts.models import Ratio
-from taxes.models import TaxAlert, IncomeTaxMonthlyStatus, IncomeTaxQuarterlyStatus, GSTMonthlyStatus, GSTQuarterlyStatus
+from taxes.models import TaxAlert, IncomeTaxMonthlyStatus, IncomeTaxQuarterlyStatus, IncomeTaxAdvanceStatus, GSTR1MonthlyStatus, GSTR3BMonthlyStatus, GSTR8MonthlyStatus, ProvidentFundMonthlyStatus, ESICMonthlyStatus
 
 # Register your models here.
 
@@ -11,8 +11,11 @@ from taxes.models import TaxAlert, IncomeTaxMonthlyStatus, IncomeTaxQuarterlySta
 class ContactPersonInline(admin.TabularInline):
     model = ContactPerson
     extra = 0
-class NotificationInline(admin.TabularInline):
-    model = Notification
+class NextDeliveryDateInline(admin.TabularInline):
+    model = NextDeliveryDate
+    extra = 0
+class ClientNotificationInline(admin.TabularInline):
+    model = ClientNotification
     extra = 0
 class DashboardAccountStatusInline(admin.TabularInline):
     model = DashboardAccountStatus
@@ -42,11 +45,23 @@ class IncomeTaxMonthlyStatusInline(admin.TabularInline):
 class IncomeTaxQuarterlyStatusInline(admin.TabularInline):
     model = IncomeTaxQuarterlyStatus
     extra = 0
-class GSTMonthlyStatusInline(admin.TabularInline):
-    model = GSTMonthlyStatus
+class IncomeTaxAdvanceStatusInline(admin.TabularInline):
+    model = IncomeTaxAdvanceStatus
     extra = 0
-class GSTQuarterlyStatusInline(admin.TabularInline):
-    model = GSTQuarterlyStatus
+class GSTR1MonthlyStatusInline(admin.TabularInline):
+    model = GSTR1MonthlyStatus
+    extra = 0
+class GSTR3BMonthlyStatusInline(admin.TabularInline):
+    model = GSTR3BMonthlyStatus
+    extra = 0
+class GSTR8MonthlyStatusInline(admin.TabularInline):
+    model = GSTR8MonthlyStatus
+    extra = 0
+class ProvidentFundMonthlyStatusInline(admin.TabularInline):
+    model = ProvidentFundMonthlyStatus
+    extra = 0
+class ESICMonthlyStatusInline(admin.TabularInline):
+    model = ESICMonthlyStatus
     extra = 0
 
 # Inline related to Cprofile App (Company profile)
@@ -58,7 +73,8 @@ class CompanyInline(admin.TabularInline):
 class ClientAdmin(admin.ModelAdmin):
     inlines = [
         ContactPersonInline,
-        NotificationInline,
+        NextDeliveryDateInline,
+        ClientNotificationInline,
         CompanyInline,
         DashboardAccountStatusInline,
         PendingActionableInline,
@@ -68,8 +84,12 @@ class ClientAdmin(admin.ModelAdmin):
         TaxAlertInline,
         IncomeTaxMonthlyStatusInline,
         IncomeTaxQuarterlyStatusInline,
-        GSTMonthlyStatusInline,
-        GSTQuarterlyStatusInline
+        IncomeTaxAdvanceStatusInline,
+        GSTR1MonthlyStatusInline,
+        GSTR3BMonthlyStatusInline,
+        GSTR8MonthlyStatusInline,
+        ProvidentFundMonthlyStatusInline,
+        ESICMonthlyStatusInline
     ]
 
 admin.site.register(Client, ClientAdmin)

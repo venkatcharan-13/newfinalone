@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.db.models import Q
-from taxes.models import TaxAlert, IncomeTaxMonthlyStatus, IncomeTaxQuarterlyStatus, GSTMonthlyStatus, GSTQuarterlyStatus, OtherTaxesMonthlyStatus, OtherTaxesQuarterlyStatus
+from taxes.models import TaxAlert, IncomeTaxMonthlyStatus, IncomeTaxQuarterlyStatus, IncomeTaxAdvanceStatus, GSTR1MonthlyStatus, GSTR3BMonthlyStatus, GSTR8MonthlyStatus, ProvidentFundMonthlyStatus, ESICMonthlyStatus
 from django.utils.translation import gettext_lazy as _
 
 # Register your models here.
@@ -28,6 +28,7 @@ class FinancialYearMonthlyListFilter(admin.SimpleListFilter):
                 filter|filter2
             )
 
+
 class FinancialYearQuarterlyListFilter(admin.SimpleListFilter):
     title = _('Financial Year')
     parameter_name = 'fy'
@@ -52,9 +53,11 @@ class FinancialYearQuarterlyListFilter(admin.SimpleListFilter):
                 filter|filter2
             )
 
+
 class TaxAlertAdmin(admin.ModelAdmin):
     date_hierarchy = 'raised_on'
 admin.site.register(TaxAlert, TaxAlertAdmin)
+
 
 class IncomeTaxMonthlyStatusAdmin(admin.ModelAdmin):
     list_filter = ['client', FinancialYearMonthlyListFilter]
@@ -63,7 +66,9 @@ class IncomeTaxMonthlyStatusAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         qs = qs.order_by('year', 'month_name')
         return qs
+
 admin.site.register(IncomeTaxMonthlyStatus, IncomeTaxMonthlyStatusAdmin)
+
 
 class IncomeTaxQuarterlyStatusAdmin(admin.ModelAdmin):
     list_filter = ['client', FinancialYearQuarterlyListFilter]
@@ -72,40 +77,71 @@ class IncomeTaxQuarterlyStatusAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         qs = qs.order_by('year', 'quarter')
         return qs
+
 admin.site.register(IncomeTaxQuarterlyStatus, IncomeTaxQuarterlyStatusAdmin)
 
-class GSTMonthlyStatusAdmin(admin.ModelAdmin):
-    list_filter = ['client', FinancialYearMonthlyListFilter]
-    list_display = ['month_name', 'year', 'payment_status']
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        qs = qs.order_by('year', 'month_name')
-        return qs
-admin.site.register(GSTMonthlyStatus, GSTMonthlyStatusAdmin)
 
-class GSTQuarterlyStatusAdmin(admin.ModelAdmin):
+class IncomeTaxAdvanceStatusAdmin(admin.ModelAdmin):
     list_filter = ['client', FinancialYearQuarterlyListFilter]
     list_display = ['quarter', 'year', 'payment_status']
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         qs = qs.order_by('year', 'quarter')
         return qs
-admin.site.register(GSTQuarterlyStatus, GSTQuarterlyStatusAdmin)
 
-class OtherTaxesMontlhyStatusAdmin(admin.ModelAdmin):
+admin.site.register(IncomeTaxAdvanceStatus, IncomeTaxAdvanceStatusAdmin)
+
+
+class GSTR1StatusAdmin(admin.ModelAdmin):
     list_filter = ['client', FinancialYearMonthlyListFilter]
     list_display = ['month_name', 'year', 'payment_status']
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         qs = qs.order_by('year', 'month_name')
         return qs
-admin.site.register(OtherTaxesMonthlyStatus, OtherTaxesMontlhyStatusAdmin)
 
-class OtherTaxesQuarterlyStatusAdmin(admin.ModelAdmin):
-    list_filter = ['client', FinancialYearQuarterlyListFilter]
-    list_display = ['quarter', 'year', 'payment_status']
+admin.site.register(GSTR1MonthlyStatus, GSTR1StatusAdmin)
+
+
+class GSTR3BMonthlyStatusAdmin(admin.ModelAdmin):
+    list_filter = ['client', FinancialYearMonthlyListFilter]
+    list_display = ['month_name', 'year', 'payment_status']
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        qs = qs.order_by('year', 'quarter')
+        qs = qs.order_by('year', 'month_name')
         return qs
-admin.site.register(OtherTaxesQuarterlyStatus, OtherTaxesQuarterlyStatusAdmin)
+
+admin.site.register(GSTR3BMonthlyStatus, GSTR3BMonthlyStatusAdmin)
+
+
+class GSTR8MonthlyStatusAdmin(admin.ModelAdmin):
+    list_filter = ['client', FinancialYearMonthlyListFilter]
+    list_display = ['month_name', 'year', 'payment_status']
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.order_by('year', 'month_name')
+        return qs
+
+admin.site.register(GSTR8MonthlyStatus, GSTR8MonthlyStatusAdmin)
+
+
+class ProvidentFundMonthlyStatusAdmin(admin.ModelAdmin):
+    list_filter = ['client', FinancialYearMonthlyListFilter]
+    list_display = ['month_name', 'year', 'payment_status']
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.order_by('year', 'month_name')
+        return qs
+
+admin.site.register(ProvidentFundMonthlyStatus, ProvidentFundMonthlyStatusAdmin)
+
+
+class ESICMonthlyStatusAdmin(admin.ModelAdmin):
+    list_filter = ['client', FinancialYearMonthlyListFilter]
+    list_display = ['month_name', 'year', 'payment_status']
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.order_by('year', 'month_name')
+        return qs
+
+admin.site.register(ESICMonthlyStatus, ESICMonthlyStatusAdmin)

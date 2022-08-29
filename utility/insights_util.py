@@ -113,7 +113,7 @@ def get_insights(client_id, current_period):
                 if new_amount >= 5000:
                     insights_data[key].append(
                         {
-                            'payee': k,
+                            'payee': k.title(),
                             'additional': locale.format("%.2f", new_amount, grouping=True)
                         }
                     )
@@ -122,7 +122,7 @@ def get_insights(client_id, current_period):
                 if addn_amount >= 5000:
                     insights_data[key].append(
                         {
-                            'payee': k,
+                            'payee': k.title(),
                             'additional': locale.format("%.2f", curr_dic[k] - prev_dic[k], grouping=True)
                         }
                     )

@@ -2,7 +2,7 @@ var endpoint = 'api/gstData/';
 var choosen_month = sessionStorage.getItem("choosen_month") ? 
 sessionStorage.getItem("choosen_month"): new Date().toISOString().slice(0, 10);
 var choosen_fy = sessionStorage.getItem("choosen_fy") ? 
-sessionStorage.getItem("choosen_month"): new Date().toISOString().slice(0, 4);
+sessionStorage.getItem("choosen_fy"): new Date().toISOString().slice(0, 4);
 
 $(document).ready(function () {
   if (sessionStorage.getItem("choosen_month")) {
@@ -30,8 +30,9 @@ $.ajax({
   success: function (response) {
     console.log("GST data loaded");
     createAlertBoxes(response.alerts, "alertsBox");
-    fillMonthlyTaxStatus(response.status.monthly, "monthly_status");
-    fillQuarterlyTaxStatus(response.status.quarterly, "quarterly_status");
+    fillMonthlyTaxStatus(response.status.gstr1, "gstr1_status", "gstr1Status");
+    fillMonthlyTaxStatus(response.status.gstr3b, "gstr3b_status", "gstr3BStatus");
+    fillMonthlyTaxStatus(response.status.gstr8, "gstr8_status", "gstr8Status");
   },
   error: function (error_data) {
     console.log("Error");
@@ -48,7 +49,6 @@ function changePeriod(params) {
 }
 
 function changeFinYear(params) {
-  console.log(params);
   sessionStorage.setItem("choosen_fy", params);
   location.reload();
 }
@@ -58,31 +58,31 @@ function createAlertBoxes(data, id) {
   var box = document.getElementById(id);
   data.forEach(function (object) {
     var div = document.createElement('div');
-    div.innerHTML = '<div class="card w-50">' +
-      `<div class="card-body"> <p class="card-text"> ${object.desc} <b> ${object.dueDate} </b></p></div></div><br>`;
+    div.innerHTML = '<div class="card">' +
+      `<div class="card-body"> <p class="card-text"> ${object.desc} <b> ${object.dueDate} </b></p></div></div>`;
     box.appendChild(div);
   })
 }
 
-function showPending(params) {
-  for (var i = 0; i < document.getElementsByClassName(params).length; i++) {
-    document.getElementsByClassName(params)[i].style.display = 'none';
+function showPending(taxClass) {
+  for (var i = 0; i < document.getElementsByClassName(taxClass).length; i++) {
+    document.getElementsByClassName(taxClass)[i].style.display = 'none';
   }
 }
 
-function showAll(params) {
-  for (var i = 0; i < document.getElementsByClassName(params).length; i++) {
-    document.getElementsByClassName(params)[i].setAttribute('style', 'display:flex;align-items:center;justify-content:center;');
+function showAll(taxClass) {
+  for (var i = 0; i < document.getElementsByClassName(taxClass).length; i++) {
+    document.getElementsByClassName(taxClass)[i].style.display = 'flex';
   }
 }
 
-function fillMonthlyTaxStatus(data, eid) {
+function fillMonthlyTaxStatus(data, eid, taxClass) {
   elem = document.getElementById(eid);
   var icon = '';
   Object.entries(data).forEach(function (month) {
     var div = document.createElement('div');
     div.setAttribute('style', 'display:flex; align-items:center; justify-content:center;');
-    div.setAttribute('class', 'col-2 shadow-sm monthlyStatus');
+    div.setAttribute('class', `col-2 shadow-sm ${taxClass}`);
     switch (month[1]) {
       case "done":
         icon = `<i class="fi fi-rs-check"></i>`;
@@ -95,35 +95,6 @@ function fillMonthlyTaxStatus(data, eid) {
         break;
       default:
         div.setAttribute('class', 'col-2 shadow-sm');
-        icon = `<i class="fi fi-rs-hourglass-end"></i>`;
-        break;
-    }
-    div.innerHTML = icon +
-      `<label class="fa" for="flexRadioDefault1">${month[0]}</label>`;
-
-    elem.appendChild(div, elem.nextSibling);
-  })
-}
-
-function fillQuarterlyTaxStatus(data, eid) {
-  elem = document.getElementById(eid);
-  var icon = '';
-  Object.entries(data).forEach(function (month) {
-    var div = document.createElement('div');
-    div.setAttribute('style', 'display:flex; align-items:center; justify-content:center;');
-    div.setAttribute('class', 'col-3 shadow-sm quarterlyStatus');
-    switch (month[1]) {
-      case "done":
-        icon = `<i class="fi fi-rs-check"></i>`;
-        break;
-      case "action_required":
-        icon = `<i class="i fi-rs-sensor-alert"></i>`;
-        break;
-      case "not_applicable":
-        icon = `<i class="fi fi-rs-lock"></i>`;
-        break;
-      default:
-        div.setAttribute('class', 'col-3 shadow-sm');
         icon = `<i class="fi fi-rs-hourglass-end"></i>`;
         break;
     }

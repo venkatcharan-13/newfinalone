@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'help.apps.HelpConfig',
     'rest_framework',
     'phonenumber_field',
+    'froala_editor'
 ]
 
 MIDDLEWARE = [

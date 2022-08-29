@@ -13,5 +13,6 @@ urlpatterns = [
     path('context/save_company_context/', views.save_company_context, name='save_company_context'),
     path('connections/', views.connections, name='connections'),
     path('banks/', views.bank_details, name='banks'),
-    path('banks/api/bank_details/', views.BanksData.as_view())
+    path('banks/api/bank_details/', views.BanksData.as_view()),
+    path('banks/save_bank_details/', views.save_bank_details, name='save_bank_details'),
 ]

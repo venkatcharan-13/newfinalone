@@ -19,6 +19,19 @@ statutory_comp_status_choices = [
 ]
 
 # Create your models here.
+class GeneralNotification(models.Model):
+    def __str__(self):
+        return self.content
+
+    content = models.TextField(max_length=100)
+    created_on = models.DateField(auto_now_add=True)
+
+
+class NextDeliveryDate(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    period = models.DateField(auto_now=False)
+    delivery_date = models.DateField(auto_now=False)
+
 
 class ContactPerson(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
@@ -27,7 +40,7 @@ class ContactPerson(models.Model):
     contact_number = models.CharField(max_length=14)
 
 
-class Notification(models.Model):
+class ClientNotification(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     content = models.TextField(max_length=100)

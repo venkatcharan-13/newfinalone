@@ -4,6 +4,20 @@
 	padding: 10px;
 }
 
+.card{
+    margin-bottom: 10px;
+    background-color: rgb(252, 248, 244);
+}
+
+.card-body {
+    padding: 5px;
+}
+
+.card-body p {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
 i {
 	margin-right: 10px;
 }

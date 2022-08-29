@@ -1,9 +1,29 @@
 from django.contrib import admin
-from home.models import Notification, ContactPerson, DashboardAccountStatus, PendingActionable, WatchOutPoint, StatutoryCompliance
+from home.models import GeneralNotification, ClientNotification, ContactPerson, NextDeliveryDate, DashboardAccountStatus, PendingActionable, WatchOutPoint, StatutoryCompliance
 
 # Register your models here.
+class GeneralNotificationAdmin(admin.ModelAdmin):
+    date_hierarchy = 'created_on'
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.order_by('created_on')
+        return qs
 
-class NotificationAdmin(admin.ModelAdmin):
+admin.site.register(GeneralNotification, GeneralNotificationAdmin)
+
+
+class NextDeliveryDateAdmin(admin.ModelAdmin):
+    list_filter = ['client']
+    list_display = ['period', 'delivery_date']
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.order_by('period')
+        return qs
+
+admin.site.register(NextDeliveryDate, NextDeliveryDateAdmin)
+
+
+class ClientNotificationAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_on'
     list_filter = ['client']
     list_display = ['content', 'created_on']
@@ -12,7 +32,8 @@ class NotificationAdmin(admin.ModelAdmin):
         qs = qs.order_by('created_on')
         return qs
 
-admin.site.register(Notification, NotificationAdmin)
+admin.site.register(ClientNotification, ClientNotificationAdmin)
+
 
 class ContactPersonAdmin(admin.ModelAdmin):
     list_filter = ['client']
@@ -24,6 +45,7 @@ class ContactPersonAdmin(admin.ModelAdmin):
 
 admin.site.register(ContactPerson, ContactPersonAdmin)
 
+
 class DashboardAccountStatusAdmin(admin.ModelAdmin):
     date_hierarchy = 'period'
     list_filter = ['client']
@@ -34,6 +56,7 @@ class DashboardAccountStatusAdmin(admin.ModelAdmin):
         return qs
 
 admin.site.register(DashboardAccountStatus, DashboardAccountStatusAdmin)
+
 
 class PendingActionableAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_on'

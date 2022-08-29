@@ -74,6 +74,28 @@ def save_company_context(request):
 
     return JsonResponse({'Message': 'Success'})
 
+@csrf_exempt
+def save_bank_details(request):
+    logged_client_id = request.user.id
+
+    company = Company.objects.get(
+        client_id=logged_client_id
+    )
+
+    BankDetail.objects.filter(company_id=company.id).delete()
+    
+    banks_list = json.loads(request.body)
+
+    for bank in banks_list:
+            new_bank = BankDetail.objects.create(company_id=company.id)
+            new_bank.bank_name = bank['bank_name']
+            new_bank.account_number = bank['bank_acc_num']
+            new_bank.ifsc_code = bank['bank_ifsc_code']
+            new_bank.location = bank['bank_branch']
+            new_bank.save()
+    
+    return JsonResponse({'Message': 'Success'})
+
 @login_required()
 def connections(request):
     return render(request, 'connections.html')

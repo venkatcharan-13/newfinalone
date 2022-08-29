@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from datetime import date, datetime
 import calendar
-from home.models import Notification, ContactPerson, DashboardAccountStatus, PendingActionable, WatchOutPoint,  StatutoryCompliance
+from home.models import ClientNotification, ContactPerson, DashboardAccountStatus, PendingActionable, WatchOutPoint,  StatutoryCompliance
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from rest_framework.views import APIView
@@ -52,7 +52,7 @@ class DashboardData(APIView):
                 'number': contact.contact_number
             })
         
-        notifications_data = Notification.objects.filter(
+        notifications_data = ClientNotification.objects.filter(
             client_id=logged_client_id,
             created_on__lte=selected_month,
             created_on__gte=selected_month.replace(day=1)
