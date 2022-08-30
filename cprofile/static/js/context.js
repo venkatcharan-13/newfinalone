@@ -9,6 +9,7 @@ $.ajax({
         fill_input_area(response.work_profile, 'work_profile');
         fill_input_area(response.key_info, 'key_info');
         fill_input_area(response.specific_request, 'specific_request');
+        new FroalaEditor('textarea');
     },
     error: function (error_data) {
         console.log("Error");

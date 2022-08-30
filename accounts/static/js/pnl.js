@@ -1,6 +1,6 @@
 const endpoint = 'api/pnlData/';
-var choosen_month = sessionStorage.getItem("choosen_month") ? 
-sessionStorage.getItem("choosen_month"): new Date().toISOString().slice(0, 10);
+var choosen_month = sessionStorage.getItem("choosen_month") ?
+  sessionStorage.getItem("choosen_month") : new Date().toISOString().slice(0, 10);
 
 $(document).ready(function () {
   if (sessionStorage.getItem("choosen_month")) {
@@ -54,14 +54,39 @@ function changePeriod(params) {
   location.reload();
 }
 
+
+function findChangeIcon(percentageChange, accountType) {
+  var arrowIcon = '';
+  if (accountType == 'expenses') {
+    if (percentageChange > 0 || percentageChange == '>100') {
+      arrowIcon = '<i class="fi fi-ss-angle-circle-up"style="float:right;color:#8A0303;"></i>';
+
+    } else if (percentageChange < 0 || percentageChange == '<100') {
+      arrowIcon = '<i class="fi fi-ss-angle-circle-down" style="float:right;color:#68CF5C;"></i>';
+    }
+  } else {
+    if (percentageChange < 0 || percentageChange == '<-100') {
+      arrowIcon = '<i class="fi fi-ss-angle-circle-down"style="float:right;color:#8A0303;"></i>';
+
+    } else if (percentageChange > 0 || percentageChange == '>100') {
+      arrowIcon = '<i class="fi fi-ss-angle-circle-up" style="float:right;color:#68CF5C;"></i>';
+    }
+  }
+  if(percentageChange == 0){
+    arrowIcon = '<i class="fa-solid fa-equals" style="float:right;"></i>';
+  }
+  return arrowIcon;
+}
+
+
 function fillPnlTableTotals(object, tid, head) {
   var expandButton = '<button type="button" id="rotateBtn" class="accordion-toggle" data-bs-toggle="collapse" data-bs-target=".incomeHiddenRows" aria-expanded="false" aria-hidden="true"><svg cla xmlns="\http://www.w3.org/2000/svg&quot;" viewBox="0 0 66.91 122.88" focusable="false" ><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z"></path></svg></button>';
-  document.getElementById(tid).innerHTML = '<th style="width:35%">'  + head + expandButton +'</th>' +
+  document.getElementById(tid).innerHTML = '<th style="width:35%">' + head + expandButton + '</th>' +
     '<th style="width: 12%; text-align:right;">' + object.current + '</th>' +
     '<th style="width: 8%;text-align: center;">' + '' + '</th>' +
     '<th style="width: 12%; text-align:right;">' + object.previous + '</th>' +
     '<th style="width: 8%; text-align: center;">' + '' + '</th>' +
-    '<th style="width: 12%; text-align:center;">' + object.per_change + '%</th>' +
+    '<th style="width: 12%; text-align:center;">' + object.per_change + '%' + findChangeIcon(object.per_change, 'income') + '</th>' +
     '<th style="width: 13%; text-align:right;">' + object.three_month_avg + '</th>';
 }
 
@@ -72,7 +97,7 @@ function fillPnlTableExpenseTotals(object, tid, head) {
     '<th style="width: 8%;text-align: center;">' + object.curr_per + '%</th>' +
     '<th style="width: 12%; text-align:right;">' + object.previous + '</th>' +
     '<th style="width: 8%; text-align: center;">' + object.prev_per + '%</th>' +
-    '<th style="width: 12%; text-align:center;">' + object.per_change + '%</th>' +
+    '<th style="width: 12%; text-align:center;">' + object.per_change + '%' + findChangeIcon(object.per_change, 'expenses') + '</th>' +
     '<th style="width: 13%; text-align:right;">' + object.three_month_avg + '</th>';
 }
 
@@ -91,7 +116,7 @@ function fillPnlTableIncome(data) {
       '<td style="width: 8%; text-align:right;">' + '' + '</td>' +
       '<td style="width: 12%; text-align:right;">' + object.previous + '</td>' +
       '<td style="width: 8%; text-align:right;">' + '' + '</td>' +
-      '<td style="width: 12%; text-align:center;">' + object.per_change + '%</td>' +
+      '<td style="width: 12%; text-align:center;">' + object.per_change + '%' + findChangeIcon(object.per_change, 'income') + '</td>' +
       '<td style="width: 13%; text-align:right;">' + object.three_month_avg + '</td>';
     i++;
   })
@@ -103,7 +128,7 @@ function fillPnlTableCogs(object, tid, head) {
     '<td style="width: 8%;text-align: center;">' + '' + '</td>' +
     '<td style="width: 12%; text-align:right;">' + object.previous + '</td>' +
     '<td style="width: 8%; text-align: center;">' + '' + '</td>' +
-    '<td style="width: 12%; text-align:center;">' + object.per_change + '%</td>' +
+    '<td style="width: 12%; text-align:center;">' + object.per_change + '%' + findChangeIcon(object.per_change, 'income') + '</td>' +
     '<td style="width: 13%; text-align:right;">' + object.three_month_avg + '</td>';
 }
 
@@ -113,7 +138,7 @@ function fillPnlTableGrossProfit(object, tid, head) {
     '<th style="width: 8%;text-align: center;">' + object.curr_per + '%</th>' +
     '<th style="width: 12%; text-align:right;">' + object.previous + '</th>' +
     '<th style="width: 8%; text-align: center;">' + object.prev_per + '%</th>' +
-    '<th style="width: 12%; text-align:center;">' + object.per_change + '%</th>' +
+    '<th style="width: 12%; text-align:center;">' + object.per_change + '%' + findChangeIcon(object.per_change, 'income') + '</th>' +
     '<th style="width: 13%; text-align:right;">' + object.three_month_avg + '</th>';
 }
 
@@ -123,7 +148,7 @@ function fillPnlTableIndividuals(object, tid, head) {
     '<td style="width: 8%;text-align: center;">' + object.curr_per + '%</td>' +
     '<td style="width: 12%; text-align:right;">' + object.previous + '</td>' +
     '<td style="width: 8%; text-align: center;">' + object.prev_per + '%</td>' +
-    '<td style="width: 12%; text-align:center;">' + object.per_change + '%</td>' +
+    '<td style="width: 12%; text-align:center;">' + object.per_change + '%' + findChangeIcon(object.per_change, 'income') + '</td>' +
     '<td style="width: 13%; text-align:right;">' + object.three_month_avg + '</td>';
 }
 
@@ -141,7 +166,7 @@ function fillPnlTableExpenses(data, tid) {
       '<th style="width: 8%;text-align: center;">' + data[category]['curr_per'] + '%</th>' +
       '<th style="width: 12%; text-align:right;">' + data[category]['previous'] + '</th>' +
       '<th style="width: 8%; text-align: center;">' + data[category]['prev_per'] + '%</th>' +
-      '<th style="width: 12%; text-align:center;">' + data[category]['per_change'] + '%</th>' +
+      '<th style="width: 12%; text-align:center;">' + data[category]['per_change'] + '%' + findChangeIcon(data[category]['per_change'], 'expenses') + '</th>' +
       '<th style="width: 13%; text-align:right;">' + data[category]['three_month_avg'] + '</th>';
     i++;
     data[category]['data'].forEach(function (object) {
@@ -152,12 +177,13 @@ function fillPnlTableExpenses(data, tid) {
         '<td style="width: 8%; text-align:right;">' + '' + '</td>' +
         '<td style="width: 12%; text-align:right;">' + object.previous + '</td>' +
         '<td style="width: 8%; text-align:right;">' + '' + '</td>' +
-        '<td style="width: 12%; text-align:center;">' + object.per_change + '%</td>' +
+        '<td style="width: 12%; text-align:center;">' + object.per_change + '%' + findChangeIcon(object.per_change, 'expenses') + '</td>' +
         '<td style="width: 13%; text-align:right;">' + object.three_month_avg + '</td>';
       i++;
     })
   })
 }
+
 
 function displayClientNotes(notes, id) {
   var box = document.getElementById(id);

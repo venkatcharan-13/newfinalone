@@ -52,7 +52,7 @@ class DashboardAccountStatusAdmin(admin.ModelAdmin):
     list_display = ['status_desc', 'status']
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        qs = qs.order_by('status_desc', 'created_on')
+        qs = qs.order_by('status_desc', 'period')
         return qs
 
 admin.site.register(DashboardAccountStatus, DashboardAccountStatusAdmin)

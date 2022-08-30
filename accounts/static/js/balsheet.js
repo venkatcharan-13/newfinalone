@@ -1,6 +1,6 @@
 const endpoint = 'api/balsheetData';
-var choosen_month = sessionStorage.getItem("choosen_month") ? 
-sessionStorage.getItem("choosen_month"): new Date().toISOString().slice(0, 10);
+var choosen_month = sessionStorage.getItem("choosen_month") ?
+  sessionStorage.getItem("choosen_month") : new Date().toISOString().slice(0, 10);
 
 $(document).ready(function () {
   if (sessionStorage.getItem("choosen_month")) {
@@ -48,7 +48,7 @@ $.ajax({
 
     document.getElementById('head_equity').innerHTML = response.response_data.total_equity.current;
     document.getElementById('head_liabilities').innerHTML = response.response_data.total_liabilities.current;
-    document.getElementById('head_assets').innerHTML = response.response_data.total_assets.current;  
+    document.getElementById('head_assets').innerHTML = response.response_data.total_assets.current;
     document.getElementById('table_info').innerHTML = response.description;
     document.getElementById('table_info_head').innerHTML = "Balance Sheet";
     displayClientNotes(response.client_notes, 'clientNotesBlock');
@@ -67,21 +67,35 @@ function changePeriod(params) {
   location.reload();
 }
 
-function fillBalsheetHeads(data, head, rid){
+function findChangeIcon(percentageChange) {
+  var arrowIcon = '';
+  if (percentageChange < 0 || percentageChange == '<-100') {
+    arrowIcon = '<i class="fi fi-ss-angle-circle-down"style="float:right;color:#8A0303;"></i>';
+
+  } else if (percentageChange > 0 || percentageChange == '>100') {
+    arrowIcon = '<i class="fi fi-ss-angle-circle-up" style="float:right;color:#68CF5C;"></i>';
+  }
+  else {
+    arrowIcon = '<i class="fa-solid fa-equals" style="float:right;"></i>';
+  }
+  return arrowIcon;
+}
+
+function fillBalsheetHeads(data, head, rid) {
   var tr = document.getElementById(rid);
-  tr.innerHTML = '<th style="width:34%">' + head + '</th>' +
-    '<th style="width: 22%; text-align:right;">' + data.current_total + '</th>' +
-    '<th style="width: 22%; text-align:right;">' + data.previous_total + '</th>' +
-    '<th style="width: 22%; text-align:center;">' + data.overall_change + '%</th>';
+  tr.innerHTML = '<th style="width:30%">' + head + '</th>' +
+    '<th style="width: 20%; text-align:right;">' + data.current_total + '</th>' +
+    '<th style="width: 20%; text-align:right;">' + data.previous_total + '</th>' +
+    '<th style="width: 30%; text-align:center;">' + data.overall_change + '%' + findChangeIcon(data.overall_change) + '</th>';
 }
 
 
-function fillSingleBalsheetRow(data, rid){
+function fillSingleBalsheetRow(data, rid) {
   var tr = document.getElementById(rid);
-  tr.innerHTML = '<th style="width:34%">' + data.account_header + '</th>' +
-    '<td style="width: 22%; text-align:right;">' + data.current + '</td>' +
-    '<td style="width: 22%; text-align:right;">' + data.previous + '</td>' +
-    '<td style="width: 22%; text-align:center;">' + data.per_change + '%</td>';
+  tr.innerHTML = '<th style="width:30%">' + data.account_header + '</th>' +
+    '<td style="width: 20%; text-align:right;">' + data.current + '</td>' +
+    '<td style="width: 20%; text-align:right;">' + data.previous + '</td>' +
+    '<td style="width: 30%; text-align:center;">' + data.per_change + '%' + findChangeIcon(data.per_change) + '</td>';
 }
 
 function addBalsheetRows(data, rid, rowType) {
@@ -91,21 +105,21 @@ function addBalsheetRows(data, rid, rowType) {
   data.forEach(function (object) {
     var tr = table.insertRow(i);
     tr.setAttribute('class', `accordion-collapse collapse ${rowType}`);
-    tr.innerHTML = '<th style="width:34%">' + object.account_header + '</th>' +
-      '<td style="width: 22%; text-align:right;">' + object.current + '</td>' +
-      '<td style="width: 22%; text-align:right;">' + object.previous + '</td>' +
-      '<td style="width: 22%; text-align:center;">' + object.per_change + '%</td>';
+    tr.innerHTML = '<th style="width:30%">' + object.account_header + '</th>' +
+      '<td style="width: 20%; text-align:right;">' + object.current + '</td>' +
+      '<td style="width: 20%; text-align:right;">' + object.previous + '</td>' +
+      '<td style="width: 30%; text-align:center;">' + object.per_change + '%' + findChangeIcon(object.per_change) + '</td>';
     i++;
   })
 }
 
 function fillTotalHead(data, tid, head, table_head_type) {
   var tr = document.getElementById(tid);
-  var expandButton = `<button type="button" id="rotateBtn" class="accordion-toggle" data-bs-toggle="collapse" data-bs-target=".${table_head_type}" aria-expanded="false" aria-hidden="true"><svg cla xmlns="\http://www.w3.org/2000/svg&quot;" viewBox="0 0 66.91 122.88" focusable="false" ><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.22L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z"></path></svg></button>`;
-  tr.innerHTML = '<th style="width:34%">' + head + ' ' + expandButton + '</th>' +
-    '<th style="width: 22%; text-align:right;">' + data.current + '</th>' +
-    '<th style="width: 22%; text-align:right;">' + data.previous + '</th>' +
-    '<th style="width: 22%; text-align:center;">' + data.per_change + '%</th>';
+  var expandButton = `<button type="button" id="rotateBtn" class="accordion-toggle" data-bs-toggle="collapse" data-bs-target=".${table_head_type}" aria-expanded="false" aria-hidden="true"><svg cla xmlns="\http://www.w3.org/2000/svg&quot;" viewBox="0 0 66.91 120.88" focusable="false" ><path d="M1.95,111.2c-2.65,2.72-2.59,7.08,0.14,9.73c2.72,2.65,7.08,2.59,9.73-0.14L64.94,66l-4.93-4.79l4.95,4.8 c2.65-2.74,2.59-7.11-0.15-9.76c-0.08-0.08-0.16-0.15-0.24-0.20L11.81,2.09c-2.65-2.73-7-2.79-9.73-0.14 C-0.64,4.6-0.7,8.95,1.95,11.68l48.46,49.55L1.95,111.2L1.95,111.2L1.95,111.2z"></path></svg></button>`;
+  tr.innerHTML = '<th style="width:30%">' + head + ' ' + expandButton + '</th>' +
+    '<th style="width: 20%; text-align:right;">' + data.current + '</th>' +
+    '<th style="width: 20%; text-align:right;">' + data.previous + '</th>' +
+    '<th style="width: 30%; text-align:center;">' + data.per_change + '%' + findChangeIcon(data.per_change) + '</th>';
 }
 
 function displayClientNotes(notes, id) {
@@ -113,9 +127,9 @@ function displayClientNotes(notes, id) {
   notes.forEach(function (note) {
     var div = document.createElement('div');
     div.setAttribute('class', 'card mb-2');
-    div.innerHTML = `<div class="card-header"> <small> ${note.created_on} </small></div>` + 
-    `<div class="card-body"> <p class="card-text"> ${note.note}</p>` +
-    `<footer class="blockquote-footer">Response: ${note.admin_response == null ? '': note.admin_response}</footer> </div>`;
+    div.innerHTML = `<div class="card-header"> <small> ${note.created_on} </small></div>` +
+      `<div class="card-body"> <p class="card-text"> ${note.note}</p>` +
+      `<footer class="blockquote-footer">Response: ${note.admin_response == null ? '' : note.admin_response}</footer> </div>`;
     box.appendChild(div);
   })
 }
@@ -125,19 +139,19 @@ function add_client_note() {
   var written_note = $('#newNote').val();
   console.log(written_note);
   $.ajax({
-      url: "/accounts/add_client_note/",
-      type: 'POST',
-      contentType: 'application/json; charset=utf-8',
-      data: JSON.stringify({
-        note: written_note,
-        period: choosen_month,
-        table: 'balsheet'
-      }),
-      dataType: 'json',
+    url: "/accounts/add_client_note/",
+    type: 'POST',
+    contentType: 'application/json; charset=utf-8',
+    data: JSON.stringify({
+      note: written_note,
+      period: choosen_month,
+      table: 'balsheet'
+    }),
+    dataType: 'json',
   }).done(function (data) {
-      console.log("Success");
-      document.location.reload();
+    console.log("Success");
+    document.location.reload();
   }).fail(function (error) {
-      console.log("error");
+    console.log("error");
   });
 }

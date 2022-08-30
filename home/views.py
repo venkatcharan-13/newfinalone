@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from datetime import date, datetime
 import calendar
-from home.models import ClientNotification, ContactPerson, DashboardAccountStatus, PendingActionable, WatchOutPoint,  StatutoryCompliance
+from home.models import ClientNotification, ContactPerson, NextDeliveryDate, DashboardAccountStatus, PendingActionable, WatchOutPoint,  StatutoryCompliance
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from rest_framework.views import APIView
@@ -51,15 +51,25 @@ class DashboardData(APIView):
                 'profile': contact.profile,
                 'number': contact.contact_number
             })
+
+        try:
+            next_delivery_date_data = NextDeliveryDate.objects.get(
+                client_id=logged_client_id,
+                period=selected_month
+            )
+            next_delivery_date = datetime.strftime(next_delivery_date_data.delivery_date, "%d %b, %Y")
+        except:
+            next_delivery_date = 'Not Available'
+
         
-        notifications_data = ClientNotification.objects.filter(
+        client_notifications_data = ClientNotification.objects.filter(
             client_id=logged_client_id,
             created_on__lte=selected_month,
             created_on__gte=selected_month.replace(day=1)
         )
-        notifications = []
-        for notification in notifications_data:
-            notifications.append({
+        client_notifications = []
+        for notification in client_notifications_data:
+            client_notifications.append({
                 'title': notification.title,
                 'content': notification.content,
                 'link': notification.link,
@@ -123,12 +133,12 @@ class DashboardData(APIView):
         
         response = {
             'contact_card': contacts,
-            'notifications': notifications,
+            'delivery_date': next_delivery_date,
+            'client_notifications': client_notifications,
             'accounts_status': accounts_status,
             'pending_points': pending_actionables,
             'watchout_points': watchout_points,
             'statutory_compliances': statutory_compliances
         }
-
 
         return Response(response)

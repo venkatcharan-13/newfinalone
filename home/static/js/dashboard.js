@@ -19,8 +19,9 @@ $.ajax({
   },
   success: function (response) {
     console.log("Success Dashboard");
-    createNotificationBoxes(response.notifications, "notification_box");
+    createNotificationBoxes(response.client_notifications, "notification_box");
     fillContactCard(response.contact_card, "contact_persons");
+    document.getElementById('delivery_date').innerHTML = response.delivery_date;
     fillDashboardStatus(response.accounts_status, "status_list");
     fillPendingActionables(response.pending_points, "pending_actionables");
     fillWatchoutPoints(response.watchout_points, "watchout_points");
